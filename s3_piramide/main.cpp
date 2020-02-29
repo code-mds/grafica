@@ -51,6 +51,7 @@ void draw() {
 }
 
 void draw_axis() {
+    glLineWidth(1.0f);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xf0f0);
     // axes are ten units long.
@@ -107,6 +108,7 @@ void draw_pyramid() {
         triangle3D(vertices[i][0], vertices[i][1], vertices[i][2]);
 
         // wireframe
+        glLineWidth(3.0f);
         glColor3ub(15, 32, 112);
         glPolygonMode(GL_FRONT, GL_LINE);
         triangle3D(vertices[i][0], vertices[i][1], vertices[i][2]);
@@ -130,8 +132,6 @@ void draw_pyram_base() {
     for (int i = 0; i < 2; ++i) {
         // face
         glColor3ub(0, 253, 0);
-
-        //glColor3ub(0, 100+i*50, 0);
         glPolygonMode(GL_FRONT,GL_FILL);
         triangle3D(basevertices[i][0], basevertices[i][1], basevertices[i][2]);
     }
@@ -149,24 +149,6 @@ void init(void) {
     gluLookAt(1, 1, 2, 0, 0, 0, 0, 1, 0);
 }
 
-void reshape(int w, int h) {
-    printf("reshape: w=%d, h=%d\n",w,h);
-    glViewport(0, 0, (GLint) w, (GLint) h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    if (w <= h) {
-        double aspect_ratio = (GLfloat)h/(GLfloat)w;
-        glOrtho (-10.0, 10.0, -10.0*aspect_ratio, 10.0*aspect_ratio, -10.0, 100.0);
-    }
-    else {
-        double aspect_ratio = (GLfloat) w / (GLfloat) h;
-        glOrtho(-10.0 * aspect_ratio, 10.0 * aspect_ratio, -10.0, 10.0, -10.0, 100.0);
-    }
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-//    gluLookAt(1, 1, 1, 0, 0, 0, 0, 1, 0);
-}
-
 void keyboardS(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_RIGHT:
@@ -181,7 +163,7 @@ void keyboardS(int key, int x, int y) {
 }
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(SCENE_WIDTH, SCENE_HEIGHT);
     glutCreateWindow("S3 piramide");
     init();
