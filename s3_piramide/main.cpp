@@ -33,6 +33,8 @@ void draw_axis();
 
 void draw_pyramid();
 
+void draw_pyram_base();
+
 void triangle3D(GLfloat* v1, GLfloat* v2, GLfloat* v3) {
     glBegin(GL_TRIANGLES);
     glVertex3fv(v1);
@@ -70,33 +72,37 @@ void draw_axis() {
 }
 
 void draw_pyramid() {
-    GLfloat vertices[4][3][3] = {
-            {
-                {-X,  0.0f, Z},    // Vertex 1 (X, Y, Z)
-                {X, 0.0f, Z},      // Vertex 2 (X, Y, Z)
-                {0.0f, Y, 0.0f}     // Vertex 3 (X, Y, Z)
-            },
-            {
-                {X,  0.0f, Z},
-                {X, 0.0f, -Z},
-                {0.0f, Y, 0.0f}
-            },
-            {
-                {X,  0.0f, -Z},
-                {-X, 0.0f, -Z},
-                {0.0f, Y, 0.0f}
-            },
-            {
-                {-X,  0.0f, -Z},
-                {-X, 0.0f, Z},
-                {0.0f, Y, 0.0f}
-            },
 
+    draw_pyram_base();
+
+    GLfloat vertices[4][3][3] = {
+        {
+            {-X,  0.0f, Z},    // Vertex 1 (X, Y, Z)
+            {X, 0.0f, Z},      // Vertex 2 (X, Y, Z)
+            {0.0f, Y, 0.0f}     // Vertex 3 (X, Y, Z)
+        },
+        {
+            {X,  0.0f, Z},
+            {X, 0.0f, -Z},
+            {0.0f, Y, 0.0f}
+        },
+        {
+            {X,  0.0f, -Z},
+            {-X, 0.0f, -Z},
+            {0.0f, Y, 0.0f}
+        },
+        {
+            {-X,  0.0f, -Z},
+            {-X, 0.0f, Z},
+            {0.0f, Y, 0.0f}
+        }
     };
 
     for (int i = 0; i < 4; ++i) {
         // face
-        glColor3ub(0, 100+i*50, 0);
+        glColor3ub(0, 253, 0);
+
+        //glColor3ub(0, 100+i*50, 0);
         glPolygonMode(GL_FRONT,GL_FILL);
         triangle3D(vertices[i][0], vertices[i][1], vertices[i][2]);
 
@@ -104,6 +110,30 @@ void draw_pyramid() {
         glColor3ub(15, 32, 112);
         glPolygonMode(GL_FRONT, GL_LINE);
         triangle3D(vertices[i][0], vertices[i][1], vertices[i][2]);
+    }
+}
+
+void draw_pyram_base() {
+    GLfloat basevertices[2][3][3] = {
+            {
+                    {-X, 0.0f, Z},
+                    {X,  0.0f, -Z},
+                    {-X,  0.0f, -Z}
+            },
+            {
+                    {-X,  0.0f, Z},
+                    {X, 0.0f, Z},
+                    {X, 0.0f, -Z}
+            }
+    };
+
+    for (int i = 0; i < 2; ++i) {
+        // face
+        glColor3ub(0, 253, 0);
+
+        //glColor3ub(0, 100+i*50, 0);
+        glPolygonMode(GL_FRONT,GL_FILL);
+        triangle3D(basevertices[i][0], basevertices[i][1], basevertices[i][2]);
     }
 }
 
@@ -153,7 +183,7 @@ int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
     glutInitWindowSize(SCENE_WIDTH, SCENE_HEIGHT);
-    glutCreateWindow("bandiera scozzese");
+    glutCreateWindow("S3 piramide");
     init();
     glutDisplayFunc(draw);
     glutSpecialFunc(keyboardS);

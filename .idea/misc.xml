@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/glut_test">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/s3_bandiera">
     <contentRoot DIR="$PROJECT_DIR$" />
   </component>
   <component name="CidrRootsConfiguration">
     <sourceRoots>
       <file path="$PROJECT_DIR$/cpp_test" />
       <file path="$PROJECT_DIR$/glut_test" />
+      <file path="$PROJECT_DIR$/s3_bandiera" />
+      <file path="$PROJECT_DIR$/serie_3" />
     </sourceRoots>
   </component>
   <component name="JavaScriptSettings">
