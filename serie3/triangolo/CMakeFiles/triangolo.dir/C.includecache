@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mazzar/Corso_grafica/GL_Esempi/serie3/triangolo/triangolo.c
+stdio.h
+-
+OpenGL/gl.h
+-
+GLUT/glut.h
+-
+

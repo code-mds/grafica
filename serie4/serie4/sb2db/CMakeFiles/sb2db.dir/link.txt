@@ -1,0 +1,1 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/sb2db.dir/sb2db.c.o  -o sb2db -framework GLUT -framework Cocoa /usr/local/lib/libGLEW.dylib -framework OpenGL 

@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mazzar/Corso_grafica/GL_Esempi/serie3/colorbuffer/colorbuffer.c
+stdio.h
+-
+OpenGL/OpenGL.h
+-
+GLUT/glut.h
+-
+

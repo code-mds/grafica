@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mazzar/Data/Work_SUPSI/Didattica/Corsi_di_base/Grafica_computerizzata/17_18/GL_Esempi/serie3/rettangolo/rettangolo.c
+stdio.h
+-
+OpenGL/gl.h
+-
+GLUT/glut.h
+-
+

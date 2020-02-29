@@ -1,0 +1,1 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/line_stripple.dir/line_stripple.c.o  -o line_stripple -framework GLUT -framework Cocoa /usr/local/lib/libGLEW.dylib -framework OpenGL 

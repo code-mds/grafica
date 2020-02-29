@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mazzar/Data/Work_SUPSI/Didattica/Corsi_di_base/Grafica_computerizzata/17_18/GL_Esempi/serie4/sb2db/sb2db.c
+stdlib.h
+-
+GLUT/glut.h
+-
+

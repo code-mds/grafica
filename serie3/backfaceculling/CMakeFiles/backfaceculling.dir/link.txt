@@ -1,0 +1,1 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/backfaceculling.dir/main.cpp.o CMakeFiles/backfaceculling.dir/imageloader.cpp.o  -o backfaceculling -framework GLUT -framework Cocoa /usr/local/lib/libGLEW.dylib -framework OpenGL 
