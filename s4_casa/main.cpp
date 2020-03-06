@@ -85,9 +85,19 @@ void draw_triangle_walls() {
                     { 0,  11/SCENE_WIDTH, 0 }
             },
             {
+                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH,  -1/SCENE_WIDTH},
+                    { 0,  11/SCENE_WIDTH, -1/SCENE_WIDTH }
+            },
+            {
                     { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
                     { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH},
                     { 0,  11/SCENE_WIDTH, -8/SCENE_WIDTH }
+            },
+            {
+                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH},
+                    { 0,  11/SCENE_WIDTH, -7/SCENE_WIDTH }
             }
     };
     int nrOfWalls = sizeof(vertices) / sizeof(vertices[0]);
