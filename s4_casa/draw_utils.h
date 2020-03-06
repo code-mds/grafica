@@ -19,8 +19,8 @@ extern bool showAxis;
 extern bool showWireFrame;
 
 void draw_axis();
-void draw_triangle3D(GLfloat *v1, GLfloat *v2, GLfloat *v3, float border);
-void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, float border);
-void draw_paralleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
-                       GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2, float border);
+void draw_triangle3D(GLfloat *v1, GLfloat *v2, GLfloat *v3, GLubyte* color);
+void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, GLubyte* color);
+void draw_paralleleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
+                         GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2, GLubyte* frontColor, GLubyte *backColor);
 #endif //GRAFICA_DRAW_UTILS_H

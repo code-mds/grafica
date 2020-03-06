@@ -6,34 +6,51 @@
 bool showAxis = true;
 bool showWireFrame = true;
 
-void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, float border) {
-    draw_triangle3D(bottomLeft, bottomRight, topRight, border);
-    draw_triangle3D(bottomLeft, topRight, topLeft, border);
+void draw_paralleleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
+                         GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2,
+                         GLubyte* frontColor, GLubyte *backColor) {
+    //front
+    draw_rectangle3D(bottomLeft1, bottomRight1, topRight1, topLeft1, frontColor);
+    //right
+    draw_rectangle3D(bottomRight1, bottomLeft2, topLeft2, topRight1, frontColor);
+    //back
+    draw_rectangle3D(bottomLeft2, bottomRight2, topRight2, topLeft2, backColor);
+    //left
+    draw_rectangle3D(bottomRight2, bottomLeft1, topLeft1, topRight2, frontColor);
+    //bottom
+    draw_rectangle3D(bottomRight2, bottomLeft2, bottomRight1, bottomLeft1, frontColor);
+    //top
+    draw_rectangle3D(topLeft1, topRight1, topLeft2, topRight2, frontColor);
 }
 
-void draw_triangle3D(GLfloat v1[], GLfloat v2[], GLfloat v3[], float border) {
-    if(border > 0) {
-        // wireframe
-        glLineWidth(border);
-        glColor3ub(15, 32, 112);
-        glPolygonMode(GL_FRONT, GL_LINE);
-    }
+void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, GLubyte* color ) {
+    draw_triangle3D(bottomLeft, bottomRight, topRight, color);
+    draw_triangle3D(topRight, topLeft, bottomLeft, color);
+}
 
+void draw_triangle3D(GLfloat v1[], GLfloat v2[], GLfloat v3[], GLubyte* color) {
+    glColor3ubv(color);
+    glPolygonMode(GL_FRONT,GL_FILL);
     glBegin(GL_TRIANGLES);
     glVertex3fv(v1);
     glVertex3fv(v2);
     glVertex3fv(v3);
     glEnd();
+
+    if(showWireFrame) {
+        // wireframe
+        glLineWidth(1.0);
+        glColor3ub(15, 32, 112);
+        glPolygonMode(GL_FRONT, GL_LINE);
+        glBegin(GL_TRIANGLES);
+        glVertex3fv(v1);
+        glVertex3fv(v2);
+        glVertex3fv(v3);
+        glEnd();
+    }
 }
 
-void draw_paralleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
-                       GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2,
-                       float border) {
-    draw_rectangle3D(bottomLeft1, bottomRight1, topRight1, topLeft1, border);
-    draw_rectangle3D(bottomRight1, bottomLeft2, topLeft2, topRight1, border);
-    draw_rectangle3D(bottomLeft2, bottomRight2, topRight2, topLeft2, border);
-    draw_rectangle3D(bottomRight2, bottomLeft1, topLeft1, topRight2, border);
-}
+
 
 void draw_axis() {
     if(!showAxis)
