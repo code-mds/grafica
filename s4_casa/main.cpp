@@ -38,13 +38,18 @@ void draw() {
 }
 
 void draw_roof() {
-    GLfloat vertices[][4][3] = {
+    GLfloat vertices[][8][3] = {
             // right roof wall
             {
                     { 6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { 6/SCENE_WIDTH,  6/SCENE_WIDTH, -9/SCENE_WIDTH},
                     { 0,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
-                    { 0,  12/SCENE_WIDTH, 1/SCENE_WIDTH }
+                    { 0,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
+
+                    { 6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
+                    { 6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { 0,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { 0,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
             },
             // left roof wall
             {
@@ -52,6 +57,11 @@ void draw_roof() {
                     { -6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { 0,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { 0,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
+
+                    { -6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { -6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
+                    { 0,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
+                    { 0,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
             }
     };
 
@@ -59,8 +69,11 @@ void draw_roof() {
     for (int i = 0; i < nrOfWalls; ++i) {
         glColor3ub(255, 0, 0);
         glPolygonMode(GL_FRONT,GL_FILL);
-        draw_rectangle3D(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3], 0);
-        draw_rectangle3D(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3], 1.0f);
+
+        draw_paralleliped(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3],
+                          vertices[i][4], vertices[i][5], vertices[i][6], vertices[i][7], .0f);
+        draw_paralleliped(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3],
+                          vertices[i][4], vertices[i][5], vertices[i][6], vertices[i][7], 1.0f);
     }
 }
 
@@ -163,7 +176,7 @@ void draw_perimetral_walls() {
 
 void init(void) {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
     glClearColor(180/255.0,180/255.0, 180/255.0, 0.0); // GREY
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
