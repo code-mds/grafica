@@ -4,14 +4,14 @@
 #include "draw_utils.h"
 
 bool showAxis = true;
+bool showWireFrame = true;
 
 void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, float border) {
-
     draw_triangle3D(bottomLeft, bottomRight, topRight, border);
     draw_triangle3D(bottomLeft, topRight, topLeft, border);
 }
 
-void draw_triangle3D(GLfloat *v1, GLfloat *v2, GLfloat *v3, float border) {
+void draw_triangle3D(GLfloat v1[], GLfloat v2[], GLfloat v3[], float border) {
     if(border > 0) {
         // wireframe
         glLineWidth(border);
@@ -24,6 +24,15 @@ void draw_triangle3D(GLfloat *v1, GLfloat *v2, GLfloat *v3, float border) {
     glVertex3fv(v2);
     glVertex3fv(v3);
     glEnd();
+}
+
+void draw_paralleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
+                       GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2,
+                       float border) {
+    draw_rectangle3D(bottomLeft1, bottomRight1, topRight1, topLeft1, border);
+    draw_rectangle3D(bottomRight1, bottomLeft2, topLeft2, topRight1, border);
+    draw_rectangle3D(bottomLeft2, bottomRight2, topRight2, topLeft2, border);
+    draw_rectangle3D(bottomRight2, bottomLeft1, topLeft1, topRight2, border);
 }
 
 void draw_axis() {
