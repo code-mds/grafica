@@ -20,9 +20,14 @@
 
 const int WINDOW_WIDTH = 600;
 const int WINDOW_HEIGHT = 600;
-const float SCENE_WIDTH = 10.0f;
+const float SW = 10.0f; //SCENE WIDTH
+
+const float HALF_DOOR_WIDTH = 2.0f;
 const float HALF_BASE_WIDTH = 5.0f;
-const float HALF_BASE_HEIGTH = 4.0f;
+const float BASE_HEIGHT = 8.0f;
+const float WALL_WIDTH = 1.0f;
+const float WALL_HEIGHT = 6.0f;
+const float ROOF_HEIGHT = 11.0f;
 
 void draw_prism_walls();
 void draw_lateral_walls();
@@ -42,10 +47,10 @@ void draw() {
 void draw_floor() {
     rectangle_t rect = {
             // floor
-            {5 / SCENE_WIDTH, 0 / SCENE_WIDTH,  0 / SCENE_WIDTH},
-            {5 / SCENE_WIDTH, 0 / SCENE_WIDTH,  -8 / SCENE_WIDTH},
-            {-5 / SCENE_WIDTH, 0 / SCENE_WIDTH, -8 / SCENE_WIDTH},
-            {-5 / SCENE_WIDTH, 0 / SCENE_WIDTH, 0 / SCENE_WIDTH},
+            {HALF_BASE_WIDTH / SW, 0,  0},
+            {HALF_BASE_WIDTH / SW, 0, -BASE_HEIGHT / SW},
+            {-HALF_BASE_WIDTH / SW, 0, -BASE_HEIGHT / SW},
+            {-HALF_BASE_WIDTH / SW, 0, 0},
             COLOR_FLOOR
     };
 
@@ -56,30 +61,30 @@ void draw_roof() {
     rectangle_t rectangles[] = {
             // right roof wall
             {
-                    { 6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { 6/SCENE_WIDTH,  6/SCENE_WIDTH, -9/SCENE_WIDTH},
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { WALL_HEIGHT/SW, WALL_HEIGHT/SW, WALL_WIDTH/SW },
+                    { WALL_HEIGHT/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
+                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
+                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, WALL_WIDTH/SW },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { 6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
-                    { 6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
+                    { WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
+                    { WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW, WALL_WIDTH/SW },
+                    { 0,  ROOF_HEIGHT/SW, WALL_WIDTH/SW },
+                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
                     COLOR_ROOF_INTERNAL
             },
             // left roof wall
             {
-                    { -6/SCENE_WIDTH,  6/SCENE_WIDTH, -9/SCENE_WIDTH},
-                    { -6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
+                    { -WALL_HEIGHT/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
+                    { -WALL_HEIGHT/SW, WALL_HEIGHT/SW, WALL_WIDTH/SW },
+                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, WALL_WIDTH/SW },
+                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { -6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
-                    { -6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { -WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW, WALL_WIDTH/SW },
+                    { -WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
+                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
+                    { 0,  ROOF_HEIGHT/SW, WALL_WIDTH/SW },
                     COLOR_ROOF_INTERNAL
             }
     };
@@ -91,17 +96,17 @@ void draw_roof() {
 void draw_prism_walls() {
     rectangle_t rect[] = {
             {
-                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, 0 / SCENE_WIDTH},
-                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, 0 / SCENE_WIDTH},
-                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -1 / SCENE_WIDTH},
-                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -1 / SCENE_WIDTH},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH / SW},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH / SW},
                     COLOR_FLOOR
             },
             {
-                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -7 / SCENE_WIDTH},
-                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -7 / SCENE_WIDTH},
-                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -8 / SCENE_WIDTH},
-                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -8 / SCENE_WIDTH},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH) / SW},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH) / SW},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT) / SW},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT) / SW},
                     COLOR_FLOOR
             },
     };
@@ -111,24 +116,24 @@ void draw_prism_walls() {
 
     vertex_t vertices[][3] = {
             {
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 0/SCENE_WIDTH }
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, 0 },
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0 },
+                    { 0,  ROOF_HEIGHT/SW, 0 }
             },
             {
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH,  -1/SCENE_WIDTH},
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -1/SCENE_WIDTH }
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW,  -WALL_WIDTH/SW},
+                    { 0,  ROOF_HEIGHT/SW, -WALL_WIDTH/SW }
             },
             {
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH},
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -8/SCENE_WIDTH }
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT)/SW },
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT)/SW},
+                    { 0,  ROOF_HEIGHT/SW, -BASE_HEIGHT/SW }
             },
             {
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH},
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -7/SCENE_WIDTH }
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW},
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW }
             },
     };
 
@@ -147,76 +152,76 @@ void draw_lateral_walls() {
     rectangle_t rectangles[10] = {
             // front walls
             {
-                    { 2/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { HALF_DOOR_WIDTH/SW, 0, 0 },
+                    { HALF_BASE_WIDTH/SW, 0, 0 },
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0 },
+                    { HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, 0 },
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 2/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW },
+                    { HALF_DOOR_WIDTH/SW, 0, -WALL_WIDTH/SW },
+                    { HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
                     COLOR_WALL_INTERNAL
             },
             {
-                    { -5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH},
-                    { -2/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { -2/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { -HALF_BASE_WIDTH/SW, 0, 0},
+                    { -HALF_DOOR_WIDTH/SW, 0, 0 },
+                    { -HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, 0 },
+                    { -HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0 },
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -2/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH},
-                    { -4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { -2/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { -HALF_DOOR_WIDTH/SW, 0, -WALL_WIDTH/SW },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW},
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { -HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
                     COLOR_WALL_INTERNAL
             },
             //right wall
             {
-                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH},
-                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { HALF_BASE_WIDTH/SW, 0, 0},
+                    { HALF_BASE_WIDTH/SW, 0, -BASE_HEIGHT/SW },
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -BASE_HEIGHT/SW },
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0 },
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH},
-                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW},
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
                     COLOR_WALL_INTERNAL
             },
             // back wall
             {
-                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  0/SCENE_WIDTH, -8/SCENE_WIDTH},
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    { HALF_BASE_WIDTH/SW, 0, -BASE_HEIGHT/SW },
+                    { -HALF_BASE_WIDTH/SW,  0, -BASE_HEIGHT/SW},
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -BASE_HEIGHT/SW },
+                    { HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -BASE_HEIGHT/SW },
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -4/SCENE_WIDTH,  0/SCENE_WIDTH, -7/SCENE_WIDTH},
-                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  0, -(BASE_HEIGHT-WALL_WIDTH)/SW},
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
                     COLOR_WALL_INTERNAL
             },
             //left wall
             {
-                    { -5/SCENE_WIDTH,  0, -8/SCENE_WIDTH},
-                    { -5/SCENE_WIDTH, 0, 0/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, 0/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    { -HALF_BASE_WIDTH/SW,  0, -BASE_HEIGHT/SW},
+                    { -HALF_BASE_WIDTH/SW, 0, 0 },
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, 0 },
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -BASE_HEIGHT/SW },
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -4/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH,  0, -7/SCENE_WIDTH},
-                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  0, -(BASE_HEIGHT-WALL_WIDTH)/SW},
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -WALL_WIDTH/SW },
                     COLOR_WALL_INTERNAL
             },
     };
@@ -233,12 +238,12 @@ void init(void) {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-1.0, 1.0, -.5, 1.5, -1.0, 10.0);
+    glOrtho(-1.0, 1.0, -.5, 1.5, -1.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     // Position camera at (x1, y1, z1) looking at (x2, y2, y2) with the vector <0, 1, 0> pointing upward.
-    gluLookAt(-1, 0.5, 2, 0, 0, 0, 0, 1, 0);
+    gluLookAt(-.6, 0.4, 1, 0, 0, 0, 0, 1, 0);
 }
 
 void keyboardS(int key, int x, int y) {
