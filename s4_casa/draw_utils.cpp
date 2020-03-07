@@ -81,3 +81,13 @@ void draw_axis() {
     glEnd();
     glDisable(GL_LINE_STIPPLE);
 }
+
+void toggleAxesVisibility() {
+    showAxis = !showAxis;
+    glutPostRedisplay();
+}
+
+void toggleWireframeVisibility() {
+    showWireFrame = !showWireFrame;
+    glutPostRedisplay();
+}

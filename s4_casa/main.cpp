@@ -232,6 +232,14 @@ void draw_lateral_walls() {
 
 }
 
+void main_menu(int value)
+{
+    switch (value) {
+        case 1: toggleAxesVisibility(); break;
+        case 2: toggleWireframeVisibility(); break;
+    }
+}
+
 void init(void) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -244,17 +252,20 @@ void init(void) {
 
     // Position camera at (x1, y1, z1) looking at (x2, y2, y2) with the vector <0, 1, 0> pointing upward.
     gluLookAt(-.6, 0.4, 1, 0, 0, 0, 0, 1, 0);
+
+    glutCreateMenu(main_menu);
+    glutAddMenuEntry("Show/Hide Axes", 1);
+    glutAddMenuEntry("Show/Hide Wireframe", 2);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void keyboardS(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_F1:
-            showAxis = !showAxis;
-            glutPostRedisplay();
+            toggleAxesVisibility();
             break;
         case GLUT_KEY_F2:
-            showWireFrame = !showWireFrame;
-            glutPostRedisplay();
+            toggleWireframeVisibility();
             break;
         case GLUT_KEY_UP:
             glRotatef(1.0,1.0,0.0,0.0);
@@ -274,6 +285,7 @@ void keyboardS(int key, int x, int y) {
             break;
     }
 }
+
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -284,3 +296,4 @@ int main(int argc, char* argv[]) {
     glutSpecialFunc(keyboardS);
     glutMainLoop();
 }
+
