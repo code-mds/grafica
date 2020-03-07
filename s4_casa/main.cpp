@@ -1,35 +1,30 @@
 //glut_test.cpp
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-
-// Headers richiesti da OSX
 #ifdef __APPLE__
-//#include <OpenGL/gl3.h>
-#include <GL/glew.h>
-#include <GLUT/glut.h>
-// headers richiesti da Windows e linux
+    // Headers richiesti da OSX
+    #include <GL/glew.h>
+    #include <GLUT/glut.h>
 #else
-#include <GL\glew.h>
-#include <GL\freeglut.h>
-#include "draw_utils.h"
+    // headers richiesti da Windows e linux
+    #include <GL\glew.h>
+    #include <GL\freeglut.h>
 #endif
+#include "draw_utils.h"
 
-using namespace std;
-
-GLubyte COLOR_ROOF_EXTERNAL[] = {203, 0, 0 };
-GLubyte COLOR_ROOF_INTERNAL[] = {170, 0, 0 };
-GLubyte COLOR_WALL_EXTERNAL[] = {192, 192, 192 };
-GLubyte COLOR_WALL_INTERNAL[] = {80, 80, 80 };
-GLubyte COLOR_FLOOR[] = {160, 160, 160 };
+#define COLOR_ROOF_EXTERNAL     230, 0, 0
+#define COLOR_ROOF_INTERNAL     160, 0, 0
+#define COLOR_WALL_EXTERNAL     200, 200, 200
+#define COLOR_WALL_INTERNAL     80, 80, 80
+#define COLOR_FLOOR             160, 160, 160
 
 const int WINDOW_WIDTH = 600;
 const int WINDOW_HEIGHT = 600;
 const float SCENE_WIDTH = 10.0f;
+const float HALF_BASE_WIDTH = 5.0f;
+const float HALF_BASE_HEIGTH = 4.0f;
 
-void draw_triangle_walls();
+void draw_prism_walls();
 void draw_lateral_walls();
 void draw_roof();
 void draw_floor();
@@ -39,37 +34,39 @@ void draw() {
     draw_axis();
     draw_floor();
     draw_lateral_walls();
-    draw_triangle_walls();
+    draw_prism_walls();
     draw_roof();
     glutSwapBuffers();
 }
 
 void draw_floor() {
-    GLfloat vertices[4][3] = {
+    rectangle_t rect = {
             // floor
             {5 / SCENE_WIDTH, 0 / SCENE_WIDTH,  0 / SCENE_WIDTH},
             {5 / SCENE_WIDTH, 0 / SCENE_WIDTH,  -8 / SCENE_WIDTH},
             {-5 / SCENE_WIDTH, 0 / SCENE_WIDTH, -8 / SCENE_WIDTH},
             {-5 / SCENE_WIDTH, 0 / SCENE_WIDTH, 0 / SCENE_WIDTH},
+            COLOR_FLOOR
     };
 
-    glPolygonMode(GL_FRONT,GL_FILL);
-    draw_rectangle3D(vertices[0], vertices[1], vertices[2], vertices[3], COLOR_FLOOR);
+    draw_rectangle3D(&rect);
 }
 
 void draw_roof() {
-    GLfloat vertices[][8][3] = {
+    rectangle_t rectangles[] = {
             // right roof wall
             {
-                    { 6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH }, //bottomLeft1
-                    { 6/SCENE_WIDTH,  6/SCENE_WIDTH, -9/SCENE_WIDTH}, //bottomRight1
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, -9/SCENE_WIDTH }, //topRight1
-                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, 1/SCENE_WIDTH }, //topLeft2
-
-                    { 6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH}, //bottomLeft2
-                    { 6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },  //bottomRight2
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 1/SCENE_WIDTH }, //topRight2
-                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -9/SCENE_WIDTH }, //topLeft2
+                    { 6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { 6/SCENE_WIDTH,  6/SCENE_WIDTH, -9/SCENE_WIDTH},
+                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
+                    { 0/SCENE_WIDTH,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    COLOR_ROOF_EXTERNAL
+            },{
+                    { 6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
+                    { 6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
+                    COLOR_ROOF_INTERNAL
             },
             // left roof wall
             {
@@ -77,120 +74,155 @@ void draw_roof() {
                     { -6/SCENE_WIDTH, 6/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { 0/SCENE_WIDTH,  12/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { 0/SCENE_WIDTH,  12/SCENE_WIDTH, -9/SCENE_WIDTH },
-
+                    COLOR_ROOF_EXTERNAL
+            },{
                     { -6/SCENE_WIDTH, 5/SCENE_WIDTH, 1/SCENE_WIDTH },
                     { -6/SCENE_WIDTH,  5/SCENE_WIDTH, -9/SCENE_WIDTH},
                     { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -9/SCENE_WIDTH },
                     { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 1/SCENE_WIDTH },
+                    COLOR_ROOF_INTERNAL
             }
     };
 
-    int nrOfWalls = sizeof(vertices) / sizeof(vertices[0]);
-    for (int i = 0; i < nrOfWalls; ++i) {
-
-        draw_paralleleliped(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3],
-                            vertices[i][4], vertices[i][5], vertices[i][6], vertices[i][7], COLOR_ROOF_EXTERNAL, COLOR_ROOF_INTERNAL);
-    }
+    draw_parallelepiped(&rectangles[0], &rectangles[1]);
+    draw_parallelepiped(&rectangles[2], &rectangles[3]);
 }
 
-void draw_triangle_walls() {
-    GLfloat vertices[][3][3] = {
+void draw_prism_walls() {
+    rectangle_t rect[] = {
             {
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, 0},
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0 },
-                    { 0,  11/SCENE_WIDTH, 0 }
+                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, 0 / SCENE_WIDTH},
+                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, 0 / SCENE_WIDTH},
+                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -1 / SCENE_WIDTH},
+                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -1 / SCENE_WIDTH},
+                    COLOR_FLOOR
+            },
+            {
+                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -7 / SCENE_WIDTH},
+                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -7 / SCENE_WIDTH},
+                    {-5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -8 / SCENE_WIDTH},
+                    {5 / SCENE_WIDTH, 6 / SCENE_WIDTH, -8 / SCENE_WIDTH},
+                    COLOR_FLOOR
+            },
+    };
+
+    draw_rectangle3D(&rect[0]);
+    draw_rectangle3D(&rect[1]);
+
+    vertex_t vertices[][3] = {
+            {
+                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, 0/SCENE_WIDTH }
             },
             {
                     { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
                     { -5/SCENE_WIDTH,  6/SCENE_WIDTH,  -1/SCENE_WIDTH},
-                    { 0,  11/SCENE_WIDTH, -1/SCENE_WIDTH }
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -1/SCENE_WIDTH }
             },
             {
                     { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
                     { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH},
-                    { 0,  11/SCENE_WIDTH, -8/SCENE_WIDTH }
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -8/SCENE_WIDTH }
             },
             {
                     { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH},
                     { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -7/SCENE_WIDTH },
-                    { 0,  11/SCENE_WIDTH, -7/SCENE_WIDTH }
+                    { 0/SCENE_WIDTH,  11/SCENE_WIDTH, -7/SCENE_WIDTH }
             },
     };
 
+    color_t frontColor = { COLOR_WALL_EXTERNAL };
+    color_t backColor =  { COLOR_WALL_INTERNAL };
+
     int nrOfWalls = sizeof(vertices) / sizeof(vertices[0]);
     for (int i = 0; i < nrOfWalls; ++i) {
-        draw_triangle3D(vertices[i][0], vertices[i][1], vertices[i][2], i%2==0 ? COLOR_WALL_EXTERNAL : COLOR_WALL_INTERNAL);
+        draw_triangle3D(&vertices[i][0], &vertices[i][1], &vertices[i][2],
+                        i%2==0 ? &frontColor : &backColor);
     }
 }
 
 void draw_lateral_walls() {
 
-    GLfloat vertices[][8][3] = {
+    rectangle_t rectangles[10] = {
             // front walls
             {
-                    { 2/SCENE_WIDTH, 0, 0 },
-                    { 5/SCENE_WIDTH, 0, 0 },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0 },
-                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, 0 },
-
-                    { 5/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { 2/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { 2/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    COLOR_WALL_EXTERNAL
             },
             {
-                    { -5/SCENE_WIDTH, 0, 0},
-                    { -2/SCENE_WIDTH, 0, 0 },
-                    { -2/SCENE_WIDTH, 6/SCENE_WIDTH, 0 },
-                    { -5/SCENE_WIDTH, 6/SCENE_WIDTH, 0 },
-
-                    { -2/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH, 0, -1/SCENE_WIDTH},
-                    { -5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { 2/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { 2/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    COLOR_WALL_INTERNAL
+            },
+            {
+                    { -5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH},
+                    { -2/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { -2/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    COLOR_WALL_EXTERNAL
+            },
+            {
+                    { -2/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { -4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH},
+                    { -4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
                     { -2/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    COLOR_WALL_INTERNAL
             },
             //right wall
             {
-                    { 5/SCENE_WIDTH, 0, -1/SCENE_WIDTH},
-                    { 5/SCENE_WIDTH, 0, -8/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, 0/SCENE_WIDTH},
+                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, -8/SCENE_WIDTH },
                     { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-
-                    { 4/SCENE_WIDTH, 0, -8/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH, 0, -1/SCENE_WIDTH},
+                    { 5/SCENE_WIDTH, 6/SCENE_WIDTH, 0/SCENE_WIDTH },
+                    COLOR_WALL_EXTERNAL
+            },
+            {
+                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -1/SCENE_WIDTH},
                     { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -1/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -8/SCENE_WIDTH },
-
+                    { 4/SCENE_WIDTH, 6/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    COLOR_WALL_INTERNAL
             },
             // back wall
             {
-                    { 4/SCENE_WIDTH, 0, -8/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH,  0, -8/SCENE_WIDTH},
-                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
-                    { 4/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
-
-                    { -4/SCENE_WIDTH,  0, -7/SCENE_WIDTH},
-                    { 4/SCENE_WIDTH, 0, -7/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH, 0/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH,  0/SCENE_WIDTH, -8/SCENE_WIDTH},
+                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    { 5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    COLOR_WALL_EXTERNAL
+            },
+            {
+                    { -4/SCENE_WIDTH,  0/SCENE_WIDTH, -7/SCENE_WIDTH},
+                    { 4/SCENE_WIDTH, 0/SCENE_WIDTH, -7/SCENE_WIDTH },
                     { 4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
                     { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
+                    COLOR_WALL_INTERNAL
             },
             //left wall
             {
                     { -5/SCENE_WIDTH,  0, -8/SCENE_WIDTH},
-                    { -5/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH, 0, 0/SCENE_WIDTH },
+                    { -5/SCENE_WIDTH,  6/SCENE_WIDTH, 0/SCENE_WIDTH },
                     { -5/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
-
+                    COLOR_WALL_EXTERNAL
+            },
+            {
                     { -4/SCENE_WIDTH, 0, -1/SCENE_WIDTH },
-                    { -4/SCENE_WIDTH,  0, -8/SCENE_WIDTH},
-                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -8/SCENE_WIDTH },
+                    { -4/SCENE_WIDTH,  0, -7/SCENE_WIDTH},
+                    { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -7/SCENE_WIDTH },
                     { -4/SCENE_WIDTH,  6/SCENE_WIDTH, -1/SCENE_WIDTH },
+                    COLOR_WALL_INTERNAL
             },
     };
-    int nrOfWalls = sizeof(vertices) / sizeof(vertices[0]);
-    for (int i = 0; i < nrOfWalls; ++i) {
-        draw_paralleleliped(vertices[i][0], vertices[i][1], vertices[i][2], vertices[i][3],
-                            vertices[i][4], vertices[i][5], vertices[i][6], vertices[i][7], COLOR_WALL_EXTERNAL, COLOR_WALL_INTERNAL);
+    int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
+    for (int i = 0; i < nrOfWalls; i=i+2) {
+        draw_parallelepiped(&rectangles[i], &rectangles[i + 1]);
     }
 
 }

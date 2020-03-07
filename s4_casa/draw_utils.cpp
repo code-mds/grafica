@@ -6,50 +6,55 @@
 bool showAxis = true;
 bool showWireFrame = true;
 
-void draw_paralleleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
-                         GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2,
-                         GLubyte* frontColor, GLubyte *backColor) {
-    //front
-    draw_rectangle3D(bottomLeft1, bottomRight1, topRight1, topLeft1, frontColor);
-    //right
-    draw_rectangle3D(bottomRight1, bottomLeft2, topLeft2, topRight1, frontColor);
-    //back
-    draw_rectangle3D(bottomLeft2, bottomRight2, topRight2, topLeft2, backColor);
-    //left
-    draw_rectangle3D(bottomRight2, bottomLeft1, topLeft1, topRight2, frontColor);
-    //bottom
-    draw_rectangle3D(bottomRight2, bottomLeft2, bottomRight1, bottomLeft1, frontColor);
-    //top
-    draw_rectangle3D(topLeft1, topRight1, topLeft2, topRight2, frontColor);
+void internal_triangle3D(const vertex_t *v1, const vertex_t *v2, const vertex_t *v3);
+
+void draw_prism(triangle_t *front, triangle_t *backRect) {
+
 }
 
-void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, GLubyte* color ) {
-    draw_triangle3D(bottomLeft, bottomRight, topRight, color);
-    draw_triangle3D(topRight, topLeft, bottomLeft, color);
+void draw_parallelepiped(rectangle_t *front, rectangle_t *backRect) {
+    draw_rectangle3D(front);
+    draw_rectangle3D(backRect);
+
+    rectangle_t right = {front->v2, backRect->v1, backRect->v4, front->v3, front->color  };
+    draw_rectangle3D(&right);
+
+    rectangle_t left = {backRect->v2, front->v1, front->v4, backRect->v3, front->color  };
+    draw_rectangle3D(&left);
+
+    rectangle_t bottom = {backRect->v2, backRect->v1, front->v2, front->v1, front->color  };
+    draw_rectangle3D(&bottom);
+
+    rectangle_t top = {front->v4, front->v3, backRect->v4, backRect->v3, front->color  };
+    draw_rectangle3D(&top);
 }
 
-void draw_triangle3D(GLfloat v1[], GLfloat v2[], GLfloat v3[], GLubyte* color) {
-    glColor3ubv(color);
+void draw_rectangle3D(rectangle_t * rect ) {
+    draw_triangle3D(&rect->v1, &rect->v2, &rect->v3, &rect->color);
+    draw_triangle3D(&rect->v3, &rect->v4, &rect->v1, &rect->color);
+}
+
+void draw_triangle3D(vertex_t *v1, vertex_t *v2, vertex_t *v3, color_t* color) {
+    glColor3ub(color->r, color->g, color->b);
     glPolygonMode(GL_FRONT,GL_FILL);
-    glBegin(GL_TRIANGLES);
-    glVertex3fv(v1);
-    glVertex3fv(v2);
-    glVertex3fv(v3);
-    glEnd();
+    internal_triangle3D(v1, v2, v3);
 
     if(showWireFrame) {
         // wireframe
         glLineWidth(1.0);
         glColor3ub(15, 32, 112);
         glPolygonMode(GL_FRONT, GL_LINE);
-        glBegin(GL_TRIANGLES);
-        glVertex3fv(v1);
-        glVertex3fv(v2);
-        glVertex3fv(v3);
-        glEnd();
+        internal_triangle3D(v1, v2, v3);
     }
 }
 
+void internal_triangle3D(const vertex_t *v1, const vertex_t *v2, const vertex_t *v3) {
+    glBegin(GL_TRIANGLES);
+    glVertex3f(v1->x, v1->y, v1->z);
+    glVertex3f(v2->x, v2->y, v2->z);
+    glVertex3f(v3->x, v3->y, v3->z);
+    glEnd();
+}
 
 
 void draw_axis() {

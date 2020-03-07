@@ -18,9 +18,27 @@
 extern bool showAxis;
 extern bool showWireFrame;
 
+typedef struct {
+    GLubyte r,g,b;
+} color_t;
+
+typedef struct {
+    GLfloat x, y, z;
+} vertex_t;
+
+typedef struct {
+    vertex_t v1, v2, v3;
+    color_t color;
+} triangle_t;
+
+typedef struct {
+    vertex_t v1, v2, v3, v4;
+    color_t color;
+} rectangle_t;
+
 void draw_axis();
-void draw_triangle3D(GLfloat *v1, GLfloat *v2, GLfloat *v3, GLubyte* color);
-void draw_rectangle3D(GLfloat *bottomLeft, GLfloat *bottomRight, GLfloat *topRight, GLfloat *topLeft, GLubyte* color);
-void draw_paralleleliped(GLfloat *bottomLeft1, GLfloat *bottomRight1, GLfloat *topRight1, GLfloat *topLeft1,
-                         GLfloat *bottomLeft2, GLfloat *bottomRight2, GLfloat *topRight2, GLfloat *topLeft2, GLubyte* frontColor, GLubyte *backColor);
+void draw_triangle3D(vertex_t *v1, vertex_t *v2, vertex_t *v3, color_t* color);
+void draw_rectangle3D(rectangle_t *rect);
+void draw_prism(triangle_t *front, triangle_t *backRect);
+void draw_parallelepiped(rectangle_t *front, rectangle_t *backRect);
 #endif //GRAFICA_DRAW_UTILS_H
