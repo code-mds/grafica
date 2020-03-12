@@ -7,12 +7,15 @@
 
 const float SW = 10.0f; //SCENE WIDTH
 
+const float DOOR_THINK = 0.5f / SW;
 const float HALF_DOOR_WIDTH = 2.0f / SW;
 const float HALF_BASE_WIDTH = 5.0f / SW;
 const float BASE_HEIGHT = 8.0f / SW;
-const float WALL_WIDTH = 1.0f / SW;
+const float WALL_THICK = 0.5f / SW;
 const float WALL_HEIGHT = 6.0f / SW;
+
 const float ROOF_HEIGHT = 11.0f / SW;
+const float ROOF_THICK = 0.5f / SW;
 
 const float CHIM_LEFT = -4.0f / SW;
 const float CHIM_RIGHT = -3.0f / SW;
@@ -25,6 +28,7 @@ const float CHIM_THICK = .3f / SW;
 #define COLOR_ROOF_EXTERNAL     230, 0, 0
 #define COLOR_ROOF_INTERNAL     160, 0, 0
 #define COLOR_WALL_EXTERNAL     200, 200, 200
+#define COLOR_DOOR              127, 0, 0
 #define COLOR_WALL_INTERNAL     80, 80, 80
 #define COLOR_FLOOR             160, 160, 160
 
@@ -34,6 +38,7 @@ void house::draw() {
     draw_prism_walls();
     draw_roof();
     draw_chimney();
+    draw_door();
 }
 
 void house::draw_chimney() {
@@ -124,30 +129,30 @@ void house::draw_roof() {
     rectangle_t rectangles[] = {
             // right roof wall
             {
-                    { WALL_HEIGHT, WALL_HEIGHT, WALL_WIDTH },
-                    { WALL_HEIGHT,  WALL_HEIGHT, -(BASE_HEIGHT+WALL_WIDTH)},
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH), -(BASE_HEIGHT+WALL_WIDTH) },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH), WALL_WIDTH },
+                    { HALF_BASE_WIDTH + ROOF_THICK, WALL_HEIGHT, ROOF_THICK },
+                    { HALF_BASE_WIDTH + ROOF_THICK,  WALL_HEIGHT, -(BASE_HEIGHT + ROOF_THICK)},
+                    { 0, ROOF_HEIGHT + ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK) },
+                    { 0, ROOF_HEIGHT + ROOF_THICK, ROOF_THICK },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { WALL_HEIGHT,  HALF_BASE_WIDTH, -(BASE_HEIGHT+WALL_WIDTH)},
-                    { WALL_HEIGHT, HALF_BASE_WIDTH, WALL_WIDTH },
-                    { 0,  ROOF_HEIGHT, WALL_WIDTH },
-                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT+WALL_WIDTH) },
+                    { HALF_BASE_WIDTH+ ROOF_THICK,  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
+                    { HALF_BASE_WIDTH+ ROOF_THICK, WALL_HEIGHT- ROOF_THICK,   ROOF_THICK },
+                    { 0,  ROOF_HEIGHT, ROOF_THICK },
+                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
                     COLOR_ROOF_INTERNAL
             },
             // left roof wall
             {
-                    { -WALL_HEIGHT,  WALL_HEIGHT, -(BASE_HEIGHT+WALL_WIDTH)},
-                    { -WALL_HEIGHT, WALL_HEIGHT, WALL_WIDTH },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH), WALL_WIDTH },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH), -(BASE_HEIGHT+WALL_WIDTH) },
+                    { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT,    -(BASE_HEIGHT + ROOF_THICK)},
+                    { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT,      ROOF_THICK },
+                    { 0,  (ROOF_HEIGHT + ROOF_THICK), ROOF_THICK },
+                    { 0,  (ROOF_HEIGHT + ROOF_THICK), -(BASE_HEIGHT + ROOF_THICK) },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { -WALL_HEIGHT, HALF_BASE_WIDTH, WALL_WIDTH },
-                    { -WALL_HEIGHT,  HALF_BASE_WIDTH, -(BASE_HEIGHT+WALL_WIDTH)},
-                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT+WALL_WIDTH) },
-                    { 0,  ROOF_HEIGHT, WALL_WIDTH },
+                    { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT- ROOF_THICK, ROOF_THICK },
+                    { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
+                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
+                    { 0,  ROOF_HEIGHT, ROOF_THICK },
                     COLOR_ROOF_INTERNAL
             }
     };
@@ -165,9 +170,9 @@ void house::draw_prism_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { HALF_BASE_WIDTH, WALL_HEIGHT, -WALL_WIDTH },
-                    { -HALF_BASE_WIDTH,  WALL_HEIGHT,  -WALL_WIDTH},
-                    { 0,  ROOF_HEIGHT, -WALL_WIDTH },
+                    { HALF_BASE_WIDTH, WALL_HEIGHT, -WALL_THICK },
+                    { -HALF_BASE_WIDTH,  WALL_HEIGHT,  -WALL_THICK},
+                    { 0,  ROOF_HEIGHT, -WALL_THICK },
                     COLOR_WALL_INTERNAL
             },
             {
@@ -177,9 +182,9 @@ void house::draw_prism_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH)},
-                    { HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
-                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
+                    { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK)},
+                    { HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
+                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
                     COLOR_WALL_INTERNAL
             },
     };
@@ -200,10 +205,10 @@ void house::draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), 0, -WALL_WIDTH },
-                    { HALF_DOOR_WIDTH, 0, -WALL_WIDTH },
-                    { HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_WIDTH },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), WALL_HEIGHT, -WALL_WIDTH },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  0, -WALL_THICK },
+                    { HALF_DOOR_WIDTH,                 0, -WALL_THICK },
+                    { HALF_DOOR_WIDTH,                 WALL_HEIGHT, -WALL_THICK },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -WALL_THICK },
                     COLOR_WALL_INTERNAL
             },
             {
@@ -214,10 +219,10 @@ void house::draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -HALF_DOOR_WIDTH, 0, -WALL_WIDTH },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH), 0, -WALL_WIDTH},
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH), WALL_HEIGHT, -WALL_WIDTH },
-                    { -HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_WIDTH },
+                    { -HALF_DOOR_WIDTH,                0, -WALL_THICK },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), 0, -WALL_THICK},
+                    { -(HALF_BASE_WIDTH - WALL_THICK), WALL_HEIGHT, -WALL_THICK },
+                    { -HALF_DOOR_WIDTH,                WALL_HEIGHT, -WALL_THICK },
                     COLOR_WALL_INTERNAL
             },
             //right wall
@@ -229,10 +234,10 @@ void house::draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), 0, -(BASE_HEIGHT-WALL_WIDTH) },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), 0, -WALL_WIDTH},
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), WALL_HEIGHT, -WALL_WIDTH },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  0, -(BASE_HEIGHT - WALL_THICK) },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  0, -WALL_THICK},
+                    { (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -WALL_THICK },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
                     COLOR_WALL_INTERNAL
             },
             // back wall
@@ -244,10 +249,10 @@ void house::draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH),  0, -(BASE_HEIGHT-WALL_WIDTH)},
-                    { (HALF_BASE_WIDTH-WALL_WIDTH), 0, -(BASE_HEIGHT-WALL_WIDTH) },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH),  WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH),  WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), 0, -(BASE_HEIGHT - WALL_THICK)},
+                    { (HALF_BASE_WIDTH - WALL_THICK),  0, -(BASE_HEIGHT - WALL_THICK) },
+                    { (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
                     COLOR_WALL_INTERNAL
             },
             //left wall
@@ -259,10 +264,10 @@ void house::draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH), 0, -WALL_WIDTH },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH),  0, -(BASE_HEIGHT-WALL_WIDTH)},
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH),  WALL_HEIGHT, -(BASE_HEIGHT-WALL_WIDTH) },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH),  WALL_HEIGHT, -WALL_WIDTH },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), 0, -WALL_THICK },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), 0, -(BASE_HEIGHT - WALL_THICK)},
+                    { -(HALF_BASE_WIDTH - WALL_THICK), WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
+                    { -(HALF_BASE_WIDTH - WALL_THICK), WALL_HEIGHT, -WALL_THICK },
                     COLOR_WALL_INTERNAL
             },
     };
@@ -271,4 +276,28 @@ void house::draw_lateral_walls() {
         draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
 
+}
+
+void house::draw_door() {
+    rectangle_t rectangles[10] = {
+            // front walls
+            {
+                    { -HALF_DOOR_WIDTH, 0, -WALL_THICK },
+                    { HALF_DOOR_WIDTH, 0, -WALL_THICK },
+                    { HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },
+                    { -HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },
+                    COLOR_DOOR
+            },
+            {
+                    { HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) },
+                    { -HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) },
+                    { -HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) },
+                    { HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) },
+                    COLOR_DOOR
+            },
+    };
+    int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
+    for (int i = 0; i < nrOfWalls; i=i+2) {
+        draw_parallelepiped(rectangles[i], rectangles[i + 1]);
+    }
 }

@@ -97,11 +97,13 @@ void timerCB(int value) {
 
 void keyCB(unsigned char key, int x, int y) {
     switch (key) {
+        case 'R':
         case 'r':
             _animation = true;
             glutTimerFunc(ANIM_MSEC, timerCB, 0);
             break;
 
+        case 'S':
         case 's':
             _animation = false;
             break;
@@ -119,11 +121,11 @@ void reshapeCB(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     if (w <= h)
-        glOrtho(-2.5, 2.5, -2.5 * (GLfloat) h / (GLfloat) w,
-                2.5 * (GLfloat) h / (GLfloat) w, -10.0, 10.0);
+        glOrtho(-1.5, 1.5, -1.5 * (GLfloat) h / (GLfloat) w,
+                1.5 * (GLfloat) h / (GLfloat) w, -10.0, 10.0);
     else
-        glOrtho(-2.5 * (GLfloat) w / (GLfloat) h,
-                2.5 * (GLfloat) w / (GLfloat) h, -2.5, 2.5, -10.0, 10.0);
+        glOrtho(-1.5 * (GLfloat) w / (GLfloat) h,
+                1.5 * (GLfloat) w / (GLfloat) h, -1.5, 1.5, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
 }
 

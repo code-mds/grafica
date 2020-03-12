@@ -25,7 +25,7 @@ const float SW = 10.0f; //SCENE WIDTH
 const float HALF_DOOR_WIDTH = 2.0f;
 const float HALF_BASE_WIDTH = 5.0f;
 const float BASE_HEIGHT = 8.0f;
-const float WALL_WIDTH = 1.0f;
+const float WALL_THICK = 1.0f;
 const float WALL_HEIGHT = 6.0f;
 const float ROOF_HEIGHT = 11.0f;
 
@@ -61,30 +61,30 @@ void draw_roof() {
     rectangle_t rectangles[] = {
             // right roof wall
             {
-                    { WALL_HEIGHT/SW, WALL_HEIGHT/SW, WALL_WIDTH/SW },
-                    { WALL_HEIGHT/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, WALL_WIDTH/SW },
+                    { WALL_HEIGHT/SW, WALL_HEIGHT/SW,      WALL_THICK / SW },
+                    { WALL_HEIGHT/SW,  WALL_HEIGHT/SW,      -(BASE_HEIGHT + WALL_THICK) / SW},
+                    { 0,  (ROOF_HEIGHT + WALL_THICK) / SW, -(BASE_HEIGHT + WALL_THICK) / SW },
+                    { 0,  (ROOF_HEIGHT + WALL_THICK) / SW, WALL_THICK / SW },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
-                    { WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW, WALL_WIDTH/SW },
-                    { 0,  ROOF_HEIGHT/SW, WALL_WIDTH/SW },
-                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
+                    { WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT + WALL_THICK) / SW},
+                    { WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW,   WALL_THICK / SW },
+                    { 0,  ROOF_HEIGHT/SW,                  WALL_THICK / SW },
+                    { 0,  ROOF_HEIGHT/SW,                  -(BASE_HEIGHT + WALL_THICK) / SW },
                     COLOR_ROOF_INTERNAL
             },
             // left roof wall
             {
-                    { -WALL_HEIGHT/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
-                    { -WALL_HEIGHT/SW, WALL_HEIGHT/SW, WALL_WIDTH/SW },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, WALL_WIDTH/SW },
-                    { 0,  (ROOF_HEIGHT+WALL_WIDTH)/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
+                    { -WALL_HEIGHT/SW,  WALL_HEIGHT/SW,    -(BASE_HEIGHT + WALL_THICK) / SW},
+                    { -WALL_HEIGHT/SW, WALL_HEIGHT/SW,      WALL_THICK / SW },
+                    { 0,  (ROOF_HEIGHT + WALL_THICK) / SW, WALL_THICK / SW },
+                    { 0,  (ROOF_HEIGHT + WALL_THICK) / SW, -(BASE_HEIGHT + WALL_THICK) / SW },
                     COLOR_ROOF_EXTERNAL
             },{
-                    { -WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW, WALL_WIDTH/SW },
-                    { -WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW},
-                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT+WALL_WIDTH)/SW },
-                    { 0,  ROOF_HEIGHT/SW, WALL_WIDTH/SW },
+                    { -WALL_HEIGHT/SW, HALF_BASE_WIDTH/SW, WALL_THICK / SW },
+                    { -WALL_HEIGHT/SW,  HALF_BASE_WIDTH/SW, -(BASE_HEIGHT + WALL_THICK) / SW},
+                    { 0,  ROOF_HEIGHT/SW,                  -(BASE_HEIGHT + WALL_THICK) / SW },
+                    { 0,  ROOF_HEIGHT/SW,                  WALL_THICK / SW },
                     COLOR_ROOF_INTERNAL
             }
     };
@@ -98,13 +98,13 @@ void draw_prism_walls() {
             {
                     {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0},
                     {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, 0},
-                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH / SW},
-                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH / SW},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_THICK / SW},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_THICK / SW},
                     COLOR_FLOOR
             },
             {
-                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH) / SW},
-                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH) / SW},
+                    {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT - WALL_THICK) / SW},
+                    {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT - WALL_THICK) / SW},
                     {-HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT) / SW},
                     {HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT) / SW},
                     COLOR_FLOOR
@@ -121,9 +121,9 @@ void draw_prism_walls() {
                     { 0,  ROOF_HEIGHT/SW, 0 }
             },
             {
-                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
-                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW,  -WALL_WIDTH/SW},
-                    { 0,  ROOF_HEIGHT/SW, -WALL_WIDTH/SW }
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW,   -WALL_THICK / SW },
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -WALL_THICK / SW},
+                    { 0,  ROOF_HEIGHT/SW, -WALL_THICK / SW }
             },
             {
                     { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT)/SW },
@@ -131,9 +131,9 @@ void draw_prism_walls() {
                     { 0,  ROOF_HEIGHT/SW, -BASE_HEIGHT/SW }
             },
             {
-                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW},
-                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
-                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW }
+                    { -HALF_BASE_WIDTH/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT - WALL_THICK) / SW},
+                    { HALF_BASE_WIDTH/SW, WALL_HEIGHT/SW,   -(BASE_HEIGHT - WALL_THICK) / SW },
+                    { 0,  ROOF_HEIGHT/SW, -(BASE_HEIGHT - WALL_THICK) / SW }
             },
     };
 
@@ -159,10 +159,10 @@ void draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW },
-                    { HALF_DOOR_WIDTH/SW, 0, -WALL_WIDTH/SW },
-                    { HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  0, -WALL_THICK / SW },
+                    { HALF_DOOR_WIDTH/SW,                   0, -WALL_THICK / SW },
+                    { HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW,                     -WALL_THICK / SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  WALL_HEIGHT / SW, -WALL_THICK / SW },
                     COLOR_WALL_INTERNAL
             },
             {
@@ -173,10 +173,10 @@ void draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -HALF_DOOR_WIDTH/SW, 0, -WALL_WIDTH/SW },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW},
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
-                    { -HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { -HALF_DOOR_WIDTH/SW,                  0, -WALL_THICK / SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, 0, -WALL_THICK / SW},
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW, -WALL_THICK / SW },
+                    { -HALF_DOOR_WIDTH/SW, WALL_HEIGHT/SW,                    -WALL_THICK / SW },
                     COLOR_WALL_INTERNAL
             },
             //right wall
@@ -188,10 +188,10 @@ void draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -(BASE_HEIGHT-WALL_WIDTH)/SW },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW},
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -WALL_WIDTH/SW },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  0, -(BASE_HEIGHT - WALL_THICK) / SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  0, -WALL_THICK / SW},
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW,  -WALL_THICK / SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  WALL_HEIGHT / SW, -(BASE_HEIGHT - WALL_THICK) / SW },
                     COLOR_WALL_INTERNAL
             },
             // back wall
@@ -203,10 +203,10 @@ void draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  0, -(BASE_HEIGHT-WALL_WIDTH)/SW},
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -(BASE_HEIGHT-WALL_WIDTH)/SW },
-                    { (HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, 0, -(BASE_HEIGHT - WALL_THICK) / SW},
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW,  0, -(BASE_HEIGHT - WALL_THICK) / SW },
+                    { (HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW,  -(BASE_HEIGHT - WALL_THICK) / SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW, -(BASE_HEIGHT - WALL_THICK) / SW },
                     COLOR_WALL_INTERNAL
             },
             //left wall
@@ -218,10 +218,10 @@ void draw_lateral_walls() {
                     COLOR_WALL_EXTERNAL
             },
             {
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW, 0, -WALL_WIDTH/SW },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  0, -(BASE_HEIGHT-WALL_WIDTH)/SW},
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -(BASE_HEIGHT-WALL_WIDTH)/SW },
-                    { -(HALF_BASE_WIDTH-WALL_WIDTH)/SW,  WALL_HEIGHT/SW, -WALL_WIDTH/SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, 0, -WALL_THICK / SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, 0, -(BASE_HEIGHT - WALL_THICK) / SW},
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW, -(BASE_HEIGHT - WALL_THICK) / SW },
+                    { -(HALF_BASE_WIDTH - WALL_THICK) / SW, WALL_HEIGHT / SW, -WALL_THICK / SW },
                     COLOR_WALL_INTERNAL
             },
     };

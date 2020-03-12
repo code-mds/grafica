@@ -15,6 +15,7 @@ private:
     void draw_roof();
     void draw_floor();
     void draw_chimney();
+    void draw_door();
 };
 
 
