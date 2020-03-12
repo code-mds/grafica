@@ -38,11 +38,15 @@ const float CHIM_START_DEPTH = -2.0f / SW;
 const float CHIM_END_DEPTH = -4.0f / SW;
 const float CHIM_THICK = .3f / SW;
 
+int _mainWindow;
+bool _animation = false;
+int ANIM_MSEC = 100;
+
+void rotate(int value);
 void draw_prism_walls();
 void draw_lateral_walls();
 void draw_roof();
 void draw_floor();
-
 void draw_chimney();
 
 void draw() {
@@ -293,6 +297,7 @@ void draw_lateral_walls() {
 
 }
 
+
 void main_menu(int value)
 {
     switch (value) {
@@ -346,15 +351,40 @@ void keyboardS(int key, int x, int y) {
             break;
     }
 }
+void rotate(int value) {
+    if(!_animation)
+        return;
+
+    glRotatef(1.0f, 0.0f, 1.0f, 0.0f);
+    glutPostRedisplay();
+    glutTimerFunc(ANIM_MSEC, rotate, 0);
+}
+
+void key_handler(unsigned char key, int x, int y) {
+    switch (key) {
+        case 'r':
+            _animation = true;
+            glutTimerFunc(ANIM_MSEC, rotate, 0);
+            break;
+
+        case 's':
+            _animation = false;
+            break;
+        case 27: // ESCAPE
+            glutDestroyWindow(_mainWindow);
+            exit(0);
+    }
+}
 
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutCreateWindow("S5 house");
+    _mainWindow = glutCreateWindow("S5 house");
     init();
     glutDisplayFunc(draw);
     glutSpecialFunc(keyboardS);
+    glutKeyboardFunc(key_handler);
     glutMainLoop();
 }
 
