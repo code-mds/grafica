@@ -48,7 +48,8 @@
 /* This program is based on the GLUT scene.c program. */
 
 #include <stdlib.h>
-#include <GLUT/glut.h>
+#include <GL\glew.h>
+#include <GL\freeglut.h>
 
 int sbwin, dbwin;
 int angle;

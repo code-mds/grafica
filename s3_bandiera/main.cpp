@@ -124,7 +124,7 @@ void reshape(int w, int h) {
     glLoadIdentity();
 }
 
-void draw() {
+void drawCB() {
     glClear( GL_COLOR_BUFFER_BIT );
     flag_background();
     triangolo_basso();
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(SCENE_WIDTH, SCENE_HEIGHT);
     glutCreateWindow("bandiera scozzese");
     init();
-    glutDisplayFunc(draw);
+    glutDisplayFunc(drawCB);
     glutReshapeFunc(reshape);
     glutMainLoop();
 }

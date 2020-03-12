@@ -43,7 +43,7 @@ void triangle3D(GLfloat* v1, GLfloat* v2, GLfloat* v3) {
     glEnd();
 }
 
-void draw() {
+void drawCB() {
     glClear( GL_COLOR_BUFFER_BIT );
     draw_axis();
     draw_pyramid();
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(SCENE_WIDTH, SCENE_HEIGHT);
     glutCreateWindow("S3 piramide");
     init();
-    glutDisplayFunc(draw);
+    glutDisplayFunc(drawCB);
     glutSpecialFunc(keyboardS);
     glutMainLoop();
 }

@@ -34,7 +34,7 @@ void draw_lateral_walls();
 void draw_roof();
 void draw_floor();
 
-void draw() {
+void drawCB() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_axis();
     draw_floor();
@@ -292,7 +292,7 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutCreateWindow("S4 house");
     init();
-    glutDisplayFunc(draw);
+    glutDisplayFunc(drawCB);
     glutSpecialFunc(keyboardS);
     glutMainLoop();
 }
