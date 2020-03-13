@@ -19,12 +19,18 @@ const int WINDOW_WIDTH = 600;
 const int WINDOW_HEIGHT = 600;
 const int ANIM_MSEC = 100;
 const char ESCAPE = 27;
+const int ROTATE_HOUSE = 0;
+const int ROTATE_DOOR = 1;
 
 int _mainWindow;
 bool _animation = false;
 house _house;
 
 void timerCB(int value);
+
+void rotate_house();
+
+void rotate_door();
 
 void drawCB() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -87,25 +93,49 @@ void specialKeyCB(int key, int x, int y) {
     }
 }
 void timerCB(int value) {
+    switch (value) {
+        case ROTATE_HOUSE:
+            rotate_house();
+            break;
+        case ROTATE_DOOR:
+            rotate_door();
+            break;
+    }
+}
+
+void rotate_door() {
+    _house.update_model();
+    glutPostRedisplay();
+    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
+}
+
+void rotate_house() {
     if(!_animation)
         return;
 
     glRotatef(1.0f, 0.0f, 1.0f, 0.0f);
     glutPostRedisplay();
-    glutTimerFunc(ANIM_MSEC, timerCB, 0);
+    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
 }
+
 
 void keyCB(unsigned char key, int x, int y) {
     switch (key) {
         case 'R':
         case 'r':
             _animation = true;
-            glutTimerFunc(ANIM_MSEC, timerCB, 0);
+            glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
             break;
 
         case 'S':
         case 's':
             _animation = false;
+            break;
+
+        case 'D':
+        case 'd':
+            _house.toggle_door();
+            glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
             break;
 
         case ESCAPE:

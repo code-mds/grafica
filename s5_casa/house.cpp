@@ -195,7 +195,7 @@ void house::draw_prism_walls() {
 
 void house::draw_lateral_walls() {
 
-    rectangle_t rectangles[10] = {
+    rectangle_t rectangles[] = {
             // front walls
             {
                     { HALF_DOOR_WIDTH, 0, 0 },
@@ -279,7 +279,11 @@ void house::draw_lateral_walls() {
 }
 
 void house::draw_door() {
-    rectangle_t rectangles[10] = {
+    glPushMatrix();
+    glTranslated(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
+    glRotatef(doorAngle,0.0,1.0,0.0);
+    glTranslated(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
+    rectangle_t rectangles[] = {
             // front walls
             {
                     { -HALF_DOOR_WIDTH, 0, -WALL_THICK },
@@ -299,5 +303,18 @@ void house::draw_door() {
     int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
     for (int i = 0; i < nrOfWalls; i=i+2) {
         draw_parallelepiped(rectangles[i], rectangles[i + 1]);
+    }
+    glPopMatrix();
+}
+
+void house::toggle_door() {
+    openDoor = !openDoor;
+}
+
+void house::update_model() {
+    if(openDoor && doorAngle < 90) {
+        doorAngle++;
+    } else if(!openDoor && doorAngle > 0) {
+        doorAngle--;
     }
 }

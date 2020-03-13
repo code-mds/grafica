@@ -5,11 +5,18 @@
 #ifndef GRAFICA_HOUSE_H
 #define GRAFICA_HOUSE_H
 
+#include <GL/glew.h>
 
 class house {
 public:
     void draw();
+    void toggle_door();
+    void update_model();
+
 private:
+    GLfloat doorAngle = 0.0;
+    GLboolean openDoor = false;
+
     void draw_prism_walls();
     void draw_lateral_walls();
     void draw_roof();
