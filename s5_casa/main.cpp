@@ -23,14 +23,15 @@ const int ROTATE_HOUSE = 0;
 const int ROTATE_DOOR = 1;
 
 int _mainWindow;
-bool _animation = false;
+bool _house_rotation = false;
 house _house;
 
 void timerCB(int value);
-
 void rotate_house();
-
 void rotate_door();
+void start_house_rotation();
+void start_door_rotation();
+void stop_house_rotation();
 
 void drawCB() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -44,6 +45,9 @@ void main_menu(int value)
     switch (value) {
         case 1: toggleAxesVisibility(); break;
         case 2: toggleWireframeVisibility(); break;
+        case 3: start_house_rotation(); break;
+        case 4: stop_house_rotation(); break;
+        case 5: start_door_rotation(); break;
     }
 }
 
@@ -63,6 +67,9 @@ void init(void) {
     glutCreateMenu(main_menu);
     glutAddMenuEntry("Show/Hide Axes", 1);
     glutAddMenuEntry("Show/Hide Wireframe", 2);
+    glutAddMenuEntry("Start House Rotation", 3);
+    glutAddMenuEntry("Stop House Rotation", 4);
+    glutAddMenuEntry("Open/Close Door", 5);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -110,7 +117,7 @@ void rotate_door() {
 }
 
 void rotate_house() {
-    if(!_animation)
+    if(!_house_rotation)
         return;
 
     glRotatef(1.0f, 0.0f, 1.0f, 0.0f);
@@ -123,19 +130,17 @@ void keyCB(unsigned char key, int x, int y) {
     switch (key) {
         case 'R':
         case 'r':
-            _animation = true;
-            glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
+            start_house_rotation();
             break;
 
         case 'S':
         case 's':
-            _animation = false;
+            stop_house_rotation();
             break;
 
         case 'D':
         case 'd':
-            _house.toggle_door();
-            glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
+            start_door_rotation();
             break;
 
         case ESCAPE:
@@ -144,6 +149,19 @@ void keyCB(unsigned char key, int x, int y) {
     }
 }
 
+void stop_house_rotation() {
+    _house_rotation = false;
+}
+
+void start_house_rotation() {
+    _house_rotation = true;
+    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
+}
+
+void start_door_rotation() {
+    _house.toggle_door();
+    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
+}
 
 void reshapeCB(int w, int h)
 {
