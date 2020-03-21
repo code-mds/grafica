@@ -28,6 +28,7 @@ public:
 
 private:
     bool _colorStandard = true;
+    color_t _colorRoofInternal;
     color_t _colorRoofExternal;
     color_t _colorWallExternal;
 

@@ -28,19 +28,23 @@ const float CHIM_THICK = .3f / SW;
 const float TRANSLATION_STEP = .05;
 const float ROTATION_STEP = 1.0;
 
+color_t COLOR_ROOF_INTERNAL_1 = { 160, 0, 0 };
+color_t COLOR_ROOF_INTERNAL_2 = { 100, 70, 60 };
+
 color_t COLOR_ROOF_EXTERNAL_1 = { 230, 0, 0 };
 color_t COLOR_ROOF_EXTERNAL_2 = { 109, 76, 65 };
 
 color_t COLOR_WALL_EXTERNAL_1 = { 238, 238, 238 };
 color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
 
-#define COLOR_ROOF_INTERNAL     160, 0, 0
+
 #define COLOR_WALL_INTERNAL     80, 80, 80
 
 #define COLOR_DOOR              141, 110, 99
 #define COLOR_FLOOR             160, 160, 160
 
 house::house() :
+    _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
 {
@@ -158,7 +162,7 @@ void house::drawRoof() {
                     { HALF_BASE_WIDTH+ ROOF_THICK, WALL_HEIGHT- ROOF_THICK,   ROOF_THICK },
                     { 0,  ROOF_HEIGHT, ROOF_THICK },
                     { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
-                    COLOR_ROOF_INTERNAL
+                    _colorRoofInternal
             },
             // left roof wall
             {
@@ -172,7 +176,7 @@ void house::drawRoof() {
                     { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
                     { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
                     { 0,  ROOF_HEIGHT, ROOF_THICK },
-                    COLOR_ROOF_INTERNAL
+                    _colorRoofInternal
             }
     };
 
@@ -361,7 +365,8 @@ void house::moveLeft() {
 
 void house::updateRotation(bool enabled) {
     _rotationEnabled = enabled;
-    _rotationX += ROTATION_STEP;
+    if(enabled)
+        _rotationX += ROTATION_STEP;
     glutPostRedisplay();
 }
 
@@ -371,6 +376,7 @@ bool house::RotationEnabled() {
 
 void house::changeColor() {
     _colorStandard = !_colorStandard;
+    _colorRoofInternal = _colorStandard ? COLOR_ROOF_INTERNAL_1 : COLOR_ROOF_INTERNAL_2;
     _colorRoofExternal = _colorStandard ? COLOR_ROOF_EXTERNAL_1 : COLOR_ROOF_EXTERNAL_2;
     _colorWallExternal  = _colorStandard ? COLOR_WALL_EXTERNAL_1 : COLOR_WALL_EXTERNAL_2;
     glutPostRedisplay();

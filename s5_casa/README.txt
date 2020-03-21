@@ -22,8 +22,10 @@ Esercizio 1:
 Funzioni:
 - Show/Hide Axes (F1 / Right Click)
 - Show/Hide Wireframe (F2 / Right Click)
-- Manual Rotate House (arrows)
+- Change Color (F3 / Right Click)
 
+- House Translate X axis (arrows left/right)
+- House Translate Y axis (arrows up/down)
 - Auto Rotate House (r / Right Click)
 - Stop Rotate House (s / Right Click)
 - Open/Close Door (d / Right Click)

@@ -132,6 +132,9 @@ void specialKeyCB(int key, int x, int y) {
         case GLUT_KEY_F2:
             toggleWireframeVisibility();
             break;
+        case GLUT_KEY_F3:
+            _house.changeColor();
+            break;
         case GLUT_KEY_UP:
             _house.moveUp();
             break;
@@ -170,9 +173,7 @@ void keyCB(unsigned char key, int x, int y) {
     }
 }
 
-
-
-void init(void) {
+void init() {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     _mainWindow = glutCreateWindow("S5 house");
