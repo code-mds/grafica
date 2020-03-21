@@ -17,13 +17,16 @@ const float WALL_HEIGHT = 6.0f / SW;
 const float ROOF_HEIGHT = 11.0f / SW;
 const float ROOF_THICK = 0.5f / SW;
 
-const float CHIM_LEFT = -4.0f / SW;
-const float CHIM_RIGHT = -3.0f / SW;
+const float CHIM_LEFT = -3.0f / SW;
+const float CHIM_RIGHT = -2.0f / SW;
 const float CHIM_BOTTOM = 7.0f / SW;
 const float CHIM_TOP = 11.0f / SW;
-const float CHIM_START_DEPTH = -2.0f / SW;
-const float CHIM_END_DEPTH = -4.0f / SW;
+const float CHIM_START_DEPTH = -3.5f / SW;
+const float CHIM_END_DEPTH = -4.5f / SW;
 const float CHIM_THICK = .3f / SW;
+
+const float TRANSLATION_STEP = .05;
+const float ROTATION_STEP = 1.0;
 
 #define COLOR_ROOF_EXTERNAL     230, 0, 0
 #define COLOR_ROOF_INTERNAL     160, 0, 0
@@ -33,15 +36,20 @@ const float CHIM_THICK = .3f / SW;
 #define COLOR_FLOOR             160, 160, 160
 
 void house::draw() {
-    draw_floor();
-    draw_lateral_walls();
-    draw_prism_walls();
-    draw_roof();
-    draw_chimney();
-    draw_door();
+    glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
+    glTranslatef(_translationX, _translationY, 0.0f);
+
+    glPushMatrix();
+    drawFloor();
+    drawLateralWalls();
+    drawPrismWalls();
+    drawRoof();
+    drawChimney();
+    drawDoor();
+    glPopMatrix();
 }
 
-void house::draw_chimney() {
+void house::drawChimney() {
     rectangle_t rectangles[] = {
             // LEFT SIDE
             {
@@ -112,7 +120,7 @@ void house::draw_chimney() {
     }
 }
 
-void house::draw_floor() {
+void house::drawFloor() {
     rectangle_t rect = {
             // floor
             {HALF_BASE_WIDTH, 0,  0},
@@ -125,7 +133,7 @@ void house::draw_floor() {
     draw_rectangle3D(rect);
 }
 
-void house::draw_roof() {
+void house::drawRoof() {
     rectangle_t rectangles[] = {
             // right roof wall
             {
@@ -161,7 +169,7 @@ void house::draw_roof() {
     draw_parallelepiped(rectangles[2], rectangles[3]);
 }
 
-void house::draw_prism_walls() {
+void house::drawPrismWalls() {
     triangle_t triangles[] = {
             {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
@@ -193,7 +201,7 @@ void house::draw_prism_walls() {
     draw_prism(triangles[2], triangles[3]);
 }
 
-void house::draw_lateral_walls() {
+void house::drawLateralWalls() {
 
     rectangle_t rectangles[] = {
             // front walls
@@ -278,10 +286,10 @@ void house::draw_lateral_walls() {
 
 }
 
-void house::draw_door() {
+void house::drawDoor() {
     glPushMatrix();
     glTranslated(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
-    glRotatef(doorAngle,0.0,1.0,0.0);
+    glRotatef(_doorAngle, 0.0, 1.0, 0.0);
     glTranslated(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
     rectangle_t rectangles[] = {
             // front walls
@@ -307,14 +315,45 @@ void house::draw_door() {
     glPopMatrix();
 }
 
-void house::toggle_door() {
-    openDoor = !openDoor;
+void house::toggleDoor() {
+    _doorOpen = !_doorOpen;
 }
 
-void house::update_model() {
-    if(openDoor && doorAngle < 90) {
-        doorAngle++;
-    } else if(!openDoor && doorAngle > 0) {
-        doorAngle--;
+void house::rotateDoor() {
+    if(_doorOpen && _doorAngle < 90) {
+        _doorAngle++;
+    } else if(!_doorOpen && _doorAngle > 0) {
+        _doorAngle--;
     }
+    glutPostRedisplay();
+}
+
+void house::moveUp() {
+    _translationY += TRANSLATION_STEP;
+    glutPostRedisplay();
+}
+
+void house::moveDown() {
+    _translationY -= TRANSLATION_STEP;
+    glutPostRedisplay();
+}
+
+void house::moveRight() {
+    _translationX += TRANSLATION_STEP;
+    glutPostRedisplay();
+}
+
+void house::moveLeft() {
+    _translationX -= TRANSLATION_STEP;
+    glutPostRedisplay();
+}
+
+void house::updateRotation(bool enabled) {
+    _rotationEnabled = enabled;
+    _rotationX += ROTATION_STEP;
+    glutPostRedisplay();
+}
+
+bool house::RotationEnabled() {
+    return _rotationEnabled;
 }

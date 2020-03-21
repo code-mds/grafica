@@ -10,19 +10,33 @@
 class house {
 public:
     void draw();
-    void toggle_door();
-    void update_model();
+    void toggleDoor();
+    void rotateDoor();
+
+    void moveUp();
+    void moveDown();
+    void moveRight();
+    void moveLeft();
+
+    void updateRotation(bool enabled);
+
+    bool RotationEnabled();
 
 private:
-    GLfloat doorAngle = 0.0;
-    GLboolean openDoor = false;
+    GLboolean _doorOpen = false;
+    GLfloat _doorAngle = 0.0;
+    GLfloat _translationY = 0.0;
+    GLfloat _translationX = 0.0;
+    GLfloat _rotationX = 0.0;
+    bool _rotationEnabled = false;
 
-    void draw_prism_walls();
-    void draw_lateral_walls();
-    void draw_roof();
-    void draw_floor();
-    void draw_chimney();
-    void draw_door();
+    void drawPrismWalls();
+    void drawLateralWalls();
+    void drawRoof();
+    void drawFloor();
+    void drawChimney();
+    void drawDoor();
+
 };
 
 

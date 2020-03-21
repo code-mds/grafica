@@ -232,11 +232,12 @@ void draw_lateral_walls() {
 
 }
 
-void main_menu(int value)
+void mainMenuCB(int value)
 {
     switch (value) {
         case 1: toggleAxesVisibility(); break;
-        case 2: toggleWireframeVisibility(); break;
+        case 2:
+            toggleWireframeVisibility(); break;
     }
 }
 
@@ -253,7 +254,7 @@ void init(void) {
     // Position camera at (x1, y1, z1) looking at (x2, y2, y2) with the vector <0, 1, 0> pointing upward.
     gluLookAt(-.6, 0.4, 1, 0, 0, 0, 0, 1, 0);
 
-    glutCreateMenu(main_menu);
+    glutCreateMenu(mainMenuCB);
     glutAddMenuEntry("Show/Hide Axes", 1);
     glutAddMenuEntry("Show/Hide Wireframe", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);

@@ -95,6 +95,7 @@ void draw_axis() {
     if(!showAxis)
         return;
 
+    glPushMatrix();
     glLineWidth(1.0f);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xf0f0);
@@ -114,6 +115,7 @@ void draw_axis() {
     glVertex3f(0, 0, 2);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
+    glPopMatrix();
 }
 
 void toggleAxesVisibility() {
