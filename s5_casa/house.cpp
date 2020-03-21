@@ -28,12 +28,22 @@ const float CHIM_THICK = .3f / SW;
 const float TRANSLATION_STEP = .05;
 const float ROTATION_STEP = 1.0;
 
-#define COLOR_ROOF_EXTERNAL     230, 0, 0
+color_t COLOR_ROOF_EXTERNAL_1 = { 230, 0, 0 };
+color_t COLOR_ROOF_EXTERNAL_2 = { 109, 76, 65 };
+
+color_t COLOR_WALL_EXTERNAL_1 = { 238, 238, 238 };
+color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
+
 #define COLOR_ROOF_INTERNAL     160, 0, 0
-#define COLOR_WALL_EXTERNAL     200, 200, 200
-#define COLOR_DOOR              127, 0, 0
 #define COLOR_WALL_INTERNAL     80, 80, 80
+
+#define COLOR_DOOR              141, 110, 99
 #define COLOR_FLOOR             160, 160, 160
+
+house::house() {
+    _colorRoofExternal = {COLOR_ROOF_EXTERNAL_1 };
+    _colorWallExternal  = {COLOR_WALL_EXTERNAL_1 };
+};
 
 void house::draw() {
     glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
@@ -141,7 +151,7 @@ void house::drawRoof() {
                     { HALF_BASE_WIDTH + ROOF_THICK,  WALL_HEIGHT, -(BASE_HEIGHT + ROOF_THICK)},
                     { 0, ROOF_HEIGHT + ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK) },
                     { 0, ROOF_HEIGHT + ROOF_THICK, ROOF_THICK },
-                    COLOR_ROOF_EXTERNAL
+                    _colorRoofExternal
             },{
                     { HALF_BASE_WIDTH+ ROOF_THICK,  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
                     { HALF_BASE_WIDTH+ ROOF_THICK, WALL_HEIGHT- ROOF_THICK,   ROOF_THICK },
@@ -155,7 +165,7 @@ void house::drawRoof() {
                     { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT,      ROOF_THICK },
                     { 0,  (ROOF_HEIGHT + ROOF_THICK), ROOF_THICK },
                     { 0,  (ROOF_HEIGHT + ROOF_THICK), -(BASE_HEIGHT + ROOF_THICK) },
-                    COLOR_ROOF_EXTERNAL
+                    _colorRoofExternal
             },{
                     { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT- ROOF_THICK, ROOF_THICK },
                     { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
@@ -175,7 +185,7 @@ void house::drawPrismWalls() {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
                     { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
                     { 0,  ROOF_HEIGHT, 0 },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { HALF_BASE_WIDTH, WALL_HEIGHT, -WALL_THICK },
@@ -187,7 +197,7 @@ void house::drawPrismWalls() {
                     { HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT) },
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT)},
                     { 0,  ROOF_HEIGHT, -BASE_HEIGHT },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK)},
@@ -210,7 +220,7 @@ void house::drawLateralWalls() {
                     { HALF_BASE_WIDTH, 0, 0 },
                     { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
                     { HALF_DOOR_WIDTH, WALL_HEIGHT, 0 },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { (HALF_BASE_WIDTH - WALL_THICK),  0, -WALL_THICK },
@@ -224,7 +234,7 @@ void house::drawLateralWalls() {
                     { -HALF_DOOR_WIDTH, 0, 0 },
                     { -HALF_DOOR_WIDTH, WALL_HEIGHT, 0 },
                     { -HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { -HALF_DOOR_WIDTH,                0, -WALL_THICK },
@@ -239,7 +249,7 @@ void house::drawLateralWalls() {
                     { HALF_BASE_WIDTH, 0, -BASE_HEIGHT },
                     { HALF_BASE_WIDTH, WALL_HEIGHT, -BASE_HEIGHT },
                     { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { (HALF_BASE_WIDTH - WALL_THICK),  0, -(BASE_HEIGHT - WALL_THICK) },
@@ -254,7 +264,7 @@ void house::drawLateralWalls() {
                     { -HALF_BASE_WIDTH,  0, -BASE_HEIGHT},
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, -BASE_HEIGHT },
                     { HALF_BASE_WIDTH,  WALL_HEIGHT, -BASE_HEIGHT },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { -(HALF_BASE_WIDTH - WALL_THICK), 0, -(BASE_HEIGHT - WALL_THICK)},
@@ -269,7 +279,7 @@ void house::drawLateralWalls() {
                     { -HALF_BASE_WIDTH, 0, 0 },
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, -BASE_HEIGHT },
-                    COLOR_WALL_EXTERNAL
+                    _colorWallExternal
             },
             {
                     { -(HALF_BASE_WIDTH - WALL_THICK), 0, -WALL_THICK },
@@ -356,4 +366,11 @@ void house::updateRotation(bool enabled) {
 
 bool house::RotationEnabled() {
     return _rotationEnabled;
+}
+
+void house::changeColor() {
+    _colorStandard = !_colorStandard;
+    _colorRoofExternal = _colorStandard ? COLOR_ROOF_EXTERNAL_1 : COLOR_ROOF_EXTERNAL_2;
+    _colorWallExternal  = _colorStandard ? COLOR_WALL_EXTERNAL_1 : COLOR_WALL_EXTERNAL_2;
+    glutPostRedisplay();
 }

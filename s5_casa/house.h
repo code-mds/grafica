@@ -6,9 +6,11 @@
 #define GRAFICA_HOUSE_H
 
 #include <GL/glew.h>
+#include "draw_utils.h"
 
 class house {
 public:
+    house();
     void draw();
     void toggleDoor();
     void rotateDoor();
@@ -22,8 +24,14 @@ public:
 
     bool RotationEnabled();
 
+    void changeColor();
+
 private:
-    GLboolean _doorOpen = false;
+    bool _colorStandard = true;
+    color_t _colorRoofExternal;
+    color_t _colorWallExternal;
+
+    bool _doorOpen = false;
     GLfloat _doorAngle = 0.0;
     GLfloat _translationY = 0.0;
     GLfloat _translationX = 0.0;

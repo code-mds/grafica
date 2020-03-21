@@ -14,6 +14,12 @@
 #include "house.h"
 
 #define COLOR_BACK              1.0, 1.0, 1.0, 0.0
+#define MNU_CHANGE_COLOR 6
+#define MNU_OPENCLOSE_DOOR 5
+#define MNU_STOP_HOUSE_ROTATION 4
+#define MNU_START_HOUSE_ROTATION 3
+#define MNU_TOGGLE_WIREFRAME 2
+#define MNU_TOGGLE_AXIS 1
 
 const int WINDOW_WIDTH = 600;
 const int WINDOW_HEIGHT = 600;
@@ -100,18 +106,21 @@ void reshapeCB(int w, int h) {
     //glMatrixMode(GL_MODELVIEW);
 }
 
+
 void mainMenuCB(int value) {
     switch (value) {
-        case 1:
+        case MNU_TOGGLE_AXIS:
             toggleAxesVisibility(); break;
-        case 2:
+        case MNU_TOGGLE_WIREFRAME:
             toggleWireframeVisibility(); break;
-        case 3:
+        case MNU_START_HOUSE_ROTATION:
             startHouseRotation(); break;
-        case 4:
+        case MNU_STOP_HOUSE_ROTATION:
             stopHouseRotation(); break;
-        case 5:
+        case MNU_OPENCLOSE_DOOR:
             startDoorRotation(); break;
+        case MNU_CHANGE_COLOR:
+            _house.changeColor(); break;
     }
 }
 
@@ -161,6 +170,8 @@ void keyCB(unsigned char key, int x, int y) {
     }
 }
 
+
+
 void init(void) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -173,11 +184,12 @@ void init(void) {
     glClearColor(COLOR_BACK);
 
     glutCreateMenu(mainMenuCB);
-    glutAddMenuEntry("Show/Hide Axes", 1);
-    glutAddMenuEntry("Show/Hide Wireframe", 2);
-    glutAddMenuEntry("Start House Rotation", 3);
-    glutAddMenuEntry("Stop House Rotation", 4);
-    glutAddMenuEntry("Open/Close Door", 5);
+    glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
+    glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
+    glutAddMenuEntry("Start House Rotation", MNU_START_HOUSE_ROTATION);
+    glutAddMenuEntry("Stop House Rotation", MNU_STOP_HOUSE_ROTATION);
+    glutAddMenuEntry("Open/Close Door", MNU_OPENCLOSE_DOOR);
+    glutAddMenuEntry("Change color", MNU_CHANGE_COLOR);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutDisplayFunc(drawCB);
