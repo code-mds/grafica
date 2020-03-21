@@ -40,10 +40,11 @@ color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
 #define COLOR_DOOR              141, 110, 99
 #define COLOR_FLOOR             160, 160, 160
 
-house::house() {
-    _colorRoofExternal = {COLOR_ROOF_EXTERNAL_1 };
-    _colorWallExternal  = {COLOR_WALL_EXTERNAL_1 };
-};
+house::house() :
+    _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
+    _colorWallExternal{COLOR_WALL_EXTERNAL_1}
+{
+}
 
 void house::draw() {
     glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
