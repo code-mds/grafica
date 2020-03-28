@@ -51,8 +51,8 @@ house::house() :
 }
 
 void house::draw() {
-    glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
     glTranslatef(_translationX, _translationY, 0.0f);
+    glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
 
     glPushMatrix();
     drawFloor();
@@ -303,11 +303,10 @@ void house::drawLateralWalls() {
 
 void house::drawDoor() {
     glPushMatrix();
-    glTranslated(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
+    glTranslatef(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
     glRotatef(_doorAngle, 0.0, 1.0, 0.0);
-    glTranslated(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
+    glTranslatef(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
     rectangle_t rectangles[] = {
-            // front walls
             {
                     { -HALF_DOOR_WIDTH, 0, -WALL_THICK },
                     { HALF_DOOR_WIDTH, 0, -WALL_THICK },

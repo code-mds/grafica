@@ -8,6 +8,12 @@ bool showWireFrame = true;
 
 void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3);
 
+/**
+ * Draw a 3D prism using front and back faces
+ * Lateral faces are derived
+ * @param front
+ * @param back
+ */
 void draw_prism(triangle_t &front, triangle_t &back) {
 
     rectangle_t rect[] = {
@@ -42,6 +48,12 @@ void draw_prism(triangle_t &front, triangle_t &back) {
     draw_triangle3D(back);
 }
 
+/**
+ * Draw a 3D parallelepiped using front and back face
+ * Lateral faces are derived
+ * @param front
+ * @param back
+ */
 void draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
     draw_rectangle3D(front);
     draw_rectangle3D(back);
@@ -59,15 +71,31 @@ void draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
     draw_rectangle3D(top);
 }
 
+/**
+ * Draw a 3D rectangle using the rect data struct
+ * The rectangle is composed by by 2 triangles
+ * @param rect
+ */
 void draw_rectangle3D(rectangle_t &rect ) {
     draw_triangle3D(rect.v1, rect.v2, rect.v3, rect.color);
     draw_triangle3D(rect.v3, rect.v4, rect.v1, rect.color);
 }
 
+/**
+ * Draw a 3D triangle using the triangle data struct
+ * @param triangle
+ */
 void draw_triangle3D(triangle_t &triangle) {
     draw_triangle3D(triangle.v1, triangle.v2, triangle.v3, triangle.color);
 }
 
+/**
+ * Draw a 3D triangle using 3 vertex structs
+ * @param v1
+ * @param v2
+ * @param v3
+ * @param color
+ */
 void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
     glColor3ub(color.r, color.g, color.b);
     glPolygonMode(GL_FRONT,GL_FILL);
@@ -90,7 +118,9 @@ void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t 
     glEnd();
 }
 
-
+/**
+ * Draw X, Y and Z axis in 3 different colors
+ */
 void draw_axis() {
     if(!showAxis)
         return;

@@ -103,7 +103,6 @@ void reshapeCB(int w, int h) {
     else
         glOrtho(-1.5 * (GLfloat) w / (GLfloat) h,
                 1.5 * (GLfloat) w / (GLfloat) h, -1.5, 1.5, -10.0, 10.0);
-    //glMatrixMode(GL_MODELVIEW);
 }
 
 
