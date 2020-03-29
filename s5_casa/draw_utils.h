@@ -6,7 +6,6 @@
 #define GRAFICA_DRAW_UTILS_H
 
 #ifdef __APPLE__
-#include <GL/glew.h>
 #include <GLUT/glut.h>
 #else
 // headers richiesti da Windows e linux

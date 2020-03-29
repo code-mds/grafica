@@ -1,13 +1,40 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_PREFIX_PATH "C:/SUPSI/freeglut")
-
-include_directories("C:/SUPSI/freeglut/include")
-include_directories("C:/SUPSI/glew-2.1.0/include")
-
-link_directories("C:/SUPSI/freeglut/lib/x64")
-link_directories("C:/SUPSI/glew-2.1.0/lib/release/x64")
-
 project(s5_casa)
 add_executable(s5_casa draw_utils.cpp house.cpp main.cpp )
-target_link_libraries(s5_casa -lfreeGLUT -lglew32 -lopengl32 -lglu32)
+
+if(APPLE)
+    message(INFO ": PLATFORM APPLE")
+
+    include_directories("/usr/local/include")
+    find_package(OpenGL REQUIRED)
+    include_directories(${OpenGL_INCLUDE_DIRS})
+    link_directories(${OpenGL_LIBRARY_DIRS})
+    add_definitions(${OpenGL_DEFINITIONS})
+    if(NOT OPENGL_FOUND)
+        message(ERROR " OPENGL not found!")
+    endif(NOT OPENGL_FOUND)
+
+    find_package(GLUT REQUIRED)
+    include_directories(${GLUT_INCLUDE_DIRS})
+    link_directories(${GLUT_LIBRARY_DIRS})
+    add_definitions(${GLUT_DEFINITIONS})
+    if(NOT GLUT_FOUND)
+        message(ERROR " GLUT not found!")
+    endif(NOT GLUT_FOUND)
+    target_link_libraries(s5_casa ${OPENGL_LIBRARY} ${GLUT_LIBRARY} ${GLEW_LIBRARIES})
+
+elseif(MSYS)
+    message(INFO ": PLATFORM WINDOWS")
+
+    set(CMAKE_PREFIX_PATH "C:/SUPSI/freeglut")
+    include_directories("C:/SUPSI/freeglut/include")
+    include_directories("C:/SUPSI/glew-2.1.0/include")
+
+    link_directories("C:/SUPSI/freeglut/lib/x64")
+    link_directories("C:/SUPSI/glew-2.1.0/lib/release/x64")
+    target_link_libraries(s5_casa -lfreeGLUT -lglew32 -lopengl32 -lglu32)
+else()
+    message(ERROR " PLATFORM NOT SUPPORTED")
+endif()
+

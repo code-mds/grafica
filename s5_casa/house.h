@@ -5,7 +5,6 @@
 #ifndef GRAFICA_HOUSE_H
 #define GRAFICA_HOUSE_H
 
-#include <GL/glew.h>
 #include "draw_utils.h"
 
 class house {

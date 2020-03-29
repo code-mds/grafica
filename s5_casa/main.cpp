@@ -3,13 +3,14 @@
 
 #ifdef __APPLE__
     // Headers richiesti da OSX
-    #include <GL/glew.h>
     #include <GLUT/glut.h>
 #else
     // headers richiesti da Windows e linux
     #include <GL\glew.h>
     #include <GL\freeglut.h>
 #endif
+
+#include <stdlib.h>
 #include "draw_utils.h"
 #include "house.h"
 
