@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 14)
-project(s5_casa)
-add_executable(s5_casa draw_utils.cpp house.cpp main.cpp )
-
 if(APPLE)
     message(INFO ": PLATFORM APPLE")
 
@@ -22,8 +19,6 @@ if(APPLE)
     if(NOT GLUT_FOUND)
         message(ERROR " GLUT not found!")
     endif(NOT GLUT_FOUND)
-    target_link_libraries(s5_casa ${OPENGL_LIBRARY} ${GLUT_LIBRARY} ${GLEW_LIBRARIES})
-
 elseif(MSYS)
     message(INFO ": PLATFORM WINDOWS")
 
@@ -33,8 +28,14 @@ elseif(MSYS)
 
     link_directories("C:/SUPSI/freeglut/lib/x64")
     link_directories("C:/SUPSI/glew-2.1.0/lib/release/x64")
-    target_link_libraries(s5_casa -lfreeGLUT -lglew32 -lopengl32 -lglu32)
+
+    set(OPENGL_LIBRARY -lopengl32)
+    set(GLUT_LIBRARY -lfreeGLUT -lglu32)
+    set(GLEW_LIBRARIES -lglew32)
 else()
     message(ERROR " PLATFORM NOT SUPPORTED")
 endif()
 
+project(s5_casa)
+add_executable(${PROJECT_NAME} draw_utils.cpp house.cpp main.cpp )
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARY} ${GLUT_LIBRARY} ${GLEW_LIBRARIES})

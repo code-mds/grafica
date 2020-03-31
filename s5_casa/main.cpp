@@ -10,7 +10,7 @@
     #include <GL\freeglut.h>
 #endif
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "draw_utils.h"
 #include "house.h"
 
@@ -47,12 +47,21 @@ void stopHouseRotation();
 
 void drawCB() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // set MODEL/VIEW matrix mode
     glMatrixMode(GL_MODELVIEW);
+
+    // load identity matrix
     glLoadIdentity();
+
+    // view transformation must be called before model transformation
+    // coordinates: eye, center/lookat, up vector
     gluLookAt(-.6, 0.4, 1, 0, 0, 0, 0, 1, 0);
 
+    // model transformations
     draw_axis();
     _house.draw();
+
     glutSwapBuffers();
 }
 

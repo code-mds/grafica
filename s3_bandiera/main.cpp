@@ -7,11 +7,7 @@
 
 // Headers richiesti da OSX
 #ifdef __APPLE__
-//#include <OpenGL/gl3.h>
-#include <GL/glew.h>
 #include <GLUT/glut.h>
-#include <iostream>
-
 // headers richiesti da Windows e linux
 #else
 #include <Windows.h>
