@@ -1,6 +1,3 @@
 cmake_minimum_required(VERSION 3.15)
 project(grafica)
-add_subdirectory(s3_bandiera)
-add_subdirectory(s3_piramide)
-add_subdirectory(s4_casa)
-add_subdirectory(s5_casa)
+add_subdirectory(s6_casa)
