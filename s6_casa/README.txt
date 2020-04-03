@@ -20,14 +20,17 @@ Esercizio 1:
 - bin\s6_casa.exe
 
 Funzioni:
-- Show/Hide Axes (F1 / Right Click)
-- Show/Hide Wireframe (F2 / Right Click)
-- Change Color (F3 / Right Click)
+- Show/Hide Axes (F1 / Right Click menu)
+- Show/Hide Wireframe (F2 / Right Click menu)
+- Change Color (F3 / Right Click menu)
 
 - House Translate X axis (arrows left/right)
 - House Translate Y axis (arrows up/down)
-- Auto Rotate House (r / Right Click)
-- Stop Rotate House (s / Right Click)
-- Open/Close Door (d / Right Click)
+- House Translate Z axis (page up/down)
+
+- Auto Rotate House (r / Right Click menu)
+- Stop Rotate House (s / Right Click menu)
+- Open/Close Door (d / Right Click menu)
 
 - Draw flag animation
+- Show/Hide Wind (Right Click menu)
