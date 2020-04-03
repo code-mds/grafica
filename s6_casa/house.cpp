@@ -25,8 +25,11 @@ const float CHIM_START_DEPTH = -3.5f / SW;
 const float CHIM_END_DEPTH = -4.5f / SW;
 const float CHIM_THICK = .3f / SW;
 
-const float CYLINDER_THICK = .3f / SW;
+const float CYLINDER_RADIUS = .1f / SW;
+const float CYLINDER_HEIGHT = 3.0f /SW;
 
+const float FLAG_HEIGHT = 1.0f / SW;
+const float FLAG_WIDTH = .05f / SW;
 
 const float TRANSLATION_STEP = .05;
 const float ROTATION_STEP = 1.0;
@@ -54,7 +57,7 @@ house::house() :
 }
 
 void house::draw() {
-    glTranslatef(_translationX, _translationY, 0.0f);
+    glTranslatef(_translationX, _translationY, _translationZ);
     glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
 
     glPushMatrix();
@@ -62,6 +65,7 @@ void house::draw() {
     drawLateralWalls();
     drawPrismWalls();
     drawRoof();
+    drawCylinder();
     drawFlag();
     drawChimney();
     drawDoor();
@@ -337,12 +341,34 @@ void house::toggleDoor() {
     _doorOpen = !_doorOpen;
 }
 
+void house::updateAnimation() {
+    if(_rotationEnabled)
+        _rotationX += ROTATION_STEP;
+
+    if(_windAngle > _flagAngle) {
+        _flagAngle++;
+    } else if(_windAngle < _flagAngle) {
+        _flagAngle--;
+    }
+
+    glutPostRedisplay();
+}
+
 void house::rotateDoor() {
     if(_doorOpen && _doorAngle < 90) {
         _doorAngle++;
     } else if(!_doorOpen && _doorAngle > 0) {
         _doorAngle--;
     }
+}
+
+void house::moveNear() {
+    _translationZ -= TRANSLATION_STEP;
+    glutPostRedisplay();
+}
+
+void house::moveFar() {
+    _translationZ += TRANSLATION_STEP;
     glutPostRedisplay();
 }
 
@@ -368,12 +394,9 @@ void house::moveLeft() {
 
 void house::updateRotation(bool enabled) {
     _rotationEnabled = enabled;
-    if(enabled)
-        _rotationX += ROTATION_STEP;
-    glutPostRedisplay();
 }
 
-bool house::RotationEnabled() {
+bool house::rotationEnabled() {
     return _rotationEnabled;
 }
 
@@ -386,7 +409,29 @@ void house::changeColor() {
 }
 
 void house::drawFlag() {
-    //TODO draw flag
+    triangle_t triangles[] = {
+            {
+                    { -FLAG_WIDTH,  0, 0 },
+                    { -FLAG_WIDTH, FLAG_HEIGHT, 0 },
+                    { -FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
+                    _colorRoofInternal
+            },
+            {
+                    { FLAG_WIDTH, FLAG_HEIGHT, 0 },
+                    { FLAG_WIDTH, 0, 0 },
+                    { FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
+                    _colorRoofExternal
+            }
+    };
+
+    glPushMatrix();
+    glTranslatef(0, ROOF_HEIGHT+CYLINDER_HEIGHT-FLAG_HEIGHT, 0);
+    glRotatef(_flagAngle, 0, 1, 0);
+    draw_prism(triangles[0], triangles[1]);
+    glPopMatrix();
+}
+
+void house::drawCylinder() const {
     GLUquadricObj *quadric;
     quadric = gluNewQuadric();
     gluQuadricDrawStyle(quadric, GLU_FILL);
@@ -394,6 +439,11 @@ void house::drawFlag() {
     glPushMatrix();
     glTranslatef(0, ROOF_HEIGHT, 0);
     glRotatef(-90, 1, 0, 0);
-    gluCylinder(quadric, 0.1/SW, 0.1/SW, 3/SW, 32, 32);
+    gluCylinder(quadric, CYLINDER_RADIUS, CYLINDER_RADIUS, CYLINDER_HEIGHT, 32, 32);
     glPopMatrix();
+}
+
+void house::updateWind() {
+    _windAngle = rand() % 360 + 1;
+    glutPostRedisplay();
 }

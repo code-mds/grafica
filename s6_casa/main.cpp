@@ -14,7 +14,7 @@
 #include "draw_utils.h"
 #include "house.h"
 
-#define COLOR_BACK              1.0, 1.0, 1.0, 0.0
+#define COLOR_BACK 1.0, 1.0, 1.0, 0.0
 #define MNU_CHANGE_COLOR 6
 #define MNU_OPENCLOSE_DOOR 5
 #define MNU_STOP_HOUSE_ROTATION 4
@@ -22,30 +22,26 @@
 #define MNU_TOGGLE_WIREFRAME 2
 #define MNU_TOGGLE_AXIS 1
 
-const int WINDOW_WIDTH = 600;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 800;
 const int ANIM_MSEC = 100;
+const int WIND_MSEC = 5000;
 const char ESCAPE = 27;
-const int ROTATE_HOUSE = 0;
-const int ROTATE_DOOR = 1;
 
 int _mainWindow;
 house _house;
 
-void drawCB();
-void mainMenuCB(int value);
-void reshapeCB(int w, int h);
-void timerCB(int value);
-void specialKeyCB(int key, int x, int y);
-void keyCB(unsigned char key, int x, int y);
+void displayCallback();
+void menuCallback(int value);
+void reshapeCallaback(int w, int h);
+void animationCallaback(int value);
+void windCallaback(int value);
+void specialKeyCallback(int key, int x, int y);
+void keyCallback(unsigned char key, int x, int y);
 
 void rotateHouse();
-void rotateDoor();
-void startHouseRotation();
-void startDoorRotation();
-void stopHouseRotation();
 
-void drawCB() {
+void displayCallback() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // set MODEL/VIEW matrix mode
@@ -56,7 +52,7 @@ void drawCB() {
 
     // view transformation must be called before model transformation
     // coordinates: eye, center/lookat, up vector
-    gluLookAt(-.6, 0.4, 1, 0, 0, 0, 0, 1, 0);
+    gluLookAt(-.6, 0.4, 0.5, 0, 0, 0, 0, .6, 0);
 
     // model transformations
     draw_axis();
@@ -65,45 +61,28 @@ void drawCB() {
     glutSwapBuffers();
 }
 
-void timerCB(int value) {
-    switch (value) {
-        case ROTATE_HOUSE:
-            rotateHouse();
-            break;
-        case ROTATE_DOOR:
-            rotateDoor();
-            break;
-    }
+
+void windCallaback(int value) {
+    _house.updateWind();
+    glutTimerFunc(WIND_MSEC, windCallaback, 0);
 }
 
-void rotateDoor() {
+void animationCallaback(int value) {
+    rotateHouse();
     _house.rotateDoor();
-    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
+    _house.updateAnimation();
+
+    glutTimerFunc(ANIM_MSEC, animationCallaback, 0);
 }
 
 void rotateHouse() {
-    if(!_house.RotationEnabled())
+    if(!_house.rotationEnabled())
         return;
 
     _house.updateRotation(true);
-    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
 }
 
-void stopHouseRotation() {
-    _house.updateRotation(false);
-}
-
-void startHouseRotation() {
-    _house.updateRotation(true);
-    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_HOUSE);
-}
-
-void startDoorRotation() {
-    _house.toggleDoor();
-    glutTimerFunc(ANIM_MSEC, timerCB, ROTATE_DOOR);
-}
-
-void reshapeCB(int w, int h) {
+void reshapeCallaback(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -116,24 +95,26 @@ void reshapeCB(int w, int h) {
 }
 
 
-void mainMenuCB(int value) {
+void menuCallback(int value) {
     switch (value) {
         case MNU_TOGGLE_AXIS:
             toggleAxesVisibility(); break;
         case MNU_TOGGLE_WIREFRAME:
             toggleWireframeVisibility(); break;
         case MNU_START_HOUSE_ROTATION:
-            startHouseRotation(); break;
+            _house.updateRotation(true); break;
         case MNU_STOP_HOUSE_ROTATION:
-            stopHouseRotation(); break;
+            _house.updateRotation(false); break;
         case MNU_OPENCLOSE_DOOR:
-            startDoorRotation(); break;
+            _house.toggleDoor();
+            break;
         case MNU_CHANGE_COLOR:
-            _house.changeColor(); break;
+            _house.changeColor();
+            break;
     }
 }
 
-void specialKeyCB(int key, int x, int y) {
+void specialKeyCallback(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_F1:
             toggleAxesVisibility();
@@ -156,24 +137,30 @@ void specialKeyCB(int key, int x, int y) {
         case GLUT_KEY_LEFT:
             _house.moveLeft();
             break;
+        case GLUT_KEY_PAGE_UP:
+            _house.moveNear();
+            break;
+        case GLUT_KEY_PAGE_DOWN:
+            _house.moveFar();
+            break;
     }
 }
 
-void keyCB(unsigned char key, int x, int y) {
+void keyCallback(unsigned char key, int x, int y) {
     switch (key) {
         case 'R':
         case 'r':
-            startHouseRotation();
+            _house.updateRotation(true);
             break;
 
         case 'S':
         case 's':
-            stopHouseRotation();
+            _house.updateRotation(false);
             break;
 
         case 'D':
         case 'd':
-            startDoorRotation();
+            _house.toggleDoor();
             break;
 
         case ESCAPE:
@@ -187,13 +174,13 @@ void init() {
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     _mainWindow = glutCreateWindow("S5 house");
 
-    glutReshapeFunc(reshapeCB);
+    glutReshapeFunc(reshapeCallaback);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClearColor(COLOR_BACK);
 
-    glutCreateMenu(mainMenuCB);
+    glutCreateMenu(menuCallback);
     glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
     glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
     glutAddMenuEntry("Start House Rotation", MNU_START_HOUSE_ROTATION);
@@ -202,9 +189,12 @@ void init() {
     glutAddMenuEntry("Change color", MNU_CHANGE_COLOR);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-    glutDisplayFunc(drawCB);
-    glutSpecialFunc(specialKeyCB);
-    glutKeyboardFunc(keyCB);
+    glutDisplayFunc(displayCallback);
+    glutSpecialFunc(specialKeyCallback);
+    glutKeyboardFunc(keyCallback);
+
+    glutTimerFunc(ANIM_MSEC, animationCallaback, 0);
+    glutTimerFunc(WIND_MSEC, windCallaback, 0);
 }
 
 int main(int argc, char* argv[]) {

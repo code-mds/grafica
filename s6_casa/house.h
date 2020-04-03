@@ -18,12 +18,15 @@ public:
     void moveDown();
     void moveRight();
     void moveLeft();
+    void moveNear();
+    void moveFar();
 
     void updateRotation(bool enabled);
 
-    bool RotationEnabled();
-
+    bool rotationEnabled();
     void changeColor();
+    void updateWind();
+    void updateAnimation();
 
 private:
     bool _colorStandard = true;
@@ -32,11 +35,15 @@ private:
     color_t _colorWallExternal;
 
     bool _doorOpen = false;
+    bool _rotationEnabled = false;
+
     GLfloat _doorAngle = 0.0;
+    GLfloat _translationZ = 0.0;
     GLfloat _translationY = 0.0;
     GLfloat _translationX = 0.0;
     GLfloat _rotationX = 0.0;
-    bool _rotationEnabled = false;
+    GLfloat _windAngle = 0.0;
+    GLfloat _flagAngle = 0.0;
 
     void drawPrismWalls();
     void drawLateralWalls();
@@ -44,8 +51,8 @@ private:
     void drawFloor();
     void drawChimney();
     void drawDoor();
-
     void drawFlag();
+    void drawCylinder() const;
 };
 
 
