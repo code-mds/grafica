@@ -26,7 +26,7 @@
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
 const int ANIM_MSEC = 50;
-const int WIND_MSEC = 10000;
+const int WIND_MSEC = 5000;
 const char ESCAPE = 27;
 
 GLfloat _windAngle = 0.0;
