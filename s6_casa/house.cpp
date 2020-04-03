@@ -25,11 +25,11 @@ const float CHIM_START_DEPTH = -3.5f / SW;
 const float CHIM_END_DEPTH = -4.5f / SW;
 const float CHIM_THICK = .3f / SW;
 
-const float CYLINDER_RADIUS = .1f / SW;
+const float CYLINDER_RADIUS = .01f / SW;
 const float CYLINDER_HEIGHT = 3.0f /SW;
 
 const float FLAG_HEIGHT = 1.0f / SW;
-const float FLAG_WIDTH = .05f / SW;
+const float FLAG_WIDTH = .03f / SW;
 
 const float TRANSLATION_STEP = .05;
 const float ROTATION_STEP = 1.0;
@@ -45,16 +45,22 @@ color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
 
 
 #define COLOR_WALL_INTERNAL     80, 80, 80
-
 #define COLOR_DOOR              141, 110, 99
 #define COLOR_FLOOR             160, 160, 160
+#define COLOR_FLAG              153,206,255
 
 house::house() :
     _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
 {
+    _quadric = gluNewQuadric();
 }
+
+house::~house() {
+    gluDeleteQuadric(_quadric);
+}
+
 
 void house::draw() {
     glTranslatef(_translationX, _translationY, _translationZ);
@@ -414,36 +420,37 @@ void house::drawFlag() {
                     { -FLAG_WIDTH,  0, 0 },
                     { -FLAG_WIDTH, FLAG_HEIGHT, 0 },
                     { -FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
-                    _colorRoofInternal
+                    COLOR_FLAG
             },
             {
                     { FLAG_WIDTH, FLAG_HEIGHT, 0 },
                     { FLAG_WIDTH, 0, 0 },
                     { FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
-                    _colorRoofExternal
+                    COLOR_FLAG
             }
     };
 
     glPushMatrix();
     glTranslatef(0, ROOF_HEIGHT+CYLINDER_HEIGHT-FLAG_HEIGHT, 0);
-    glRotatef(_flagAngle, 0, 1, 0);
+    glRotatef(_flagAngle-_rotationX, 0, 1, 0);
     draw_prism(triangles[0], triangles[1]);
     glPopMatrix();
 }
 
 void house::drawCylinder() const {
-    GLUquadricObj *quadric;
-    quadric = gluNewQuadric();
-    gluQuadricDrawStyle(quadric, GLU_FILL);
+    gluQuadricDrawStyle(_quadric, GLU_LINE);
+    gluQuadricNormals(_quadric, GLU_SMOOTH);
 
     glPushMatrix();
+    glLineWidth(1.0f);
+    glColor3ub(15, 32, 112);
     glTranslatef(0, ROOF_HEIGHT, 0);
     glRotatef(-90, 1, 0, 0);
-    gluCylinder(quadric, CYLINDER_RADIUS, CYLINDER_RADIUS, CYLINDER_HEIGHT, 32, 32);
+    gluCylinder(_quadric, CYLINDER_RADIUS, CYLINDER_RADIUS, CYLINDER_HEIGHT, 32, 32);
     glPopMatrix();
 }
 
-void house::updateWind() {
-    _windAngle = rand() % 360 + 1;
+void house::updateWind(GLfloat windAngle) {
+    _windAngle = windAngle;
     glutPostRedisplay();
 }

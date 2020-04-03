@@ -10,6 +10,7 @@
 class house {
 public:
     house();
+    ~house();
     void draw();
     void toggleDoor();
     void rotateDoor();
@@ -21,11 +22,12 @@ public:
     void moveNear();
     void moveFar();
 
+    void toggleWindVisibility();
     void updateRotation(bool enabled);
 
     bool rotationEnabled();
     void changeColor();
-    void updateWind();
+    void updateWind(GLfloat windAngle);
     void updateAnimation();
 
 private:
@@ -53,6 +55,8 @@ private:
     void drawDoor();
     void drawFlag();
     void drawCylinder() const;
+
+    GLUquadric *_quadric;
 };
 
 

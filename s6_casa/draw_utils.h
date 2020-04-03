@@ -14,8 +14,9 @@
 #include "draw_utils.h"
 #endif
 
-extern bool showAxis;
-extern bool showWireFrame;
+extern bool _showWind;
+extern bool _showAxis;
+extern bool _showWireFrame;
 
 typedef struct {
     GLubyte r,g,b;
@@ -35,10 +36,12 @@ typedef struct {
     color_t color;
 } rectangle_t;
 
+void draw_wind(GLfloat windAngle);
 void draw_axis();
 void toggleAxesVisibility();
 void toggleWireframeVisibility();
-
+void toggleWindVisibility();
+void testMinMaxLineWidth();
 void draw_triangle3D(triangle_t &triangle);
 void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color);
 void draw_rectangle3D(rectangle_t &rect);

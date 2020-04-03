@@ -15,6 +15,7 @@
 #include "house.h"
 
 #define COLOR_BACK 1.0, 1.0, 1.0, 0.0
+#define MNU_TOGGLE_WIND 7
 #define MNU_CHANGE_COLOR 6
 #define MNU_OPENCLOSE_DOOR 5
 #define MNU_STOP_HOUSE_ROTATION 4
@@ -24,10 +25,11 @@
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const int ANIM_MSEC = 100;
-const int WIND_MSEC = 5000;
+const int ANIM_MSEC = 50;
+const int WIND_MSEC = 10000;
 const char ESCAPE = 27;
 
+GLfloat _windAngle = 0.0;
 int _mainWindow;
 house _house;
 
@@ -55,6 +57,7 @@ void displayCallback() {
     gluLookAt(-.6, 0.4, 0.5, 0, 0, 0, 0, .6, 0);
 
     // model transformations
+    draw_wind(_windAngle);
     draw_axis();
     _house.draw();
 
@@ -63,7 +66,8 @@ void displayCallback() {
 
 
 void windCallaback(int value) {
-    _house.updateWind();
+    _windAngle = rand() % 360 + 1;
+    _house.updateWind(_windAngle);
     glutTimerFunc(WIND_MSEC, windCallaback, 0);
 }
 
@@ -98,13 +102,20 @@ void reshapeCallaback(int w, int h) {
 void menuCallback(int value) {
     switch (value) {
         case MNU_TOGGLE_AXIS:
-            toggleAxesVisibility(); break;
+            toggleAxesVisibility();
+            break;
         case MNU_TOGGLE_WIREFRAME:
-            toggleWireframeVisibility(); break;
+            toggleWireframeVisibility();
+            break;
+        case MNU_TOGGLE_WIND:
+            toggleWindVisibility();
+            break;
         case MNU_START_HOUSE_ROTATION:
-            _house.updateRotation(true); break;
+            _house.updateRotation(true);
+            break;
         case MNU_STOP_HOUSE_ROTATION:
-            _house.updateRotation(false); break;
+            _house.updateRotation(false);
+            break;
         case MNU_OPENCLOSE_DOOR:
             _house.toggleDoor();
             break;
@@ -181,6 +192,7 @@ void init() {
     glClearColor(COLOR_BACK);
 
     glutCreateMenu(menuCallback);
+    glutAddMenuEntry("Show/Hide Wind", MNU_TOGGLE_WIND);
     glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
     glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
     glutAddMenuEntry("Start House Rotation", MNU_START_HOUSE_ROTATION);
@@ -200,6 +212,6 @@ void init() {
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     init();
+
     glutMainLoop();
 }
-

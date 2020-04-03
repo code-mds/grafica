@@ -3,9 +3,10 @@
 //
 #include "draw_utils.h"
 
-bool showAxis = true;
-bool showWireFrame = true;
-
+bool _showWind = true;
+bool _showAxis = true;
+bool _showWireFrame = true;
+#define WIREFRAME_COLOR 15, 32, 112
 void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3);
 
 /**
@@ -101,10 +102,10 @@ void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
     glPolygonMode(GL_FRONT,GL_FILL);
     internal_triangle3D(v1, v2, v3);
 
-    if(showWireFrame) {
+    if(_showWireFrame) {
         // wireframe
-        glLineWidth(1.0);
-        glColor3ub(15, 32, 112);
+        glLineWidth(1.0f);
+        glColor3ub(WIREFRAME_COLOR);
         glPolygonMode(GL_FRONT, GL_LINE);
         internal_triangle3D(v1, v2, v3);
     }
@@ -122,7 +123,7 @@ void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t 
  * Draw X, Y and Z axis in 3 different colors
  */
 void draw_axis() {
-    if(!showAxis)
+    if(!_showAxis)
         return;
 
     glPushMatrix();
@@ -148,12 +149,40 @@ void draw_axis() {
     glPopMatrix();
 }
 
+void draw_wind(GLfloat windAngle) {
+    if(!_showWind)
+        return;
+
+    glPushMatrix();
+    glRotatef(windAngle, 0, 1, 0);
+    glLineWidth(5.0f);
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0xf0f0);
+    glBegin(GL_LINES);
+    glColor3ub(214, 234, 248);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, -10);
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
+    glPopMatrix();
+}
+
 void toggleAxesVisibility() {
-    showAxis = !showAxis;
+    _showAxis = !_showAxis;
     glutPostRedisplay();
 }
 
 void toggleWireframeVisibility() {
-    showWireFrame = !showWireFrame;
+    _showWireFrame = !_showWireFrame;
     glutPostRedisplay();
+}
+
+void toggleWindVisibility() {
+    _showWind = !_showWind;
+    glutPostRedisplay();
+}
+
+void testMinMaxLineWidth() {
+    GLfloat lineWidthRange[2] = {0.0f, 0.0f};
+    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
 }
