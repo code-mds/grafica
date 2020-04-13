@@ -1,1 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/icosaedro_suddiviso.dir/icosaedro_suddiviso.c.o  -o icosaedro_suddiviso -framework GLUT -framework Cocoa /usr/local/lib/libGLEW.dylib -framework OpenGL 

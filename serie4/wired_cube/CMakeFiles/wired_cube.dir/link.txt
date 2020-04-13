@@ -1,1 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/wired_cube.dir/wired_cube.c.o  -o wired_cube -framework GLUT -framework Cocoa /usr/local/lib/libGLEW.dylib -framework OpenGL 
