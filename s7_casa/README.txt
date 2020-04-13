@@ -24,16 +24,16 @@ Funzioni:
 - Show/Hide Wireframe (F2 / Right Click menu)
 - Change Color (F3 / Right Click menu)
 
-- House Translate X axis (CTRL LEFT/RIGHT keys)
+- House Translate X axis (F7/F8 keys)
 - House Translate Y axis (PAGE UP/DOWN keys)
 - House Translate Z axis (HOME/END keys)
 
-- Auto Rotate House (r key / Right Click menu)
-- Stop Rotate House (s key / Right Click menu)
-- Open/Close Door (d key / Right Click menu)
+- Auto Rotate House (r/R key / Right Click menu)
+- Stop Rotate House (s/S key / Right Click menu)
+- Open/Close Door (d/D key / Right Click menu)
 
 - Draw flag animation
 - Show/Hide Wind (Right Click menu)
 
-- Assonometric projection (a key / Right Click menu)
-- Perspective projection (p key / Right Click menu)
+- Orthographic projection (a/A key / Right Click menu)
+- Perspective projection (p/P key / Right Click menu)
