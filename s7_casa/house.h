@@ -9,7 +9,7 @@
 
 class house {
 public:
-    house();
+    house(draw_utils& utils);
     ~house();
     void draw();
     void toggleDoor();
@@ -57,6 +57,7 @@ private:
     void drawCylinder() const;
 
     GLUquadric *_quadric;
+    draw_utils& _utils;
 };
 
 

@@ -1,13 +1,14 @@
 //
 // Created by massi on 05.03.2020.
 //
+#include <iostream>
 #include "draw_utils.h"
 
-bool _showWind = true;
-bool _showAxis = true;
-bool _showWireFrame = true;
 #define WIREFRAME_COLOR 15, 32, 112
-void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3);
+
+void draw_utils::log(std::string msg) {
+    std::cout << msg << std::endl;
+}
 
 /**
  * Draw a 3D prism using front and back faces
@@ -15,7 +16,7 @@ void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t 
  * @param front
  * @param back
  */
-void draw_prism(triangle_t &front, triangle_t &back) {
+void draw_utils::draw_prism(triangle_t &front, triangle_t &back) {
 
     rectangle_t rect[] = {
             {
@@ -55,7 +56,7 @@ void draw_prism(triangle_t &front, triangle_t &back) {
  * @param front
  * @param back
  */
-void draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
+void draw_utils::draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
     draw_rectangle3D(front);
     draw_rectangle3D(back);
 
@@ -77,7 +78,7 @@ void draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
  * The rectangle is composed by by 2 triangles
  * @param rect
  */
-void draw_rectangle3D(rectangle_t &rect ) {
+void draw_utils::draw_rectangle3D(rectangle_t &rect ) {
     draw_triangle3D(rect.v1, rect.v2, rect.v3, rect.color);
     draw_triangle3D(rect.v3, rect.v4, rect.v1, rect.color);
 }
@@ -86,7 +87,7 @@ void draw_rectangle3D(rectangle_t &rect ) {
  * Draw a 3D triangle using the triangle data struct
  * @param triangle
  */
-void draw_triangle3D(triangle_t &triangle) {
+void draw_utils::draw_triangle3D(triangle_t &triangle) {
     draw_triangle3D(triangle.v1, triangle.v2, triangle.v3, triangle.color);
 }
 
@@ -97,7 +98,7 @@ void draw_triangle3D(triangle_t &triangle) {
  * @param v3
  * @param color
  */
-void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
+void draw_utils::draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
     glColor3ub(color.r, color.g, color.b);
     glPolygonMode(GL_FRONT,GL_FILL);
     internal_triangle3D(v1, v2, v3);
@@ -111,7 +112,7 @@ void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
     }
 }
 
-void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3) {
+void draw_utils::internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3) {
     glBegin(GL_TRIANGLES);
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
@@ -122,7 +123,7 @@ void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t 
 /**
  * Draw X, Y and Z axis in 3 different colors
  */
-void draw_axis(volume_t volume) {
+void draw_utils::draw_axis(volume_t volume) {
     if(!_showAxis)
         return;
 
@@ -150,7 +151,7 @@ void draw_axis(volume_t volume) {
     glPopMatrix();
 }
 
-void draw_wind(GLfloat windAngle) {
+void draw_utils::draw_wind(GLfloat windAngle) {
     if(!_showWind)
         return;
 
@@ -168,22 +169,25 @@ void draw_wind(GLfloat windAngle) {
     glPopMatrix();
 }
 
-void toggleAxesVisibility() {
+void draw_utils::toggleAxesVisibility() {
     _showAxis = !_showAxis;
+    log(std::string("axis ") + (_showAxis ? "visible" : "hidden"));
     glutPostRedisplay();
 }
 
-void toggleWireframeVisibility() {
+void draw_utils::toggleWireframeVisibility() {
     _showWireFrame = !_showWireFrame;
+    log(std::string("wireframe ") + (_showWireFrame ? "visible" : "hidden"));
     glutPostRedisplay();
 }
 
-void toggleWindVisibility() {
+void draw_utils::toggleWindVisibility() {
     _showWind = !_showWind;
+    log(std::string("wind ") + (_showWind ? "visible" : "hidden"));
     glutPostRedisplay();
 }
 
-void testMinMaxLineWidth() {
+void draw_utils::testMinMaxLineWidth() {
     GLfloat lineWidthRange[2] = {0.0f, 0.0f};
     glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
 }

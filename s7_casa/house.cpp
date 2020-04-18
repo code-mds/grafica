@@ -49,7 +49,8 @@ color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
 #define COLOR_FLOOR             160, 160, 160
 #define COLOR_FLAG              153,206,255
 
-house::house() :
+house::house(draw_utils& utils) :
+    _utils{utils},
     _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
@@ -145,7 +146,7 @@ void house::drawChimney() {
 
     int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
     for (int i = 0; i < nrOfWalls; i=i+2) {
-        draw_parallelepiped(rectangles[i], rectangles[i + 1]);
+        _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
 }
 
@@ -159,7 +160,7 @@ void house::drawFloor() {
             COLOR_FLOOR
     };
 
-    draw_rectangle3D(rect);
+    _utils.draw_rectangle3D(rect);
 }
 
 void house::drawRoof() {
@@ -194,8 +195,8 @@ void house::drawRoof() {
             }
     };
 
-    draw_parallelepiped(rectangles[0], rectangles[1]);
-    draw_parallelepiped(rectangles[2], rectangles[3]);
+    _utils.draw_parallelepiped(rectangles[0], rectangles[1]);
+    _utils.draw_parallelepiped(rectangles[2], rectangles[3]);
 }
 
 void house::drawPrismWalls() {
@@ -226,8 +227,8 @@ void house::drawPrismWalls() {
             },
     };
 
-    draw_prism(triangles[0], triangles[1]);
-    draw_prism(triangles[2], triangles[3]);
+    _utils.draw_prism(triangles[0], triangles[1]);
+    _utils.draw_prism(triangles[2], triangles[3]);
 }
 
 void house::drawLateralWalls() {
@@ -310,7 +311,7 @@ void house::drawLateralWalls() {
     };
     int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
     for (int i = 0; i < nrOfWalls; i=i+2) {
-        draw_parallelepiped(rectangles[i], rectangles[i + 1]);
+        _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
 
 }
@@ -338,7 +339,7 @@ void house::drawDoor() {
     };
     int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
     for (int i = 0; i < nrOfWalls; i=i+2) {
-        draw_parallelepiped(rectangles[i], rectangles[i + 1]);
+        _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
     glPopMatrix();
 }
@@ -371,31 +372,37 @@ void house::rotateDoor() {
 void house::moveNear() {
     _translationZ -= TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation Z:" + std::to_string(_translationZ));
 }
 
 void house::moveFar() {
     _translationZ += TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation Z:" + std::to_string(_translationZ));
 }
 
 void house::moveUp() {
     _translationY += TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation Y:" + std::to_string(_translationY));
 }
 
 void house::moveDown() {
     _translationY -= TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation Y:" + std::to_string(_translationY));
 }
 
 void house::moveRight() {
     _translationX += TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation X:" + std::to_string(_translationX));
 }
 
 void house::moveLeft() {
     _translationX -= TRANSLATION_STEP;
     glutPostRedisplay();
+    _utils.log("Translation X:" + std::to_string(_translationX));
 }
 
 void house::updateRotation(bool enabled) {
@@ -433,7 +440,7 @@ void house::drawFlag() {
     glPushMatrix();
     glTranslatef(0, ROOF_HEIGHT+CYLINDER_HEIGHT-FLAG_HEIGHT, 0);
     glRotatef(_flagAngle-_rotationX, 0, 1, 0);
-    draw_prism(triangles[0], triangles[1]);
+    _utils.draw_prism(triangles[0], triangles[1]);
     glPopMatrix();
 }
 

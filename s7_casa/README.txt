@@ -20,20 +20,20 @@ Esercizio 1:
 - bin\s7_casa.exe
 
 Funzioni:
-- Show/Hide Axes (F1 / Right Click menu)
-- Show/Hide Wireframe (F2 / Right Click menu)
-- Change Color (F3 / Right Click menu)
+- Show/Hide Axes (x,X keys / Right Click menu)
+- Show/Hide Wireframe (w,W keys / Right Click menu)
+- Change Color (c,C / Right Click menu)
 
-- House Translate X axis (F7/F8 keys)
-- House Translate Y axis (PAGE UP/DOWN keys)
-- House Translate Z axis (HOME/END keys)
+- House Translate X axis (F1/F2 keys)
+- House Translate Y axis (F3/F4 keys)
+- House Translate Z axis (F5/F6 keys)
 
-- Auto Rotate House (r/R key / Right Click menu)
-- Stop Rotate House (s/S key / Right Click menu)
-- Open/Close Door (d/D key / Right Click menu)
+- Auto Rotate House (r,R key / Right Click menu)
+- Stop Rotate House (s,S key / Right Click menu)
+- Open/Close Door (d,D key / Right Click menu)
 
 - Draw flag animation
 - Show/Hide Wind (Right Click menu)
 
-- Orthographic projection (a/A key / Right Click menu)
-- Perspective projection (p/P key / Right Click menu)
+- Orthographic projection (a,A key / Right Click menu)
+- Perspective projection (p,P key / Right Click menu)

@@ -13,6 +13,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include "draw_utils.h"
 #include "house.h"
 #include "main.h"
@@ -27,6 +28,8 @@
 #define MNU_START_HOUSE_ROTATION 3
 #define MNU_TOGGLE_WIREFRAME 2
 #define MNU_TOGGLE_AXIS 1
+#define PROJ_ORTHOGRAPHIC 'a'
+#define PROJ_PERSPECTIVE 'p'
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -34,14 +37,19 @@ const int ANIM_MSEC = 50;
 const int WIND_MSEC = 5000;
 const char ESCAPE = 27;
 
-// global variables
-GLfloat _windAngle = 0.0;
-int _mainWindow = 0;
-GLdouble _fovy = 60.0;
-lookat_t _camera{0, 0, 3.0, 0, 0, 0, 0 , .1, 0};
-volume_t _volume{-5.0, 5.0, -5.0, 5.0, -5.0, 10.0};
-char _projection_type = 'p';
-house _house;
+struct AppGlobals {
+    // global variables
+    GLfloat windAngle = 0.0;
+    int mainWindow = 0;
+    GLdouble fovy = 60.0;
+    camera_t camera{-1, 0, 3.0, 0, 0, 0, 0 , .1, 0};
+    volume_t volume{-5.0, 5.0, -5.0, 5.0, -5.0, 10.0};
+    char projection_type = PROJ_PERSPECTIVE;
+    draw_utils utils;
+    house house{utils};
+};
+
+AppGlobals* _app;
 
 void displayCallback() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -54,55 +62,52 @@ void displayCallback() {
 
     // view transformation must be called before model transformation
     // coordinates: eye, center/lookat, up vector
-    gluLookAt(_camera.eyex, _camera.eyey, _camera.eyez,
-              _camera.centerx, _camera.centery, _camera.centerz,
-              _camera.upx, _camera.upy, _camera.upz);
+    gluLookAt(_app->camera.eyex, _app->camera.eyey, _app->camera.eyez,
+              _app->camera.centerx, _app->camera.centery, _app->camera.centerz,
+              _app->camera.upx, _app->camera.upy, _app->camera.upz);
 
     // model transformations
-    draw_wind(_windAngle);
-    draw_axis(_volume);
-    _house.draw();
+    _app->utils.draw_wind(_app->windAngle);
+    _app->utils.draw_axis(_app->volume);
+    _app->house.draw();
 
     glutSwapBuffers();
 }
 
-void windCallaback(int value) {
-    _windAngle = rand() % 360 + 1;
-    _house.updateWind(_windAngle);
-    glutTimerFunc(WIND_MSEC, windCallaback, 0);
+void windCallback(int value) {
+    _app->windAngle = rand() % 360 + 1;
+    _app->house.updateWind(_app->windAngle);
+    glutTimerFunc(WIND_MSEC, windCallback, 0);
 }
 
-void animationCallaback(int value) {
-    rotateHouse();
-    _house.rotateDoor();
-    _house.updateAnimation();
+void animationCallback(int value) {
+    if(_app->house.rotationEnabled())
+        _app->house.updateRotation(true);
 
-    glutTimerFunc(ANIM_MSEC, animationCallaback, 0);
+    _app->house.rotateDoor();
+    _app->house.updateAnimation();
+
+    glutTimerFunc(ANIM_MSEC, animationCallback, 0);
 }
 
-void rotateHouse() {
-    if(!_house.rotationEnabled())
-        return;
-
-    _house.updateRotation(true);
-}
-
-void reshapeCallaback(int w, int h) {
+void reshapeCallback(int w, int h) {
     glViewport(0, 0, w, h);
+    reshape(w, h);
+}
+
+void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-
-    GLdouble l{_volume.left};
-    GLdouble r{_volume.right};
-    GLdouble b{_volume.bottom};
-    GLdouble t{_volume.top};
-    GLdouble n{_volume.n};
-    GLdouble f{_volume.f};
+    GLdouble l{_app->volume.left};
+    GLdouble r{_app->volume.right};
+    GLdouble b{_app->volume.bottom};
+    GLdouble t{_app->volume.top};
+    GLdouble n{_app->volume.n};
+    GLdouble f{_app->volume.f};
     GLdouble ratio{1.0};
 
-
-    if(_projection_type == 'a') {
+    if(_app->projection_type == PROJ_ORTHOGRAPHIC) {
         // orthographic projection
         if (w <= h) {
             ratio = (GLdouble) h / w;
@@ -117,7 +122,7 @@ void reshapeCallaback(int w, int h) {
     } else {
         // perspective projection
         GLdouble aspect = (GLdouble)w/h;
-        gluPerspective(_fovy, aspect, 1.0, 50.0);
+        gluPerspective(_app->fovy, aspect, 1.0, 500.0);
     }
 }
 
@@ -131,124 +136,141 @@ void menuCallback(int value) {
             setProspectiveProjection();
             break;
         case MNU_TOGGLE_AXIS:
-            toggleAxesVisibility();
+            _app->utils.toggleAxesVisibility();
             break;
         case MNU_TOGGLE_WIREFRAME:
-            toggleWireframeVisibility();
+            _app->utils.toggleWireframeVisibility();
             break;
         case MNU_TOGGLE_WIND:
-            toggleWindVisibility();
+            _app->utils.toggleWindVisibility();
             break;
         case MNU_START_HOUSE_ROTATION:
-            _house.updateRotation(true);
+            _app->house.updateRotation(true);
             break;
         case MNU_STOP_HOUSE_ROTATION:
-            _house.updateRotation(false);
+            _app->house.updateRotation(false);
             break;
         case MNU_OPENCLOSE_DOOR:
-            _house.toggleDoor();
+            _app->house.toggleDoor();
             break;
         case MNU_CHANGE_COLOR:
-            _house.changeColor();
+            _app->house.changeColor();
             break;
     }
 }
 
 void setProspectiveProjection() {
-    _projection_type = 'p';
-    reshapeCallaback(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+    _app->utils.log("Projection: Prospective");
+    forceReshape(PROJ_PERSPECTIVE);
 }
 
 void setOrthographicProjection() {
-    _projection_type = 'a';
-    reshapeCallaback(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+    _app->utils.log("Projection: Orthographic");
+    forceReshape(PROJ_ORTHOGRAPHIC);
+}
+
+void forceReshape(char type) {
+    _app->projection_type = type;
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    reshape(viewport[2], viewport[3]);
 }
 
 void specialKeyCallback(int key, int x, int y) {
     switch (key) {
-        case GLUT_KEY_F1:
-            toggleAxesVisibility();
-            break;
-        case GLUT_KEY_F2:
-            toggleWireframeVisibility();
-            break;
-        case GLUT_KEY_F3:
-            _house.changeColor();
-            break;
 
         case GLUT_KEY_F9:
-            _fovy -= 1;
-            std::cout << "_fovy " << _fovy << std::endl;
-            reshapeCallaback(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            _app->fovy -= 1;
+            _app->utils.log("fovy=" + std::to_string(_app->fovy));
+            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
         case GLUT_KEY_F10:
-            _fovy += 1;
-            std::cout << "_fovy " << _fovy << std::endl;
-            reshapeCallaback(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            _app->fovy += 1;
+            _app->utils.log("fovy=" + std::to_string(_app->fovy));
+            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
+
         case GLUT_KEY_F11:
-            _camera.eyez -= .05;
+            _app->camera.eyez -= .05;
             updateCamera();
             break;
         case GLUT_KEY_F12:
-            _camera.eyez += .05;
+            _app->camera.eyez += .05;
             updateCamera();
             break;
         case GLUT_KEY_UP:
-            _camera.eyey += .05;
+            _app->camera.eyey += .05;
             updateCamera();
             break;
         case GLUT_KEY_DOWN:
-            _camera.eyey -= .05;
+            _app->camera.eyey -= .05;
             updateCamera();
             break;
         case GLUT_KEY_RIGHT:
-            _camera.eyex += .05;
+            _app->camera.eyex += .05;
             updateCamera();
             break;
         case GLUT_KEY_LEFT:
-            _camera.eyex -= .05;
+            _app->camera.eyex -= .05;
             updateCamera();
             break;
 
-        case GLUT_KEY_F7:
+        case GLUT_KEY_F1:
             // translation: -X
-            _house.moveLeft();
+            _app->house.moveLeft();
             break;
-        case GLUT_KEY_F8:
+        case GLUT_KEY_F2:
             // translation: +X
-            _house.moveRight();
+            _app->house.moveRight();
             break;
-
-        case GLUT_KEY_HOME:
-            // translation: -Z
-            _house.moveNear();
-            break;
-        case GLUT_KEY_END:
-            // translation: +Z
-            _house.moveFar();
-            break;
-
-        case GLUT_KEY_PAGE_UP:
+        case GLUT_KEY_F3:
             // translation: +Y
-            _house.moveUp();
+            _app->house.moveUp();
             break;
-        case GLUT_KEY_PAGE_DOWN:
+        case GLUT_KEY_F4:
             // translation: -Y
-            _house.moveDown();
+            _app->house.moveDown();
             break;
+        case GLUT_KEY_F5:
+            // translation: -Z
+            _app->house.moveNear();
+            break;
+        case GLUT_KEY_F6:
+            // translation: +Z
+            _app->house.moveFar();
+            break;
+
     }
 }
 
 void updateCamera() {
-    std::cout << "Camera: x=" << _camera.eyex;
-    std::cout << ", y=" << _camera.eyey;
-    std::cout << ", z=" << _camera.eyez << std::endl;
+    std::ostringstream ostr;
+    ostr << std::fixed << std::setprecision(2);
+    ostr << "Camera: x=" << _app->camera.eyex;
+    ostr << ", y=" << _app->camera.eyey;
+    ostr << ", z=" << _app->camera.eyez;
+    _app->utils.log(ostr.str());
+
     glutPostRedisplay();
 }
 
 void keyCallback(unsigned char key, int x, int y) {
     switch (key) {
+        case 'c':
+        case 'C':
+            _app->house.changeColor();
+            break;
+
+        case 'X':
+        case 'x':
+            _app->utils.toggleAxesVisibility();
+            break;
+
+        case 'W':
+        case 'w':
+            _app->utils.toggleWireframeVisibility();
+            break;
+
         case 'A':
         case 'a':
             setOrthographicProjection();
@@ -261,31 +283,31 @@ void keyCallback(unsigned char key, int x, int y) {
 
         case 'R':
         case 'r':
-            _house.updateRotation(true);
+            _app->house.updateRotation(true);
             break;
 
         case 'S':
         case 's':
-            _house.updateRotation(false);
+            _app->house.updateRotation(false);
             break;
 
         case 'D':
         case 'd':
-            _house.toggleDoor();
+            _app->house.toggleDoor();
             break;
 
         case ESCAPE:
-            glutDestroyWindow(_mainWindow);
+            glutDestroyWindow(_app->mainWindow);
             exit(0);
     }
 }
 
-void init() {
+void appInit() {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    _mainWindow = glutCreateWindow("S5 house");
+    _app->mainWindow = glutCreateWindow("house");
 
-    glutReshapeFunc(reshapeCallaback);
+    glutReshapeFunc(reshapeCallback);
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -297,8 +319,8 @@ void init() {
     glutSpecialFunc(specialKeyCallback);
     glutKeyboardFunc(keyCallback);
 
-    glutTimerFunc(ANIM_MSEC, animationCallaback, 0);
-    glutTimerFunc(WIND_MSEC, windCallaback, 0);
+    glutTimerFunc(ANIM_MSEC, animationCallback, 0);
+    glutTimerFunc(WIND_MSEC, windCallback, 0);
 }
 
 void createMenu() {
@@ -329,8 +351,11 @@ void createMenu() {
 }
 
 int main(int argc, char* argv[]) {
+    AppGlobals app;
+    _app = &app;
+
     glutInit(&argc, argv);
-    init();
+    appInit();
 
     glutMainLoop();
 }
