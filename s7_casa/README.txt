@@ -37,3 +37,5 @@ Funzioni:
 
 - Orthographic projection (a,A key / Right Click menu)
 - Perspective projection (p,P key / Right Click menu)
+
+- Camera (arrows + PG UP/DOWN)

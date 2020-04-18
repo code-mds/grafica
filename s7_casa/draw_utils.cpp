@@ -123,32 +123,62 @@ void draw_utils::internal_triangle3D(const vertex_t &v1, const vertex_t &v2, con
 /**
  * Draw X, Y and Z axis in 3 different colors
  */
-void draw_utils::draw_axis(volume_t volume) {
+void draw_utils::draw_axis() {
     if(!_showAxis)
         return;
 
     glPushMatrix();
     glLineWidth(1.0f);
+
+    glPolygonMode(GL_FRONT, GL_LINE);
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0xf0f0);
-    // axes are ten units long.
+
     glBegin(GL_LINES);
     // Draw a red x-axis
     glColor3ub(255, 0, 0);
-    glVertex3f(volume.left, 0, 0);
-    glVertex3f(volume.right, 0, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(10, 0, 0);
 
     // Draw a green y-axis
     glColor3ub(0, 255, 0);
-    glVertex3f(0, volume.bottom, 0);
-    glVertex3f(0, volume.top, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 10, 0);
+
     // Draw a blue z-axis
     glColor3ub(0, 0, 255);
-    glVertex3f(0, 0, volume.n);
-    glVertex3f(0, 0, volume.f);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, 10);
+
     glEnd();
     glDisable(GL_LINE_STIPPLE);
     glPopMatrix();
+}
+
+void draw_utils::draw_volume(const ortho_t &vol) const {// volume cube
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glShadeModel (GL_FLAT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    //draw the front face dimensions
+    glBegin(GL_QUADS);
+    glColor4f(1.0, 0, 0, .3);
+    glVertex3f(vol.left, vol.bottom, vol.znear);
+    glVertex3f(vol.right, vol.bottom, vol.znear);
+    glVertex3f(vol.right, vol.top, vol.znear);
+    glVertex3f(vol.left, vol.top, vol.znear);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glColor4f(0, 1.0, 0, .3);
+    glVertex3f(vol.left, vol.bottom, vol.zfar);
+    glVertex3f(vol.right, vol.bottom, vol.zfar);
+    glVertex3f(vol.right, vol.top, vol.zfar);
+    glVertex3f(vol.left, vol.top, vol.zfar);
+    glEnd();
+
+    glDisable(GL_FILL);
 }
 
 void draw_utils::draw_wind(GLfloat windAngle) {

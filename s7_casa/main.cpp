@@ -19,6 +19,7 @@
 #include "main.h"
 
 #define COLOR_BACK 1.0, 1.0, 1.0, 0.0
+#define MNU_RESET 10
 #define MNU_ORTHO 9
 #define MNU_PERSPECTIVE 8
 #define MNU_TOGGLE_WIND 7
@@ -42,12 +43,15 @@ struct AppGlobals {
     GLfloat windAngle = 0.0;
     int mainWindow = 0;
     GLdouble fovy = 60.0;
-    camera_t camera{-1, 0, 3.0, 0, 0, 0, 0 , .1, 0};
-    volume_t volume{-5.0, 5.0, -5.0, 5.0, -5.0, 10.0};
-    char projection_type = PROJ_PERSPECTIVE;
+    camera_t camera{0, 0, 1.0, 0, 0, 0, 0 , 1, 0};
+    ortho_t ortho{-5.0, 5.0, -5.0, 5.0, -5.0, 5.0};
+    volume_t volume;
+    char projection_type = PROJ_ORTHOGRAPHIC; //PROJ_PERSPECTIVE;
     draw_utils utils;
-    house house{utils};
+    house house{utils, ortho};
 };
+
+void reset();
 
 AppGlobals* _app;
 
@@ -68,7 +72,8 @@ void displayCallback() {
 
     // model transformations
     _app->utils.draw_wind(_app->windAngle);
-    _app->utils.draw_axis(_app->volume);
+    _app->utils.draw_axis();
+
     _app->house.draw();
 
     glutSwapBuffers();
@@ -99,36 +104,36 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    GLdouble l{_app->volume.left};
-    GLdouble r{_app->volume.right};
-    GLdouble b{_app->volume.bottom};
-    GLdouble t{_app->volume.top};
-    GLdouble n{_app->volume.n};
-    GLdouble f{_app->volume.f};
-    GLdouble ratio{1.0};
-
+    GLdouble aspect = (GLdouble)w/h;
     if(_app->projection_type == PROJ_ORTHOGRAPHIC) {
+        GLdouble l{_app->ortho.left};
+        GLdouble r{_app->ortho.right};
+        GLdouble b{_app->ortho.bottom};
+        GLdouble t{_app->ortho.top};
+        GLdouble n{_app->ortho.znear};
+        GLdouble f{_app->ortho.zfar};
+
         // orthographic projection
         if (w <= h) {
-            ratio = (GLdouble) h / w;
-            b*=ratio;
-            t*=ratio;
+            b /= aspect;
+            t /= aspect;
         } else {
-            ratio = (GLdouble) w / h;
-            l*=ratio;
-            r*=ratio;
+            l *= aspect;
+            r *= aspect;
         }
         glOrtho(l, r, b, t, n, f);
     } else {
         // perspective projection
-        GLdouble aspect = (GLdouble)w/h;
-        gluPerspective(_app->fovy, aspect, 1.0, 500.0);
+        gluPerspective(_app->fovy, aspect, 1.0, 100.0);
     }
 }
 
 
 void menuCallback(int value) {
     switch (value) {
+        case MNU_RESET:
+            reset();
+            break;
         case MNU_ORTHO:
             setOrthographicProjection();
             break;
@@ -159,6 +164,11 @@ void menuCallback(int value) {
     }
 }
 
+void reset() {
+    _app->house.reset();
+    _app->utils.log("reset");
+}
+
 void setProspectiveProjection() {
     _app->utils.log("Projection: Prospective");
     forceReshape(PROJ_PERSPECTIVE);
@@ -171,14 +181,16 @@ void setOrthographicProjection() {
 
 void forceReshape(char type) {
     _app->projection_type = type;
-    GLint viewport[4];
+    GLint viewport[4]; //x,y,w,h
     glGetIntegerv(GL_VIEWPORT, viewport);
     reshape(viewport[2], viewport[3]);
 }
 
 void specialKeyCallback(int key, int x, int y) {
     switch (key) {
-
+        case GLUT_KEY_CTRL_R:
+            reset();
+            break;
         case GLUT_KEY_F9:
             _app->fovy -= 1;
             _app->utils.log("fovy=" + std::to_string(_app->fovy));
@@ -190,11 +202,11 @@ void specialKeyCallback(int key, int x, int y) {
             reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
 
-        case GLUT_KEY_F11:
+        case GLUT_KEY_PAGE_DOWN:
             _app->camera.eyez -= .05;
             updateCamera();
             break;
-        case GLUT_KEY_F12:
+        case GLUT_KEY_PAGE_UP:
             _app->camera.eyez += .05;
             updateCamera();
             break;

@@ -9,7 +9,7 @@
 
 class house {
 public:
-    house(draw_utils& utils);
+    house(draw_utils& utils, ortho_t& ortho);
     ~house();
     void draw();
     void toggleDoor();
@@ -21,6 +21,7 @@ public:
     void moveLeft();
     void moveNear();
     void moveFar();
+    void reset();
 
     void toggleWindVisibility();
     void updateRotation(bool enabled);
@@ -29,6 +30,7 @@ public:
     void changeColor();
     void updateWind(GLfloat windAngle);
     void updateAnimation();
+    bool inBoundaries();
 
 private:
     bool _colorStandard = true;
@@ -40,8 +42,8 @@ private:
     bool _rotationEnabled = false;
 
     GLfloat _doorAngle = 0.0;
-    GLfloat _translationZ = 0.4;
-    GLfloat _translationY = -0.4;
+    GLfloat _translationZ = 0.0;
+    GLfloat _translationY = 0.0;
     GLfloat _translationX = 0.0;
     GLfloat _rotationX = 0.0;
     GLfloat _windAngle = 0.0;
@@ -58,6 +60,10 @@ private:
 
     GLUquadric *_quadric;
     draw_utils& _utils;
+    ortho_t& _ortho;
+    volume_t _volume;
+
+    void setupVolume();
 };
 
 
