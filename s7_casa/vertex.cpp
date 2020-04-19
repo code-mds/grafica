@@ -63,7 +63,7 @@ bool vertex_t::inViewingVolume(const float *projectionMatrix, const float *model
     vertex_t v = this->matrixProduct(modelviewMatrix);
     v = v.matrixProduct(projectionMatrix);
 
-    return !(v.x / v.w > 1.0 || v.y / v.w > 1.0 || v.z / v.w > 1.0);
+    return !(abs(v.x / v.w) > 1.0 || abs(v.y / v.w) > 1.0 || abs(v.z / v.w) > 1.0);
 }
 
 vertex_t vertex_t::matrixProduct(const float *m) {

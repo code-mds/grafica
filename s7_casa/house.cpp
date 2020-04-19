@@ -448,19 +448,6 @@ bool House::inBoundaries() {
             _utils.log("house OUT of boundaries");
             return false;
         }
-
-//        if(!_frustum.pointInFrustum(_volume.vertex[i])) {
-//            _utils.log("house OUT of boundaries");
-//            return false;
-//        }
-
-//        if( _volume.vertex[i].x + _translationX > _ortho.right ||
-//            _volume.vertex[i].x + _translationX < _ortho.left ||
-//            _volume.vertex[i].y + _translationY > _ortho.top ||
-//            _volume.vertex[i].y + _translationY < _ortho.bottom ||
-//            _volume.vertex[i].z + _translationZ > -_ortho.znear ||
-//            _volume.vertex[i].z + _translationZ < -_ortho.zfar)
-//            return false;
     }
     _utils.log("house IN boundaries");
     return true;
