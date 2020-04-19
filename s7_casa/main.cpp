@@ -350,6 +350,7 @@ void createMenu() {
     glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
     glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
     glutAddMenuEntry("Change color", MNU_CHANGE_COLOR);
+    glutAddMenuEntry("Reset position", MNU_RESET);
     glutCreateMenu(menuCallback);
 
     int menuAnimation = glutCreateMenu(menuCallback);
