@@ -5,7 +5,16 @@
 #ifndef S7_CASA_VERTEX_H
 #define S7_CASA_VERTEX_H
 
-#include <GL/glew.h>
+#ifdef __APPLE__
+    // Headers richiesti da OSX
+    #include <GL/glew.h>
+    #include <GLUT/glut.h>
+#else
+// headers richiesti da Windows e linux
+    #include <GL/glew.h>
+    #include <GL/freeglut.h>
+#endif
+
 
 struct vertex_t {
     GLfloat x, y, z, w=1;
