@@ -37,5 +37,5 @@ endif()
 set(REQUIRED_LIBS ${GLUT_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARY})
 
 project(s7_casa)
-add_executable(${PROJECT_NAME} draw_utils.cpp house.cpp main.cpp )
+add_executable(${PROJECT_NAME} vertex.cpp draw_utils.cpp house.cpp main.cpp )
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBS})

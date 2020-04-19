@@ -18,6 +18,7 @@
 #include "house.h"
 #include "main.h"
 
+#define ANG2RAD 3.14159265358979323846 / 180.0 * 0.5
 #define COLOR_BACK 1.0, 1.0, 1.0, 0.0
 #define MNU_RESET 10
 #define MNU_ORTHO 9
@@ -42,16 +43,20 @@ struct AppGlobals {
     // global variables
     GLfloat windAngle = 0.0;
     int mainWindow = 0;
-    GLdouble fovy = 60.0;
-    camera_t camera{0, 0, 1.0, 0, 0, 0, 0 , 1, 0};
-    ortho_t ortho{-5.0, 5.0, -5.0, 5.0, -5.0, 5.0};
-    volume_t volume;
-    char projection_type = PROJ_ORTHOGRAPHIC; //PROJ_PERSPECTIVE;
+
+    Camera camera{
+        {0, 0, 5.0},
+        {0, 0, 0},
+        {0 , 1, 0}
+    };
+    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 6.0};
+    Perspective perspective{  45.0, 1.0, 1.0, 100.0};
+
+    char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
     draw_utils utils;
-    house house{utils, ortho};
+    House house{utils};
 };
 
-void reset();
 
 AppGlobals* _app;
 
@@ -66,14 +71,13 @@ void displayCallback() {
 
     // view transformation must be called before model transformation
     // coordinates: eye, center/lookat, up vector
-    gluLookAt(_app->camera.eyex, _app->camera.eyey, _app->camera.eyez,
-              _app->camera.centerx, _app->camera.centery, _app->camera.centerz,
-              _app->camera.upx, _app->camera.upy, _app->camera.upz);
+    gluLookAt(_app->camera.eye.x, _app->camera.eye.y, _app->camera.eye.z,
+              _app->camera.center.x, _app->camera.center.y, _app->camera.center.z,
+              _app->camera.up.x, _app->camera.up.y, _app->camera.up.z);
 
     // model transformations
     _app->utils.draw_wind(_app->windAngle);
     _app->utils.draw_axis();
-
     _app->house.draw();
 
     glutSwapBuffers();
@@ -104,15 +108,13 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    GLdouble aspect = (GLdouble)w/h;
+    GLdouble aspect = (GLdouble)w/(h==0 ? 1 : h);
+
     if(_app->projection_type == PROJ_ORTHOGRAPHIC) {
         GLdouble l{_app->ortho.left};
         GLdouble r{_app->ortho.right};
         GLdouble b{_app->ortho.bottom};
         GLdouble t{_app->ortho.top};
-        GLdouble n{_app->ortho.znear};
-        GLdouble f{_app->ortho.zfar};
-
         // orthographic projection
         if (w <= h) {
             b /= aspect;
@@ -121,10 +123,13 @@ void reshape(int w, int h) {
             l *= aspect;
             r *= aspect;
         }
-        glOrtho(l, r, b, t, n, f);
+        glOrtho(l, r, b, t, _app->ortho.zNear, _app->ortho.zFar);
     } else {
         // perspective projection
-        gluPerspective(_app->fovy, aspect, 1.0, 100.0);
+        float fH = tan(_app->perspective.fovy * ANG2RAD) * _app->perspective.zNear;
+        float fW = fH * aspect;
+        glFrustum(-fW, fW, -fH, fH, _app->perspective.zNear, _app->perspective.zFar);
+        //gluPerspective(_app->perspective.fovy, aspect, _app->perspective.zNear, _app->perspective.zFar);
     }
 }
 
@@ -192,38 +197,38 @@ void specialKeyCallback(int key, int x, int y) {
             reset();
             break;
         case GLUT_KEY_F9:
-            _app->fovy -= 1;
-            _app->utils.log("fovy=" + std::to_string(_app->fovy));
+            _app->perspective.fovy -= 1;
+            _app->utils.log("fovy=" + std::to_string(_app->perspective.fovy));
             reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
         case GLUT_KEY_F10:
-            _app->fovy += 1;
-            _app->utils.log("fovy=" + std::to_string(_app->fovy));
+            _app->perspective.fovy += 1;
+            _app->utils.log("fovy=" + std::to_string(_app->perspective.fovy));
             reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            _app->camera.eyez -= .05;
+            _app->camera.eye.z -= .05;
             updateCamera();
             break;
         case GLUT_KEY_PAGE_UP:
-            _app->camera.eyez += .05;
+            _app->camera.eye.z += .05;
             updateCamera();
             break;
         case GLUT_KEY_UP:
-            _app->camera.eyey += .05;
+            _app->camera.eye.y += .05;
             updateCamera();
             break;
         case GLUT_KEY_DOWN:
-            _app->camera.eyey -= .05;
+            _app->camera.eye.y -= .05;
             updateCamera();
             break;
         case GLUT_KEY_RIGHT:
-            _app->camera.eyex += .05;
+            _app->camera.eye.x += .05;
             updateCamera();
             break;
         case GLUT_KEY_LEFT:
-            _app->camera.eyex -= .05;
+            _app->camera.eye.x -= .05;
             updateCamera();
             break;
 
@@ -251,16 +256,15 @@ void specialKeyCallback(int key, int x, int y) {
             // translation: +Z
             _app->house.moveFar();
             break;
-
     }
 }
 
 void updateCamera() {
     std::ostringstream ostr;
     ostr << std::fixed << std::setprecision(2);
-    ostr << "Camera: x=" << _app->camera.eyex;
-    ostr << ", y=" << _app->camera.eyey;
-    ostr << ", z=" << _app->camera.eyez;
+    ostr << "Camera: x=" << _app->camera.eye.x;
+    ostr << ", y=" << _app->camera.eye.y;
+    ostr << ", z=" << _app->camera.eye.z;
     _app->utils.log(ostr.str());
 
     glutPostRedisplay();
@@ -268,8 +272,8 @@ void updateCamera() {
 
 void keyCallback(unsigned char key, int x, int y) {
     switch (key) {
-        case 'c':
         case 'C':
+        case 'c':
             _app->house.changeColor();
             break;
 
@@ -315,7 +319,7 @@ void keyCallback(unsigned char key, int x, int y) {
 }
 
 void appInit() {
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     _app->mainWindow = glutCreateWindow("house");
 

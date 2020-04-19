@@ -39,3 +39,4 @@ Funzioni:
 - Perspective projection (p,P key / Right Click menu)
 
 - Camera (arrows + PG UP/DOWN)
+- Check House in Viewing Volume

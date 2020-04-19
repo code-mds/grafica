@@ -15,9 +15,10 @@ void animationCallback(int value);
 void windCallback(int value);
 void specialKeyCallback(int key, int x, int y);
 void keyCallback(unsigned char key, int x, int y);
-void rotateHouse();
 void updateCamera();
 void reshape(int w, int h);
 void forceReshape(char type);
+void reset();
+
 
 #endif //S7_CASA_MAIN_H

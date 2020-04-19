@@ -49,9 +49,8 @@ color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
 #define COLOR_FLOOR             160, 160, 160
 #define COLOR_FLAG              153,206,255
 
-house::house(draw_utils& utils, ortho_t& ortho) :
+House::House(draw_utils& utils) :
     _utils{utils},
-    _ortho{ortho},
     _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
@@ -60,7 +59,7 @@ house::house(draw_utils& utils, ortho_t& ortho) :
     setupVolume();
 }
 
-void house::setupVolume() {
+void House::setupVolume() {
     GLfloat x = HALF_BASE_WIDTH + ROOF_THICK;
     GLfloat y = ROOF_HEIGHT + CYLINDER_HEIGHT;
     GLfloat z = BASE_HEIGHT + ROOF_THICK;
@@ -77,11 +76,11 @@ void house::setupVolume() {
     _volume.vertex[i++] = {-x, y, -z };
 }
 
-house::~house() {
+House::~House() {
     gluDeleteQuadric(_quadric);
 }
 
-void house::draw() {
+void House::draw() {
     glTranslatef(_translationX, _translationY, _translationZ);
     glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
 
@@ -97,7 +96,7 @@ void house::draw() {
     glPopMatrix();
 }
 
-void house::drawChimney() {
+void House::drawChimney() {
     rectangle_t rectangles[] = {
             // LEFT SIDE
             {
@@ -168,7 +167,7 @@ void house::drawChimney() {
     }
 }
 
-void house::drawFloor() {
+void House::drawFloor() {
     rectangle_t rectangles[] = {
             // floor inside
             {
@@ -191,7 +190,7 @@ void house::drawFloor() {
     _utils.draw_parallelepiped(rectangles[0], rectangles[1]);
 }
 
-void house::drawRoof() {
+void House::drawRoof() {
     rectangle_t rectangles[] = {
             // right roof wall
             {
@@ -227,8 +226,8 @@ void house::drawRoof() {
     _utils.draw_parallelepiped(rectangles[2], rectangles[3]);
 }
 
-void house::drawPrismWalls() {
-    triangle_t triangles[] = {
+void House::drawPrismWalls() {
+    Triangle triangles[] = {
             {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
                     { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
@@ -259,7 +258,7 @@ void house::drawPrismWalls() {
     _utils.draw_prism(triangles[2], triangles[3]);
 }
 
-void house::drawLateralWalls() {
+void House::drawLateralWalls() {
 
     rectangle_t rectangles[] = {
             // front walls
@@ -344,7 +343,7 @@ void house::drawLateralWalls() {
 
 }
 
-void house::drawDoor() {
+void House::drawDoor() {
     glPushMatrix();
     glTranslatef(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
     glRotatef(_doorAngle, 0.0, 1.0, 0.0);
@@ -372,11 +371,11 @@ void house::drawDoor() {
     glPopMatrix();
 }
 
-void house::toggleDoor() {
+void House::toggleDoor() {
     _doorOpen = !_doorOpen;
 }
 
-void house::updateAnimation() {
+void House::updateAnimation() {
     if(_rotationEnabled)
         _rotationX += ROTATION_STEP;
 
@@ -389,7 +388,7 @@ void house::updateAnimation() {
     glutPostRedisplay();
 }
 
-void house::rotateDoor() {
+void House::rotateDoor() {
     if(_doorOpen && _doorAngle < 90) {
         _doorAngle++;
     } else if(!_doorOpen && _doorAngle > 0) {
@@ -397,7 +396,7 @@ void house::rotateDoor() {
     }
 }
 
-void house::moveNear() {
+void House::moveNear() {
     _translationZ -= TRANSLATION_STEP;
     if(!inBoundaries())
         _translationZ += TRANSLATION_STEP;
@@ -406,7 +405,7 @@ void house::moveNear() {
     _utils.log("Translation Z:" + std::to_string(_translationZ));
 }
 
-void house::moveFar() {
+void House::moveFar() {
     _translationZ += TRANSLATION_STEP;
     if(!inBoundaries())
         _translationZ -= TRANSLATION_STEP;
@@ -415,7 +414,7 @@ void house::moveFar() {
     _utils.log("Translation Z:" + std::to_string(_translationZ));
 }
 
-void house::moveUp() {
+void House::moveUp() {
     _translationY += TRANSLATION_STEP;
     if(!inBoundaries())
         _translationY -= TRANSLATION_STEP;
@@ -424,7 +423,7 @@ void house::moveUp() {
     _utils.log("Translation Y:" + std::to_string(_translationY));
 }
 
-void house::moveDown() {
+void House::moveDown() {
     _translationY -= TRANSLATION_STEP;
     if(!inBoundaries())
         _translationY += TRANSLATION_STEP;
@@ -433,21 +432,41 @@ void house::moveDown() {
     _utils.log("Translation Y:" + std::to_string(_translationY));
 }
 
-bool house::inBoundaries() {
-    // verify that the 8 vertex of the box containing the house stay inside the ortho
+bool House::inBoundaries() {
+    float tempMatrix[16], projectionMatrix[16], modelviewMatrix[16];
+
+    glGetFloatv(GL_MODELVIEW_MATRIX, tempMatrix);
+    vertex_t::matrixTranspose(tempMatrix, modelviewMatrix);
+
+    glGetFloatv(GL_PROJECTION_MATRIX, tempMatrix);
+    vertex_t::matrixTranspose(tempMatrix, projectionMatrix);
+
+    // verify that the 8 vertex of the box containing the house stay inside the viewing volume
     for (int i = 0; i < 8; ++i) {
-        if( _volume.vertex[i].x + _translationX > _ortho.right ||
-            _volume.vertex[i].x + _translationX < _ortho.left ||
-            _volume.vertex[i].y + _translationY > _ortho.top ||
-            _volume.vertex[i].y + _translationY < _ortho.bottom ||
-            _volume.vertex[i].z + _translationZ > -_ortho.znear ||
-            _volume.vertex[i].z + _translationZ < -_ortho.zfar)
+        vertex_t v = _volume.vertex[i].sum({_translationX, _translationY, _translationZ});
+        if(!v.inViewingVolume(projectionMatrix, modelviewMatrix)) {
+            _utils.log("house OUT of boundaries");
             return false;
+        }
+
+//        if(!_frustum.pointInFrustum(_volume.vertex[i])) {
+//            _utils.log("house OUT of boundaries");
+//            return false;
+//        }
+
+//        if( _volume.vertex[i].x + _translationX > _ortho.right ||
+//            _volume.vertex[i].x + _translationX < _ortho.left ||
+//            _volume.vertex[i].y + _translationY > _ortho.top ||
+//            _volume.vertex[i].y + _translationY < _ortho.bottom ||
+//            _volume.vertex[i].z + _translationZ > -_ortho.znear ||
+//            _volume.vertex[i].z + _translationZ < -_ortho.zfar)
+//            return false;
     }
+    _utils.log("house IN boundaries");
     return true;
 }
 
-void house::moveRight() {
+void House::moveRight() {
     _translationX += TRANSLATION_STEP;
     if(!inBoundaries())
         _translationX -= TRANSLATION_STEP;
@@ -456,7 +475,7 @@ void house::moveRight() {
     _utils.log("Translation X:" + std::to_string(_translationX));
 }
 
-void house::moveLeft() {
+void House::moveLeft() {
     _translationX -= TRANSLATION_STEP;
     if(!inBoundaries())
         _translationX += TRANSLATION_STEP;
@@ -465,15 +484,15 @@ void house::moveLeft() {
     _utils.log("Translation X:" + std::to_string(_translationX));
 }
 
-void house::updateRotation(bool enabled) {
+void House::updateRotation(bool enabled) {
     _rotationEnabled = enabled;
 }
 
-bool house::rotationEnabled() {
+bool House::rotationEnabled() {
     return _rotationEnabled;
 }
 
-void house::changeColor() {
+void House::changeColor() {
     _colorStandard = !_colorStandard;
     _colorRoofInternal = _colorStandard ? COLOR_ROOF_INTERNAL_1 : COLOR_ROOF_INTERNAL_2;
     _colorRoofExternal = _colorStandard ? COLOR_ROOF_EXTERNAL_1 : COLOR_ROOF_EXTERNAL_2;
@@ -481,8 +500,8 @@ void house::changeColor() {
     glutPostRedisplay();
 }
 
-void house::drawFlag() {
-    triangle_t triangles[] = {
+void House::drawFlag() {
+    Triangle triangles[] = {
             {
                     { -FLAG_WIDTH,  0, 0 },
                     { -FLAG_WIDTH, FLAG_HEIGHT, 0 },
@@ -504,7 +523,7 @@ void house::drawFlag() {
     glPopMatrix();
 }
 
-void house::drawCylinder() const {
+void House::drawCylinder() const {
     gluQuadricDrawStyle(_quadric, GLU_LINE);
     gluQuadricNormals(_quadric, GLU_SMOOTH);
 
@@ -517,12 +536,12 @@ void house::drawCylinder() const {
     glPopMatrix();
 }
 
-void house::updateWind(GLfloat windAngle) {
+void House::updateWind(GLfloat windAngle) {
     _windAngle = windAngle;
     glutPostRedisplay();
 }
 
-void house::reset() {
+void House::reset() {
     _windAngle = 0.0;
     _translationX = 0.0;
     _translationY = 0.0;

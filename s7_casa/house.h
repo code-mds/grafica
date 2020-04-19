@@ -7,10 +7,10 @@
 
 #include "draw_utils.h"
 
-class house {
+class House {
 public:
-    house(draw_utils& utils, ortho_t& ortho);
-    ~house();
+    explicit House(draw_utils& utils);
+    ~House();
     void draw();
     void toggleDoor();
     void rotateDoor();
@@ -23,7 +23,6 @@ public:
     void moveFar();
     void reset();
 
-    void toggleWindVisibility();
     void updateRotation(bool enabled);
 
     bool rotationEnabled();
@@ -57,13 +56,11 @@ private:
     void drawDoor();
     void drawFlag();
     void drawCylinder() const;
+    void setupVolume();
 
     GLUquadric *_quadric;
     draw_utils& _utils;
-    ortho_t& _ortho;
     volume_t _volume;
-
-    void setupVolume();
 };
 
 

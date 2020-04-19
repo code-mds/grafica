@@ -16,7 +16,7 @@ void draw_utils::log(std::string msg) {
  * @param front
  * @param back
  */
-void draw_utils::draw_prism(triangle_t &front, triangle_t &back) {
+void draw_utils::draw_prism(Triangle &front, Triangle &back) {
 
     rectangle_t rect[] = {
             {
@@ -87,7 +87,7 @@ void draw_utils::draw_rectangle3D(rectangle_t &rect ) {
  * Draw a 3D triangle using the triangle data struct
  * @param triangle
  */
-void draw_utils::draw_triangle3D(triangle_t &triangle) {
+void draw_utils::draw_triangle3D(Triangle &triangle) {
     draw_triangle3D(triangle.v1, triangle.v2, triangle.v3, triangle.color);
 }
 
@@ -155,7 +155,7 @@ void draw_utils::draw_axis() {
     glPopMatrix();
 }
 
-void draw_utils::draw_volume(const ortho_t &vol) const {// volume cube
+void draw_utils::draw_volume(const Ortho &vol) const {// volume cube
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel (GL_FLAT);
@@ -164,18 +164,18 @@ void draw_utils::draw_volume(const ortho_t &vol) const {// volume cube
     //draw the front face dimensions
     glBegin(GL_QUADS);
     glColor4f(1.0, 0, 0, .3);
-    glVertex3f(vol.left, vol.bottom, vol.znear);
-    glVertex3f(vol.right, vol.bottom, vol.znear);
-    glVertex3f(vol.right, vol.top, vol.znear);
-    glVertex3f(vol.left, vol.top, vol.znear);
+    glVertex3f(vol.left, vol.bottom, vol.zNear);
+    glVertex3f(vol.right, vol.bottom, vol.zNear);
+    glVertex3f(vol.right, vol.top, vol.zNear);
+    glVertex3f(vol.left, vol.top, vol.zNear);
     glEnd();
 
     glBegin(GL_QUADS);
     glColor4f(0, 1.0, 0, .3);
-    glVertex3f(vol.left, vol.bottom, vol.zfar);
-    glVertex3f(vol.right, vol.bottom, vol.zfar);
-    glVertex3f(vol.right, vol.top, vol.zfar);
-    glVertex3f(vol.left, vol.top, vol.zfar);
+    glVertex3f(vol.left, vol.bottom, vol.zFar);
+    glVertex3f(vol.right, vol.bottom, vol.zFar);
+    glVertex3f(vol.right, vol.top, vol.zFar);
+    glVertex3f(vol.left, vol.top, vol.zFar);
     glEnd();
 
     glDisable(GL_FILL);
@@ -221,3 +221,4 @@ void draw_utils::testMinMaxLineWidth() {
     GLfloat lineWidthRange[2] = {0.0f, 0.0f};
     glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
 }
+

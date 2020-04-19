@@ -16,33 +16,35 @@
 
 #include <string>
 #include <math.h>
+#include "vertex.h"
 
 extern bool _showWind;
 extern bool _showAxis;
 extern bool _showWireFrame;
 
-struct camera_t {
-    GLdouble eyex, eyey, eyez;
-    GLdouble centerx, centery, centerz;
-    GLdouble upx, upy, upz;
+struct Camera {
+    vertex_t eye;
+    vertex_t center;
+    vertex_t up;
 };
 
-struct ortho_t {
+struct Perspective {
+    GLdouble fovy;
+    GLdouble ratio;
+    GLdouble zNear, zFar;
+};
+
+struct Ortho {
     GLdouble left, right, bottom, top;
-    GLdouble znear, zfar;
+    GLdouble zNear, zFar;
 };
 
 struct color_t {
     GLubyte r,g,b;
 };
 
-struct vertex_t {
-    GLfloat x, y, z;
-    GLfloat dotProduct(vertex_t& o) { return x*o.x + y*o.y + z*o.z; }
-    GLfloat length() { return sqrt(x*x + y*y + z*z); }
-};
 
-struct triangle_t {
+struct Triangle {
     vertex_t v1, v2, v3;
     color_t color;
 };
@@ -60,15 +62,15 @@ class draw_utils {
 public:
     void draw_wind(GLfloat windAngle);
     void draw_axis();
-    void draw_volume(const ortho_t &vol) const;
+    void draw_volume(const Ortho &vol) const;
     void toggleAxesVisibility();
     void toggleWireframeVisibility();
     void toggleWindVisibility();
     void testMinMaxLineWidth();
-    void draw_triangle3D(triangle_t &triangle);
+    void draw_triangle3D(Triangle &triangle);
     void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color);
     void draw_rectangle3D(rectangle_t &rect);
-    void draw_prism(triangle_t &front, triangle_t &back);
+    void draw_prism(Triangle &front, Triangle &back);
     void draw_parallelepiped(rectangle_t &front, rectangle_t &back);
     void log(std::string msg);
 
