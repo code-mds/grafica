@@ -45,12 +45,8 @@ struct AppGlobals {
     GLfloat windAngle = 0.0;
     int mainWindow = 0;
 
-    Camera camera{
-        {0, 0, 5.0},
-        {0, 0, 0},
-        {0 , 1, 0}
-    };
-    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 6.0};
+    Camera camera;
+    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 100.0};
     Perspective perspective{  45.0, 1.0, 1.0, 100.0};
 
     char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
@@ -64,21 +60,13 @@ AppGlobals* _app;
 void displayCallback() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // set MODEL/VIEW matrix mode
-    glMatrixMode(GL_MODELVIEW);
-
-    // load identity matrix
-    glLoadIdentity();
-
     // view transformation must be called before model transformation
     // coordinates: eye, center/lookat, up vector
-    gluLookAt(_app->camera.eye.x, _app->camera.eye.y, _app->camera.eye.z,
-              _app->camera.center.x, _app->camera.center.y, _app->camera.center.z,
-              _app->camera.up.x, _app->camera.up.y, _app->camera.up.z);
+    _app->camera.lookAt();
 
     // model transformations
     _app->utils.draw_wind(_app->windAngle);
-    _app->utils.draw_axis();
+    _app->utils.draw_axes();
     _app->house.draw();
 
     glutSwapBuffers();
@@ -171,6 +159,7 @@ void menuCallback(int value) {
 }
 
 void reset() {
+    _app->camera.reset();
     _app->house.reset();
     _app->utils.log("reset");
 }
@@ -209,27 +198,33 @@ void specialKeyCallback(int key, int x, int y) {
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            _app->camera.eye.z -= .05;
+            _app->camera.moveBackward();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveForward();
             updateCamera();
             break;
         case GLUT_KEY_PAGE_UP:
-            _app->camera.eye.z += .05;
+            _app->camera.moveForward();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveBackward();
             updateCamera();
             break;
         case GLUT_KEY_UP:
-            _app->camera.eye.y += .05;
+            _app->camera.moveTop();
             updateCamera();
             break;
         case GLUT_KEY_DOWN:
-            _app->camera.eye.y -= .05;
+            _app->camera.moveBottom();
             updateCamera();
             break;
         case GLUT_KEY_RIGHT:
-            _app->camera.eye.x += .05;
+            _app->camera.moveRight();
             updateCamera();
             break;
         case GLUT_KEY_LEFT:
-            _app->camera.eye.x -= .05;
+            _app->camera.moveLeft();
+//            if(!_app->house.inBoundaries())
+//                _app->camera.moveRight();
             updateCamera();
             break;
 

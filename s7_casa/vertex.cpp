@@ -60,10 +60,21 @@ void vertex_t::normalize() {
 }
 
 bool vertex_t::inViewingVolume(const float *projectionMatrix, const float *modelviewMatrix) {
+    // simulate pipeline
+
+    // multiply current vertex by the model-view matrix
     vertex_t v = this->matrixProduct(modelviewMatrix);
+
+    // multiply the result vertex by the projection  matrix
     v = v.matrixProduct(projectionMatrix);
 
-    return !(abs(v.x / v.w) > 1.0 || abs(v.y / v.w) > 1.0 || abs(v.z / v.w) > 1.0);
+    // divide by the 4th coordinate (w) and get abs normalized coords
+    // if any norm coords is greater than 1, i'm out of the viewing volume
+    bool inBound = !(abs(v.x / v.w) > 1.0 || abs(v.y / v.w) > 1.0 || abs(v.z / v.w) > 1.0);
+    if(!inBound)
+        return false;
+
+    return inBound;
 }
 
 vertex_t vertex_t::matrixProduct(const float *m) {

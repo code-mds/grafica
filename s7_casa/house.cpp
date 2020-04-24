@@ -441,11 +441,14 @@ bool House::inBoundaries() {
     glGetFloatv(GL_PROJECTION_MATRIX, tempMatrix);
     vertex_t::matrixTranspose(tempMatrix, projectionMatrix);
 
-    // verify that the 8 vertex of the box containing the house stay inside the viewing volume
+    // verify that all the 8 vertex of the box containing the house
+    // stay inside the viewing volume
     for (int i = 0; i < 8; ++i) {
+        // calculate where the volume vertex will stay when the translation is applied
         vertex_t v = _volume.vertex[i].sum({_translationX, _translationY, _translationZ});
+        // check if the new vertex is in viewing volume
         if(!v.inViewingVolume(projectionMatrix, modelviewMatrix)) {
-            _utils.log("house OUT of boundaries");
+            _utils.log("OUT of boundaries");
             return false;
         }
     }

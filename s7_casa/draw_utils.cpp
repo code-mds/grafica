@@ -10,6 +10,11 @@ void draw_utils::log(std::string msg) {
     std::cout << msg << std::endl;
 }
 
+void draw_utils::testMinMaxLineWidth() {
+    GLfloat lineWidthRange[2] = {0.0f, 0.0f};
+    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
+}
+
 /**
  * Draw a 3D prism using front and back faces
  * Lateral faces are derived
@@ -121,9 +126,9 @@ void draw_utils::internal_triangle3D(const vertex_t &v1, const vertex_t &v2, con
 }
 
 /**
- * Draw X, Y and Z axis in 3 different colors
+ * Draw X, Y and Z axes in 3 different colors
  */
-void draw_utils::draw_axis() {
+void draw_utils::draw_axes() {
     if(!_showAxis)
         return;
 
@@ -155,7 +160,16 @@ void draw_utils::draw_axis() {
     glPopMatrix();
 }
 
-void draw_utils::draw_volume(const Ortho &vol) const {// volume cube
+void draw_utils::toggleAxesVisibility() {
+    _showAxis = !_showAxis;
+    log(std::string("axis ") + (_showAxis ? "visible" : "hidden"));
+    glutPostRedisplay();
+}
+
+/**
+ * volume cube
+ */
+void draw_utils::draw_volume(const Ortho &vol) const {
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel (GL_FLAT);
@@ -181,6 +195,22 @@ void draw_utils::draw_volume(const Ortho &vol) const {// volume cube
     glDisable(GL_FILL);
 }
 
+
+/**
+ * WIND
+ */
+void draw_utils::toggleWireframeVisibility() {
+    _showWireFrame = !_showWireFrame;
+    log(std::string("wireframe ") + (_showWireFrame ? "visible" : "hidden"));
+    glutPostRedisplay();
+}
+
+void draw_utils::toggleWindVisibility() {
+    _showWind = !_showWind;
+    log(std::string("wind ") + (_showWind ? "visible" : "hidden"));
+    glutPostRedisplay();
+}
+
 void draw_utils::draw_wind(GLfloat windAngle) {
     if(!_showWind)
         return;
@@ -199,26 +229,32 @@ void draw_utils::draw_wind(GLfloat windAngle) {
     glPopMatrix();
 }
 
-void draw_utils::toggleAxesVisibility() {
-    _showAxis = !_showAxis;
-    log(std::string("axis ") + (_showAxis ? "visible" : "hidden"));
-    glutPostRedisplay();
+/**
+ * CAMERA
+ */
+static const float CAMERA_STEP = .25;
+void Camera::moveLeft() { eye.x -= CAMERA_STEP; lookAt(); }
+void Camera::moveRight() { eye.x += CAMERA_STEP; lookAt(); }
+void Camera::moveBottom() { eye.y -= CAMERA_STEP; lookAt(); }
+void Camera::moveTop() { eye.y += CAMERA_STEP; lookAt(); }
+void Camera::moveForward() { eye.z -= CAMERA_STEP; lookAt(); }
+void Camera::moveBackward() { eye.z += CAMERA_STEP; lookAt(); }
+
+void Camera::reset() {
+    eye = {0, 0, 5.0};
+    center = {0, 0, 0};
+    up = {0 , 1, 0};
 }
 
-void draw_utils::toggleWireframeVisibility() {
-    _showWireFrame = !_showWireFrame;
-    log(std::string("wireframe ") + (_showWireFrame ? "visible" : "hidden"));
-    glutPostRedisplay();
-}
+void Camera::lookAt() {
+    // set MODEL/VIEW matrix mode
+    glMatrixMode(GL_MODELVIEW);
 
-void draw_utils::toggleWindVisibility() {
-    _showWind = !_showWind;
-    log(std::string("wind ") + (_showWind ? "visible" : "hidden"));
-    glutPostRedisplay();
-}
+    // load identity matrix
+    glLoadIdentity();
 
-void draw_utils::testMinMaxLineWidth() {
-    GLfloat lineWidthRange[2] = {0.0f, 0.0f};
-    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
+    gluLookAt(eye.x, eye.y, eye.z,
+              center.x, center.y, center.z,
+              up.x, up.y, up.z);
 }
 

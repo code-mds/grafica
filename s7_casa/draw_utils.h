@@ -18,14 +18,23 @@
 #include <math.h>
 #include "vertex.h"
 
-extern bool _showWind;
-extern bool _showAxis;
-extern bool _showWireFrame;
-
 struct Camera {
-    vertex_t eye;
-    vertex_t center;
-    vertex_t up;
+    vertex_t eye{0, 0, 5.0};
+    vertex_t center{0, 0, 0};
+    vertex_t up{0 , 1, 0};
+
+    void reset();
+
+    void moveLeft();
+    void moveRight();
+
+    void moveBottom();
+    void moveTop();
+
+    void moveForward();
+    void moveBackward();
+
+    void lookAt();
 };
 
 struct Perspective {
@@ -60,19 +69,23 @@ struct volume_t {
 
 class draw_utils {
 public:
-    void draw_wind(GLfloat windAngle);
-    void draw_axis();
-    void draw_volume(const Ortho &vol) const;
+    void draw_axes();
     void toggleAxesVisibility();
-    void toggleWireframeVisibility();
+
+    void draw_wind(GLfloat windAngle);
     void toggleWindVisibility();
-    void testMinMaxLineWidth();
+
+    void toggleWireframeVisibility();
+
     void draw_triangle3D(Triangle &triangle);
     void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color);
     void draw_rectangle3D(rectangle_t &rect);
     void draw_prism(Triangle &front, Triangle &back);
     void draw_parallelepiped(rectangle_t &front, rectangle_t &back);
-    void log(std::string msg);
+
+    static void log(std::string msg);
+    void testMinMaxLineWidth();
+    void draw_volume(const Ortho &vol) const;
 
 private:
     void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3);
