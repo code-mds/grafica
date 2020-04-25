@@ -5,52 +5,52 @@
 #include <math.h>
 #include "vertex.h"
 
-void vertex_t::set(float x, float y, float z) {
+void Vertex::set(float x, float y, float z) {
     this->x = x;
     this->y = y;
     this->z = z;
 }
 
-void vertex_t::copyFrom(const vertex_t& o) {
+void Vertex::copyFrom(const Vertex& o) {
     x = o.x;
     y = o.y;
     z = o.z;
 }
 
-vertex_t vertex_t::operator-() {
-    return vertex_t{ -x, -y, -z };
+Vertex Vertex::operator-() {
+    return Vertex{-x, -y, -z };
 }
 
-vertex_t vertex_t::sum(const vertex_t& o) {
-    return vertex_t{ x+o.x, y+o.y, z+o.z };
+Vertex Vertex::sum(const Vertex& o) {
+    return Vertex{x + o.x, y + o.y, z + o.z };
 }
 
 //  n = v x u
 //  return the normal vector
-vertex_t vertex_t::crossProduct(const vertex_t& o) {
-    return vertex_t{ y*o.z - z*o.y, z * o.x - x * o.z, x * o.y - y * o.x };
+Vertex Vertex::crossProduct(const Vertex& o) {
+    return Vertex{y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x };
 }
 
 //  n = v * s,
 // return a vector
-vertex_t vertex_t::scalarProduct(float scalar) {
-    return vertex_t{ x*scalar, y*scalar, z*scalar };
+Vertex Vertex::scalarProduct(float scalar) {
+    return Vertex{x * scalar, y * scalar, z * scalar };
 }
 
 // also known as inner product, return a scalar
 // the relation of cos(a) and the two vectors
 // n = v . u = |v| |u| * cos(a) = vx*ux + vy*uy + vz*uz
-GLfloat vertex_t::dotProduct(const vertex_t& o) {
+GLfloat Vertex::dotProduct(const Vertex& o) {
     return x*o.x + y*o.y + z*o.z;
 }
 
 // return the length of the vector
-GLfloat vertex_t::length() {
+GLfloat Vertex::length() {
     return sqrt(x*x + y*y + z*z);
 }
 
 // return the normalized vector
-void vertex_t::normalize() {
+void Vertex::normalize() {
     float len = length();
     if (len != 0) {
         x /= len;
@@ -59,11 +59,11 @@ void vertex_t::normalize() {
     }
 }
 
-bool vertex_t::inViewingVolume(const float *projectionMatrix, const float *modelviewMatrix) {
+bool Vertex::inViewingVolume(const float *projectionMatrix, const float *modelviewMatrix) {
     // simulate pipeline
 
     // multiply current vertex by the model-view matrix
-    vertex_t v = this->matrixProduct(modelviewMatrix);
+    Vertex v = this->matrixProduct(modelviewMatrix);
 
     // multiply the result vertex by the projection  matrix
     v = v.matrixProduct(projectionMatrix);
@@ -77,15 +77,15 @@ bool vertex_t::inViewingVolume(const float *projectionMatrix, const float *model
     return inBound;
 }
 
-vertex_t vertex_t::matrixProduct(const float *m) {
-    return vertex_t{
+Vertex Vertex::matrixProduct(const float *m) {
+    return Vertex{
             x*m[0] + y*m[1] + z*m[2] + w*m[3],
             x*m[4] + y*m[5] + z*m[6] + w*m[7],
             x*m[8] + y*m[9] + z*m[10] + w*m[11],
             x*m[12] + y*m[13] + z*m[14] + w*m[15]};
 }
 
-void vertex_t::matrixTranspose(const float *m, float *t) {
+void Vertex::matrixTranspose(const float *m, float *t) {
     t[0] = m[0];
     t[1] = m[4];
     t[2] = m[8];

@@ -16,17 +16,17 @@
 #endif
 
 
-struct vertex_t {
+struct Vertex {
     GLfloat x, y, z, w=1;
 
     void set(float x, float y, float z);
-    void copyFrom(const vertex_t& o);
-    vertex_t operator-();
-    vertex_t sum(const vertex_t& o);
-    vertex_t crossProduct(const vertex_t& o);
-    vertex_t scalarProduct(float scalar);
-    GLfloat dotProduct(const vertex_t& u);
-    vertex_t matrixProduct(const float *m);
+    void copyFrom(const Vertex& o);
+    Vertex operator-();
+    Vertex sum(const Vertex& o);
+    Vertex crossProduct(const Vertex& o);
+    Vertex scalarProduct(float scalar);
+    GLfloat dotProduct(const Vertex& u);
+    Vertex matrixProduct(const float *m);
     bool inViewingVolume(const float* projectionMatrix, const float *modelviewMatrix);
     static void matrixTranspose(const float *m, float *t);
 

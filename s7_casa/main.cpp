@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
+#include "camera.h"
 #include "draw_utils.h"
 #include "house.h"
 #include "main.h"
@@ -43,25 +44,23 @@ const char ESCAPE = 27;
 struct AppGlobals {
     // global variables
     GLfloat windAngle = 0.0;
-    int mainWindow = 0;
+    int mainWindowID = 0;
 
     Camera camera;
-    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 100.0};
-    Perspective perspective{  45.0, 1.0, 1.0, 100.0};
+    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 50.0};
+    Perspective perspective{  45.0, 1.0, 100.0};
 
     char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
     draw_utils utils;
     House house{utils};
 };
 
-
-AppGlobals* _app;
+static AppGlobals* _app;
 
 void displayCallback() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // view transformation must be called before model transformation
-    // coordinates: eye, center/lookat, up vector
     _app->camera.lookAt();
 
     // model transformations
@@ -114,10 +113,12 @@ void reshape(int w, int h) {
         }
         glOrtho(l, r, b, t, _app->ortho.zNear, _app->ortho.zFar);
     } else {
-        // perspective projection
-        float fH = tan(_app->perspective.fovy * ANG2RAD) * _app->perspective.zNear;
-        float fW = fH * aspect;
+        // perspective projection using glFrustum
+        GLdouble fH = tan(_app->perspective.fovy * ANG2RAD) * _app->perspective.zNear;
+        GLdouble fW = fH * aspect;
         glFrustum(-fW, fW, -fH, fH, _app->perspective.zNear, _app->perspective.zFar);
+
+        // perspective projection using gluPerspective
         //gluPerspective(_app->perspective.fovy, aspect, _app->perspective.zNear, _app->perspective.zFar);
     }
 }
@@ -155,9 +156,15 @@ void menuCallback(int value) {
         case MNU_CHANGE_COLOR:
             _app->house.changeColor();
             break;
+        default:
+            _app->utils.log("unhandled MENU");
+            break;
     }
 }
 
+/**
+ * reset model and camera to initial values
+ */
 void reset() {
     _app->camera.reset();
     _app->house.reset();
@@ -211,20 +218,26 @@ void specialKeyCallback(int key, int x, int y) {
             break;
         case GLUT_KEY_UP:
             _app->camera.moveTop();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveBottom();
             updateCamera();
             break;
         case GLUT_KEY_DOWN:
             _app->camera.moveBottom();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveTop();
             updateCamera();
             break;
         case GLUT_KEY_RIGHT:
             _app->camera.moveRight();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveLeft();
             updateCamera();
             break;
         case GLUT_KEY_LEFT:
             _app->camera.moveLeft();
-//            if(!_app->house.inBoundaries())
-//                _app->camera.moveRight();
+            if(!_app->house.inBoundaries())
+                _app->camera.moveRight();
             updateCamera();
             break;
 
@@ -251,6 +264,9 @@ void specialKeyCallback(int key, int x, int y) {
         case GLUT_KEY_F6:
             // translation: +Z
             _app->house.moveFar();
+            break;
+        default:
+            _app->utils.log("unhandled key");
             break;
     }
 }
@@ -309,15 +325,19 @@ void keyCallback(unsigned char key, int x, int y) {
             break;
 
         case ESCAPE:
-            glutDestroyWindow(_app->mainWindow);
+            glutDestroyWindow(_app->mainWindowID);
             exit(0);
+
+        default:
+            _app->utils.log("unhandled key");
+            break;
     }
 }
 
 void appInit() {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    _app->mainWindow = glutCreateWindow("house");
+    _app->mainWindowID = glutCreateWindow("house");
 
     glutReshapeFunc(reshapeCallback);
 
@@ -346,7 +366,7 @@ void createMenu() {
     glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
     glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
     glutAddMenuEntry("Change color", MNU_CHANGE_COLOR);
-    glutAddMenuEntry("Reset position", MNU_RESET);
+    glutAddMenuEntry("Reset", MNU_RESET);
     glutCreateMenu(menuCallback);
 
     int menuAnimation = glutCreateMenu(menuCallback);

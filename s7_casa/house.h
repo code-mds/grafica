@@ -32,10 +32,22 @@ public:
     bool inBoundaries();
 
 private:
+    void drawPrismWalls();
+    void drawLateralWalls();
+    void drawRoof();
+    void drawFloor();
+    void drawChimney();
+    void drawDoor();
+    void drawFlag();
+    void drawCylinder() const;
+    void setupVolume();
+    void updateColor();
+
+private:
     bool _colorStandard = true;
-    color_t _colorRoofInternal;
-    color_t _colorRoofExternal;
-    color_t _colorWallExternal;
+    Color _colorRoofInternal;
+    Color _colorRoofExternal;
+    Color _colorWallExternal;
 
     bool _doorOpen = false;
     bool _rotationEnabled = false;
@@ -48,19 +60,9 @@ private:
     GLfloat _windAngle = 0.0;
     GLfloat _flagAngle = 0.0;
 
-    void drawPrismWalls();
-    void drawLateralWalls();
-    void drawRoof();
-    void drawFloor();
-    void drawChimney();
-    void drawDoor();
-    void drawFlag();
-    void drawCylinder() const;
-    void setupVolume();
-
     GLUquadric *_quadric;
     draw_utils& _utils;
-    volume_t _volume;
+    Volume _volume;
 };
 
 

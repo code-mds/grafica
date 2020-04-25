@@ -34,14 +34,14 @@ const float FLAG_WIDTH = .03f / SW;
 const float TRANSLATION_STEP = .05;
 const float ROTATION_STEP = 1.0;
 
-color_t COLOR_ROOF_INTERNAL_1 = { 160, 0, 0 };
-color_t COLOR_ROOF_INTERNAL_2 = { 100, 70, 60 };
+Color COLOR_ROOF_INTERNAL_1 = {160, 0, 0 };
+Color COLOR_ROOF_INTERNAL_2 = {100, 70, 60 };
 
-color_t COLOR_ROOF_EXTERNAL_1 = { 230, 0, 0 };
-color_t COLOR_ROOF_EXTERNAL_2 = { 109, 76, 65 };
+Color COLOR_ROOF_EXTERNAL_1 = {230, 0, 0 };
+Color COLOR_ROOF_EXTERNAL_2 = {109, 76, 65 };
 
-color_t COLOR_WALL_EXTERNAL_1 = { 238, 238, 238 };
-color_t COLOR_WALL_EXTERNAL_2 = { 188, 170, 164 };
+Color COLOR_WALL_EXTERNAL_1 = {238, 238, 238 };
+Color COLOR_WALL_EXTERNAL_2 = {188, 170, 164 };
 
 
 #define COLOR_WALL_INTERNAL     80, 80, 80
@@ -65,15 +65,15 @@ void House::setupVolume() {
     GLfloat z = BASE_HEIGHT + ROOF_THICK;
     int i=0;
     // front vertexes
-    _volume.vertex[i++] = {-x, 0.0, ROOF_THICK };
-    _volume.vertex[i++] = {x, 0.0, ROOF_THICK };
-    _volume.vertex[i++] = {x, y, ROOF_THICK };
-    _volume.vertex[i++] = {-x, y, ROOF_THICK };
+    _volume.vertexes[i++] = {-x, 0.0, ROOF_THICK };
+    _volume.vertexes[i++] = {x, 0.0, ROOF_THICK };
+    _volume.vertexes[i++] = {x, y, ROOF_THICK };
+    _volume.vertexes[i++] = {-x, y, ROOF_THICK };
     // back vertexes
-    _volume.vertex[i++] = {-x, y, -z };
-    _volume.vertex[i++] = {x, 0.0, -z };
-    _volume.vertex[i++] = {x, y, -z };
-    _volume.vertex[i++] = {-x, y, -z };
+    _volume.vertexes[i++] = {-x, y, -z };
+    _volume.vertexes[i++] = {x, 0.0, -z };
+    _volume.vertexes[i++] = {x, y, -z };
+    _volume.vertexes[i++] = {-x, y, -z };
 }
 
 House::~House() {
@@ -97,7 +97,7 @@ void House::draw() {
 }
 
 void House::drawChimney() {
-    rectangle_t rectangles[] = {
+    Rect rectangles[] = {
             // LEFT SIDE
             {
                     {CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH},
@@ -168,7 +168,7 @@ void House::drawChimney() {
 }
 
 void House::drawFloor() {
-    rectangle_t rectangles[] = {
+    Rect rectangles[] = {
             // floor inside
             {
                 {HALF_BASE_WIDTH, 0, 0},
@@ -191,7 +191,7 @@ void House::drawFloor() {
 }
 
 void House::drawRoof() {
-    rectangle_t rectangles[] = {
+    Rect rectangles[] = {
             // right roof wall
             {
                     { HALF_BASE_WIDTH + ROOF_THICK, WALL_HEIGHT, ROOF_THICK },
@@ -260,7 +260,7 @@ void House::drawPrismWalls() {
 
 void House::drawLateralWalls() {
 
-    rectangle_t rectangles[] = {
+    Rect rectangles[] = {
             // front walls
             {
                     { HALF_DOOR_WIDTH, 0, 0 },
@@ -348,7 +348,7 @@ void House::drawDoor() {
     glTranslatef(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
     glRotatef(_doorAngle, 0.0, 1.0, 0.0);
     glTranslatef(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
-    rectangle_t rectangles[] = {
+    Rect rectangles[] = {
             {
                     { -HALF_DOOR_WIDTH, 0, -WALL_THICK },
                     { HALF_DOOR_WIDTH, 0, -WALL_THICK },
@@ -432,30 +432,6 @@ void House::moveDown() {
     _utils.log("Translation Y:" + std::to_string(_translationY));
 }
 
-bool House::inBoundaries() {
-    float tempMatrix[16], projectionMatrix[16], modelviewMatrix[16];
-
-    glGetFloatv(GL_MODELVIEW_MATRIX, tempMatrix);
-    vertex_t::matrixTranspose(tempMatrix, modelviewMatrix);
-
-    glGetFloatv(GL_PROJECTION_MATRIX, tempMatrix);
-    vertex_t::matrixTranspose(tempMatrix, projectionMatrix);
-
-    // verify that all the 8 vertex of the box containing the house
-    // stay inside the viewing volume
-    for (int i = 0; i < 8; ++i) {
-        // calculate where the volume vertex will stay when the translation is applied
-        vertex_t v = _volume.vertex[i].sum({_translationX, _translationY, _translationZ});
-        // check if the new vertex is in viewing volume
-        if(!v.inViewingVolume(projectionMatrix, modelviewMatrix)) {
-            _utils.log("OUT of boundaries");
-            return false;
-        }
-    }
-    _utils.log("house IN boundaries");
-    return true;
-}
-
 void House::moveRight() {
     _translationX += TRANSLATION_STEP;
     if(!inBoundaries())
@@ -484,10 +460,14 @@ bool House::rotationEnabled() {
 
 void House::changeColor() {
     _colorStandard = !_colorStandard;
+    updateColor();
+    glutPostRedisplay();
+}
+
+void House::updateColor() {
     _colorRoofInternal = _colorStandard ? COLOR_ROOF_INTERNAL_1 : COLOR_ROOF_INTERNAL_2;
     _colorRoofExternal = _colorStandard ? COLOR_ROOF_EXTERNAL_1 : COLOR_ROOF_EXTERNAL_2;
-    _colorWallExternal  = _colorStandard ? COLOR_WALL_EXTERNAL_1 : COLOR_WALL_EXTERNAL_2;
-    glutPostRedisplay();
+    _colorWallExternal = _colorStandard ? COLOR_WALL_EXTERNAL_1 : COLOR_WALL_EXTERNAL_2;
 }
 
 void House::drawFlag() {
@@ -513,6 +493,7 @@ void House::drawFlag() {
     glPopMatrix();
 }
 
+// flag cylinder
 void House::drawCylinder() const {
     gluQuadricDrawStyle(_quadric, GLU_LINE);
     gluQuadricNormals(_quadric, GLU_SMOOTH);
@@ -537,4 +518,34 @@ void House::reset() {
     _translationY = 0.0;
     _translationZ = 0.0;
     _rotationX = 0.0;
+    _flagAngle = 0.0;
+    _doorAngle = 0.0;
+    _doorOpen = false;
+    _rotationEnabled = false;
+    _colorStandard = true;
+    updateColor();
+}
+
+bool House::inBoundaries() {
+    float tempMatrix[16], projectionMatrix[16], modelviewMatrix[16];
+
+    glGetFloatv(GL_MODELVIEW_MATRIX, tempMatrix);
+    Vertex::matrixTranspose(tempMatrix, modelviewMatrix);
+
+    glGetFloatv(GL_PROJECTION_MATRIX, tempMatrix);
+    Vertex::matrixTranspose(tempMatrix, projectionMatrix);
+
+    // verify that all the 8 vertex of the box containing the house
+    // stay inside the viewing volume
+    for (auto & vertex : _volume.vertexes) {
+        // calculate where the volume vertex will stay when the translation is applied
+        Vertex v = vertex.sum({_translationX, _translationY, _translationZ});
+        // check if the new vertex is in viewing volume
+        if(!v.inViewingVolume(projectionMatrix, modelviewMatrix)) {
+            _utils.log("OUT of boundaries");
+            return false;
+        }
+    }
+    _utils.log("house IN boundaries");
+    return true;
 }

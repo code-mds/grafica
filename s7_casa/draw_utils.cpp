@@ -23,7 +23,7 @@ void draw_utils::testMinMaxLineWidth() {
  */
 void draw_utils::draw_prism(Triangle &front, Triangle &back) {
 
-    rectangle_t rect[] = {
+    Rect rect[] = {
             {
                 front.v2,
                 front.v1,
@@ -61,20 +61,20 @@ void draw_utils::draw_prism(Triangle &front, Triangle &back) {
  * @param front
  * @param back
  */
-void draw_utils::draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
+void draw_utils::draw_parallelepiped(Rect &front, Rect &back) {
     draw_rectangle3D(front);
     draw_rectangle3D(back);
 
-    rectangle_t right = {front.v2, back.v1, back.v4, front.v3, front.color  };
+    Rect right = {front.v2, back.v1, back.v4, front.v3, front.color  };
     draw_rectangle3D(right);
 
-    rectangle_t left = {back.v2, front.v1, front.v4, back.v3, front.color  };
+    Rect left = {back.v2, front.v1, front.v4, back.v3, front.color  };
     draw_rectangle3D(left);
 
-    rectangle_t bottom = {back.v2, back.v1, front.v2, front.v1, front.color  };
+    Rect bottom = {back.v2, back.v1, front.v2, front.v1, front.color  };
     draw_rectangle3D(bottom);
 
-    rectangle_t top = {front.v4, front.v3, back.v4, back.v3, front.color  };
+    Rect top = {front.v4, front.v3, back.v4, back.v3, front.color  };
     draw_rectangle3D(top);
 }
 
@@ -83,7 +83,7 @@ void draw_utils::draw_parallelepiped(rectangle_t &front, rectangle_t &back) {
  * The rectangle is composed by by 2 triangles
  * @param rect
  */
-void draw_utils::draw_rectangle3D(rectangle_t &rect ) {
+void draw_utils::draw_rectangle3D(Rect &rect ) {
     draw_triangle3D(rect.v1, rect.v2, rect.v3, rect.color);
     draw_triangle3D(rect.v3, rect.v4, rect.v1, rect.color);
 }
@@ -103,7 +103,7 @@ void draw_utils::draw_triangle3D(Triangle &triangle) {
  * @param v3
  * @param color
  */
-void draw_utils::draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color) {
+void draw_utils::draw_triangle3D(Vertex &v1, Vertex &v2, Vertex &v3, Color &color) {
     glColor3ub(color.r, color.g, color.b);
     glPolygonMode(GL_FRONT,GL_FILL);
     internal_triangle3D(v1, v2, v3);
@@ -117,7 +117,7 @@ void draw_utils::draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color
     }
 }
 
-void draw_utils::internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3) {
+void draw_utils::internal_triangle3D(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
     glBegin(GL_TRIANGLES);
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
@@ -227,34 +227,5 @@ void draw_utils::draw_wind(GLfloat windAngle) {
     glEnd();
     glDisable(GL_LINE_STIPPLE);
     glPopMatrix();
-}
-
-/**
- * CAMERA
- */
-static const float CAMERA_STEP = .25;
-void Camera::moveLeft() { eye.x -= CAMERA_STEP; lookAt(); }
-void Camera::moveRight() { eye.x += CAMERA_STEP; lookAt(); }
-void Camera::moveBottom() { eye.y -= CAMERA_STEP; lookAt(); }
-void Camera::moveTop() { eye.y += CAMERA_STEP; lookAt(); }
-void Camera::moveForward() { eye.z -= CAMERA_STEP; lookAt(); }
-void Camera::moveBackward() { eye.z += CAMERA_STEP; lookAt(); }
-
-void Camera::reset() {
-    eye = {0, 0, 5.0};
-    center = {0, 0, 0};
-    up = {0 , 1, 0};
-}
-
-void Camera::lookAt() {
-    // set MODEL/VIEW matrix mode
-    glMatrixMode(GL_MODELVIEW);
-
-    // load identity matrix
-    glLoadIdentity();
-
-    gluLookAt(eye.x, eye.y, eye.z,
-              center.x, center.y, center.z,
-              up.x, up.y, up.z);
 }
 

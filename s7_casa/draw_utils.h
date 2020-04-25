@@ -15,31 +15,11 @@
 #endif
 
 #include <string>
-#include <math.h>
+#include <cmath>
 #include "vertex.h"
-
-struct Camera {
-    vertex_t eye{0, 0, 5.0};
-    vertex_t center{0, 0, 0};
-    vertex_t up{0 , 1, 0};
-
-    void reset();
-
-    void moveLeft();
-    void moveRight();
-
-    void moveBottom();
-    void moveTop();
-
-    void moveForward();
-    void moveBackward();
-
-    void lookAt();
-};
 
 struct Perspective {
     GLdouble fovy;
-    GLdouble ratio;
     GLdouble zNear, zFar;
 };
 
@@ -48,23 +28,24 @@ struct Ortho {
     GLdouble zNear, zFar;
 };
 
-struct color_t {
-    GLubyte r,g,b;
+struct Color {
+    GLubyte r{255};
+    GLubyte g{255};
+    GLubyte b{255};
 };
-
 
 struct Triangle {
-    vertex_t v1, v2, v3;
-    color_t color;
+    Vertex v1, v2, v3;
+    Color color;
 };
 
-struct rectangle_t {
-    vertex_t v1, v2, v3, v4;
-    color_t color;
+struct Rect {
+    Vertex v1, v2, v3, v4;
+    Color color;
 };
 
-struct volume_t {
-    vertex_t vertex[8];
+struct Volume {
+    Vertex vertexes[8];
 };
 
 class draw_utils {
@@ -78,17 +59,17 @@ public:
     void toggleWireframeVisibility();
 
     void draw_triangle3D(Triangle &triangle);
-    void draw_triangle3D(vertex_t &v1, vertex_t &v2, vertex_t &v3, color_t &color);
-    void draw_rectangle3D(rectangle_t &rect);
+    void draw_triangle3D(Vertex &v1, Vertex &v2, Vertex &v3, Color &color);
+    void draw_rectangle3D(Rect &rect);
     void draw_prism(Triangle &front, Triangle &back);
-    void draw_parallelepiped(rectangle_t &front, rectangle_t &back);
+    void draw_parallelepiped(Rect &front, Rect &back);
 
-    static void log(std::string msg);
+    void log(std::string msg);
     void testMinMaxLineWidth();
     void draw_volume(const Ortho &vol) const;
 
 private:
-    void internal_triangle3D(const vertex_t &v1, const vertex_t &v2, const vertex_t &v3);
+    void internal_triangle3D(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 
     bool _showWind = true;
     bool _showAxis = true;
