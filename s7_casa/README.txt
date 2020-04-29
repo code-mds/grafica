@@ -28,7 +28,7 @@ Funzioni:
 - Show/Hide Axes (x,X keys / Right Click menu)
 - Show/Hide Wireframe (w,W keys / Right Click menu)
 - Change Color (c,C / Right Click menu)
-- Reset (Right CTRL key / Right Click menu)
+- Reset (F12 / Right Click menu)
 
 - House Translate X axis (F1/F2 keys)
 - House Translate Y axis (F3/F4 keys)
