@@ -13,7 +13,7 @@
 #endif
 
 #include <cstdlib>
-#include <iostream>
+#include <sstream>
 #include <iomanip>
 #include "camera.h"
 #include "draw_utils.h"
@@ -190,7 +190,7 @@ void forceReshape(char type) {
 
 void specialKeyCallback(int key, int x, int y) {
     switch (key) {
-        case GLUT_KEY_CTRL_R:
+        case GLUT_KEY_F12:
             reset();
             break;
         case GLUT_KEY_F9:

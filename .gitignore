@@ -34,3 +34,4 @@
 # CLion
 cmake-build-debug
 .idea/workspace.xml
+/.idea/.name

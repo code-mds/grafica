@@ -19,13 +19,12 @@ if(APPLE)
     if(NOT GLUT_FOUND)
         message(ERROR " GLUT not found!")
     endif(NOT GLUT_FOUND)
-endif(APPLE)
-
-if(UNIX)
-    message(INFO ": PLATFORM LINUX")
-
-    set(OPENGL_LIBRARY -lGL)
-    set(GLUT_LIBRARY -lglut -lGLU)
+#endif(APPLE)
+#if(UNIX)
+#    message(INFO ": PLATFORM LINUX")
+#
+#    set(OPENGL_LIBRARY -lGL)
+#    set(GLUT_LIBRARY -lglut -lGLU)
 else()
     message(INFO ": PLATFORM WINDOWS")
 
