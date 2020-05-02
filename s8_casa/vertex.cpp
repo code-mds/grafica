@@ -19,35 +19,38 @@ void Vertex::copyFrom(const Vertex& o) {
     z = o.z;
 }
 
-Vertex Vertex::operator-() {
+Vertex Vertex::operator-() const {
     return Vertex{-x, -y, -z };
 }
 
-Vertex Vertex::sum(const Vertex& o) {
+Vertex Vertex::sum(const Vertex& o) const {
     return Vertex{x + o.x, y + o.y, z + o.z };
+}
+Vertex Vertex::subtract(const Vertex& o) const {
+    return Vertex{x - o.x, y - o.y, z - o.z };
 }
 
 //  n = v x u
 //  return the normal vector
-Vertex Vertex::crossProduct(const Vertex& o) {
+Vertex Vertex::crossProduct(const Vertex& o) const {
     return Vertex{y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x };
 }
 
 //  n = v * s,
 // return a vector
-Vertex Vertex::scalarProduct(float scalar) {
+Vertex Vertex::scalarProduct(float scalar) const {
     return Vertex{x * scalar, y * scalar, z * scalar };
 }
 
 // also known as inner product, return a scalar
 // the relation of cos(a) and the two vectors
 // n = v . u = |v| |u| * cos(a) = vx*ux + vy*uy + vz*uz
-GLfloat Vertex::dotProduct(const Vertex& o) {
+GLfloat Vertex::dotProduct(const Vertex& o) const {
     return x*o.x + y*o.y + z*o.z;
 }
 
 // return the length of the vector
-GLfloat Vertex::length() {
+GLfloat Vertex::length() const {
     return sqrt(x*x + y*y + z*z);
 }
 
@@ -61,7 +64,7 @@ void Vertex::normalize() {
     }
 }
 
-bool Vertex::inViewingVolume(const float *projectionMatrix, const float *modelviewMatrix) {
+bool Vertex::inViewingVolume(const float *projectionMatrix, const float *modelviewMatrix) const {
     // simulate pipeline
 
     // multiply current vertex by the model-view matrix
@@ -79,7 +82,7 @@ bool Vertex::inViewingVolume(const float *projectionMatrix, const float *modelvi
     return inBound;
 }
 
-Vertex Vertex::matrixProduct(const float *m) {
+Vertex Vertex::matrixProduct(const float *m) const {
     return Vertex{
             x*m[0] + y*m[1] + z*m[2] + w*m[3],
             x*m[4] + y*m[5] + z*m[6] + w*m[7],
@@ -104,4 +107,10 @@ void Vertex::matrixTranspose(const float *m, float *t) {
     t[13] = m[7];
     t[14] = m[11];
     t[15] = m[15];
+}
+
+Vertex Vertex::normal(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+    Vertex norm = v1.subtract(v2).crossProduct(v2.subtract(v3));
+    norm.normalize();
+    return norm;
 }

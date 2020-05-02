@@ -17,9 +17,13 @@
 #include "draw_utils.h"
 #include "house.h"
 #include "main.h"
+#include "light.h"
 
 #define ANG2RAD 3.14159265358979323846 / 180.0 * 0.5
 #define COLOR_BKG 1.0, 1.0, 1.0, 0.0
+
+#define MNU_TOGGLE_LIGHT2 12
+#define MNU_TOGGLE_LIGHT1 11
 #define MNU_RESET 10
 #define MNU_ORTHO 9
 #define MNU_PERSPECTIVE 8
@@ -44,6 +48,8 @@ struct AppGlobals {
     GLfloat windAngle = 0.0;
     int mainWindowID = 0;
 
+    Light light1{Vertex{1, 1, 1, 1}};
+    Light light2{Vertex{-1, 1, -1, 1}};
     Camera camera;
     Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 50.0};
     Perspective perspective{  45.0, 1.0, 100.0};
@@ -53,8 +59,6 @@ struct AppGlobals {
     House house{utils};
 };
 
-void initLight();
-
 static AppGlobals* _app;
 
 void displayCallback() {
@@ -62,6 +66,8 @@ void displayCallback() {
 
     // view transformation must be called before model transformation
     _app->camera.lookAt();
+    _app->light1.draw();
+    _app->light2.draw();
 
     // model transformations
     _app->utils.draw_wind(_app->windAngle);
@@ -126,6 +132,12 @@ void reshape(int w, int h) {
 
 void menuCallback(int value) {
     switch (value) {
+        case MNU_TOGGLE_LIGHT2:
+            _app->light2.toggle();
+            break;
+        case MNU_TOGGLE_LIGHT1:
+            _app->light1.toggle();
+            break;
         case MNU_RESET:
             reset();
             break;
@@ -340,6 +352,8 @@ void appInit() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(COLOR_BKG);
 
+    initLight();
+
     createMenu();
 
     glutReshapeFunc(reshapeCallback);
@@ -353,7 +367,11 @@ void appInit() {
 
 
 void createMenu() {
-    int menuProj = glutCreateMenu(menuCallback);
+    int menuLight = glutCreateMenu(menuCallback);
+    glutAddMenuEntry("On/Off Light 1", MNU_TOGGLE_LIGHT1);
+    glutAddMenuEntry("On/Off Light 2", MNU_TOGGLE_LIGHT2);
+
+    int menuProjection = glutCreateMenu(menuCallback);
     glutAddMenuEntry("Perspective", MNU_PERSPECTIVE);
     glutAddMenuEntry("Ortho", MNU_ORTHO);
     glutCreateMenu(menuCallback);
@@ -372,12 +390,44 @@ void createMenu() {
     glutAddMenuEntry("Open/Close Door", MNU_OPENCLOSE_DOOR);
     glutCreateMenu(menuCallback);
 
+    glutAddSubMenu("Light", menuLight);
     glutAddSubMenu("Structure", menuStructure);
     glutAddSubMenu("Animation", menuAnimation);
-    glutAddSubMenu("Projection", menuProj);
+    glutAddSubMenu("Projection", menuProjection);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void initLight() {
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+//    // material
+//    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat mat_shininess[] = { 50.0 };
+//    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+//    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+//
+//
+//    GLfloat light1_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+//    GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+//    GLfloat light1_position[] = { -2.0, 0.0, 0.0, 1.0 };
+//    GLfloat spot_direction[] = { 1.0, 0.0, 0.0 };
+//
+//    glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+//    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+//    glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+//    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+//    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.5);
+//    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
+//    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.2);
+//
+//    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0);
+//    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+//    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
 }
 
 int main(int argc, char* argv[]) {

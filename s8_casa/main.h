@@ -19,6 +19,6 @@ void updateCamera();
 void reshape(int w, int h);
 void forceReshape(char type);
 void reset();
-
+void initLight();
 
 #endif //S7_CASA_MAIN_H

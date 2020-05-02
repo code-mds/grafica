@@ -17,23 +17,27 @@
 
 
 struct Vertex {
-    GLfloat x, y, z, w=1;
+    GLfloat x=0, y=0, z=0, w=1;
 
     void set(float x, float y, float z);
     void copyFrom(const Vertex& o);
-    Vertex operator-();
-    Vertex sum(const Vertex& o);
-    Vertex crossProduct(const Vertex& o);
-    Vertex scalarProduct(float scalar);
-    GLfloat dotProduct(const Vertex& u);
-    Vertex matrixProduct(const float *m);
-    bool inViewingVolume(const float* projectionMatrix, const float *modelviewMatrix);
+    Vertex operator-() const;
+    Vertex sum(const Vertex& o) const;
+    Vertex subtract(const Vertex& o) const;
+
+    Vertex crossProduct(const Vertex& o) const;
+    Vertex scalarProduct(float scalar) const;
+    GLfloat dotProduct(const Vertex& u) const;
+    Vertex matrixProduct(const float *m) const;
+    bool inViewingVolume(const float* projectionMatrix, const float *modelviewMatrix) const;
+
+    GLfloat length() const;
+
     static void matrixTranspose(const float *m, float *t);
+    static Vertex normal(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 
-    GLfloat length();
+private:
     void normalize();
-
-    Vertex normal(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 };
 
 
