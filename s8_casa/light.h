@@ -19,21 +19,23 @@
 class Light {
 public:
     Light();
-    Light(const Vertex& pos);
+    explicit Light(const Vertex& pos, const Vertex& dir);
     void toggle();
     void draw();
 
+    static void ambient();
+
 private:
-    void update() const;
+    void drawLightSource() const;
+
+    static int LastCreated;
 
     bool _isOn;
-    GLenum _lightNum;
+    int _lightNum;
     Vertex _position;
     Vertex _direction;
 
-    static GLenum LastCreated;
-
-    void drawLightSource() const;
+    void drawSpot();
 };
 
 

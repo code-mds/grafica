@@ -19,7 +19,8 @@
 #include "main.h"
 #include "light.h"
 
-#define ANG2RAD 3.14159265358979323846 / 180.0 * 0.5
+#define ANG2RAD (3.14159265358979323846 / 180.0 * 0.5)
+
 #define COLOR_BKG 1.0, 1.0, 1.0, 0.0
 
 #define MNU_TOGGLE_LIGHT2 12
@@ -48,8 +49,10 @@ struct AppGlobals {
     GLfloat windAngle = 0.0;
     int mainWindowID = 0;
 
-    Light light1{Vertex{1, 1, 1, 1}};
-    Light light2{Vertex{-1, 1, -1, 1}};
+    // The light source can be a POSITIONAL (w > 0) or DIRECTIONAL (w = 0) light source depending on the w value.
+    Light light1{Vertex{-.4, 1.2, -.6, 1.0}, Vertex{.1, .1, 1}};
+    Light light2{Vertex{.2, .1, .5, 1.0}, Vertex{-.1, .1, -1}};
+
     Camera camera;
     Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 50.0};
     Perspective perspective{  45.0, 1.0, 100.0};
@@ -343,17 +346,13 @@ void keyCallback(unsigned char key, int x, int y) {
 
 void appInit() {
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     _app->mainWindowID = glutCreateWindow("house");
 
-//    glShadeModel (GL_FLAT);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
     glClearColor(COLOR_BKG);
 
     initLight();
-
     createMenu();
 
     glutReshapeFunc(reshapeCallback);
@@ -365,6 +364,14 @@ void appInit() {
     glutTimerFunc(WIND_MSEC, windCallback, 0);
 }
 
+void initLight() {
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    Light::ambient();
+}
 
 void createMenu() {
     int menuLight = glutCreateMenu(menuCallback);
@@ -397,37 +404,6 @@ void createMenu() {
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
-}
-
-void initLight() {
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-
-//    // material
-//    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-//    GLfloat mat_shininess[] = { 50.0 };
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-//    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-//
-//
-//    GLfloat light1_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-//    GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-//    GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-//    GLfloat light1_position[] = { -2.0, 0.0, 0.0, 1.0 };
-//    GLfloat spot_direction[] = { 1.0, 0.0, 0.0 };
-//
-//    glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
-//    glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
-//    glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
-//    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
-//    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.5);
-//    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
-//    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.2);
-//
-//    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0);
-//    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
-//    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
 }
 
 int main(int argc, char* argv[]) {

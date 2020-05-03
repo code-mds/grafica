@@ -6,7 +6,7 @@
 
 #define WIREFRAME_COLOR 15, 32, 112
 
-void draw_utils::log(std::string msg) {
+void draw_utils::log(const std::string &msg) const {
     std::cout << msg << std::endl;
 }
 
@@ -119,9 +119,10 @@ void draw_utils::draw_triangle3D(Vertex &v1, Vertex &v2, Vertex &v3, Color &colo
 
 void draw_utils::internal_triangle3D(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
     glBegin(GL_TRIANGLES);
-    Vertex normal = Vertex::normal(v1, v2, v3);
 
+    Vertex normal = Vertex::normal(v1, v2, v3);
     glNormal3f(normal.x, normal.y, normal.z);
+
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
     glVertex3f(v3.x, v3.y, v3.z);

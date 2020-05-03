@@ -64,7 +64,7 @@ public:
     void draw_prism(Triangle &front, Triangle &back);
     void draw_parallelepiped(Rect &front, Rect &back);
 
-    void log(std::string msg);
+    void log(const std::string &msg) const;
     void testMinMaxLineWidth();
     void draw_volume(const Ortho &vol) const;
 
