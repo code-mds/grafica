@@ -4,8 +4,9 @@
 
 #include "house.h"
 #include "draw_utils.h"
+#include "light.h"
 
-const float SW = 10.0f; //SCENE WIDTH
+static const GLfloat SW = 10.0f; //SCENE WIDTH
 
 const float DOOR_THINK = 0.5f / SW;
 const float HALF_DOOR_WIDTH = 2.0f / SW;
@@ -44,10 +45,10 @@ Color COLOR_WALL_EXTERNAL_1 = {238, 238, 238 };
 Color COLOR_WALL_EXTERNAL_2 = {188, 170, 164 };
 
 
-#define COLOR_WALL_INTERNAL     80, 80, 80
-#define COLOR_DOOR              141, 110, 99
-#define COLOR_FLOOR             160, 160, 160
-#define COLOR_FLAG              153,206,255
+#define COLOR_WALL_INTERNAL     {80, 80, 80}
+#define COLOR_DOOR              {141, 110, 99}
+#define COLOR_FLOOR             {160, 160, 160}
+#define COLOR_FLAG              {153,206,255}
 
 House::House(draw_utils& utils) :
     _utils{utils},
@@ -97,6 +98,7 @@ void House::draw() {
 }
 
 void House::drawChimney() {
+    setExternalMaterial();
     Rect rectangles[] = {
             // LEFT SIDE
             {
@@ -179,10 +181,10 @@ void House::drawFloor() {
             },
             {
                 // floor outside
-                    {HALF_BASE_WIDTH, 0, -BASE_HEIGHT},
+                {HALF_BASE_WIDTH, 0, -BASE_HEIGHT},
                 {HALF_BASE_WIDTH, 0,  0},
                 {-HALF_BASE_WIDTH, 0, 0},
-                    {-HALF_BASE_WIDTH, 0, -BASE_HEIGHT},
+                {-HALF_BASE_WIDTH, 0, -BASE_HEIGHT},
                 COLOR_FLOOR
             }
     };
@@ -191,6 +193,9 @@ void House::drawFloor() {
 }
 
 void House::drawRoof() {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_RED);
+    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_HIGH);
+
     Rect rectangles[] = {
             // right roof wall
             {
@@ -226,7 +231,14 @@ void House::drawRoof() {
     _utils.draw_parallelepiped(rectangles[2], rectangles[3]);
 }
 
+void House::setExternalMaterial() const {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_WHITE);
+    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_LOW);
+}
+
 void House::drawPrismWalls() {
+    setExternalMaterial();
+
     Triangle triangles[] = {
             {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
@@ -259,6 +271,7 @@ void House::drawPrismWalls() {
 }
 
 void House::drawLateralWalls() {
+    setExternalMaterial();
 
     Rect rectangles[] = {
             // front walls
@@ -345,6 +358,9 @@ void House::drawLateralWalls() {
 
 void House::drawDoor() {
     glPushMatrix();
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
+    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
+
     glTranslatef(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK);
     glRotatef(_doorAngle, 0.0, 1.0, 0.0);
     glTranslatef(HALF_DOOR_WIDTH, 0.f, WALL_THICK);
@@ -471,6 +487,9 @@ void House::updateColor() {
 }
 
 void House::drawFlag() {
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
+    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
+
     Triangle triangles[] = {
             {
                     { -FLAG_WIDTH,  0, 0 },
@@ -495,6 +514,10 @@ void House::drawFlag() {
 
 // flag cylinder
 void House::drawCylinder() const {
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, MATERIAL_BLACK);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
+    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
+
     gluQuadricDrawStyle(_quadric, GLU_LINE);
     gluQuadricNormals(_quadric, GLU_SMOOTH);
 

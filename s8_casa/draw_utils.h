@@ -29,9 +29,13 @@ struct Ortho {
 };
 
 struct Color {
-    GLubyte r{255};
-    GLubyte g{255};
-    GLubyte b{255};
+    Color(GLubyte r, GLubyte g, GLubyte b) : _r{r/255.0f}, _g{g/255.0f}, _b{b/255.0f}, _a{1.0} { }
+    GLfloat* fv() { return &_r; }
+private:
+    GLfloat _r;
+    GLfloat _g;
+    GLfloat _b;
+    GLfloat _a;
 };
 
 struct Triangle {

@@ -346,7 +346,7 @@ void keyCallback(unsigned char key, int x, int y) {
 
 void appInit() {
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     _app->mainWindowID = glutCreateWindow("house");
 
@@ -369,8 +369,8 @@ void initLight() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
-    Light::ambient();
+//    glEnable(GL_COLOR_MATERIAL);
+    Light::globalAmbient();
 }
 
 void createMenu() {

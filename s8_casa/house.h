@@ -63,6 +63,8 @@ private:
     GLUquadric *_quadric;
     draw_utils& _utils;
     Volume _volume;
+
+    void setExternalMaterial() const;
 };
 
 

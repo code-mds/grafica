@@ -3,8 +3,9 @@
 //
 #include <iostream>
 #include "draw_utils.h"
+#include "light.h"
 
-#define WIREFRAME_COLOR 15, 32, 112
+const GLfloat WIREFRAME_COLOR[] = {15/255.0f, 32/255.0f, 112/255.0f};
 
 void draw_utils::log(const std::string &msg) const {
     std::cout << msg << std::endl;
@@ -104,14 +105,24 @@ void draw_utils::draw_triangle3D(Triangle &triangle) {
  * @param color
  */
 void draw_utils::draw_triangle3D(Vertex &v1, Vertex &v2, Vertex &v3, Color &color) {
-    glColor3ub(color.r, color.g, color.b);
+    bool isColorMaterialOn = Light::isColorMaterialOn();
+    if(isColorMaterialOn)
+        glColor3fv(color.fv());
+    else
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color.fv());
+
     glPolygonMode(GL_FRONT,GL_FILL);
     internal_triangle3D(v1, v2, v3);
 
     if(_showWireFrame) {
         // wireframe
         glLineWidth(1.0f);
-        glColor3ub(WIREFRAME_COLOR);
+
+        if(isColorMaterialOn)
+            glColor3fv(WIREFRAME_COLOR);
+        else
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, WIREFRAME_COLOR);
+
         glPolygonMode(GL_FRONT, GL_LINE);
         internal_triangle3D(v1, v2, v3);
     }

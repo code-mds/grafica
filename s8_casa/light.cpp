@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include "light.h"
 
-static const GLfloat black[] = {0.0, 0.0, 0.0, 1.0 };
-static const GLfloat white[] = {1.0, 1.0, 1.0, 1.0 };
 static const GLenum LIGHTS[] = { GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7 };
 
 int Light::LastCreated = 0;
@@ -44,20 +42,6 @@ void Light::draw() {
     } else {
         glEnable(LIGHTS[_lightNum]);
         glLightfv(LIGHTS[_lightNum], GL_POSITION, &_position.x);
-
-        // For each lights, we defines their ambient, diffuse and specular color
-//        glLightfv(LIGHTS[_lightNum], GL_AMBIENT, white);
-//        glLightfv(LIGHTS[_lightNum], GL_DIFFUSE, white);
-//        glLightfv(LIGHTS[_lightNum], GL_SPECULAR, white);
-
-//    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-//    GLfloat mat_shininess[] = { 50.0 };
-//    GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-//    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-//    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-
         drawSpot();
         drawLightSource();
     }
@@ -73,23 +57,19 @@ void Light::drawLightSource() const {
     glPopMatrix ();
 }
 
+
 void Light::drawSpot() {
-    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-    glLightfv(LIGHTS[_lightNum], GL_AMBIENT, light_ambient);
+    // For each lights, we defines their ambient, diffuse and specular color
+    glLightfv(LIGHTS[_lightNum], GL_AMBIENT, MATERIAL_BLACK);
+    glLightfv(LIGHTS[_lightNum], GL_DIFFUSE, MATERIAL_WHITE);
+    glLightfv(LIGHTS[_lightNum], GL_SPECULAR, MATERIAL_WHITE);
 
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    glLightfv(LIGHTS[_lightNum], GL_DIFFUSE, light_diffuse);
-    glLightfv(LIGHTS[_lightNum], GL_SPECULAR, light_specular);
-
-
-    // http://jerome.jouvie.free.fr/opengl-tutorials/Lesson6.php#Notion
     // In OpenGl, we also can defines the light attenuation with the distance.
     // OpenGl calculates an attenuation factor (between 0 and 1) that is multiplied to the ambient, diffuse and specular color.
     // By default, they are no attenuation (attenuation factor is 1) so you have to defines your own attenuation.
     glLightf(LIGHTS[_lightNum], GL_CONSTANT_ATTENUATION, 1.0);
-    glLightf(LIGHTS[_lightNum], GL_LINEAR_ATTENUATION, 0.0);
-    glLightf(LIGHTS[_lightNum], GL_QUADRATIC_ATTENUATION, 0.0);
+    glLightf(LIGHTS[_lightNum], GL_LINEAR_ATTENUATION, 0.2);
+    glLightf(LIGHTS[_lightNum], GL_QUADRATIC_ATTENUATION, 0.08);
 
     // We have seen that positional source emits light in all the direction.
     // But, we can creates a spot that emits lights into an emission cone by restricting the emission area of the light source.
@@ -98,8 +78,15 @@ void Light::drawSpot() {
     glLightfv(LIGHTS[_lightNum], GL_SPOT_DIRECTION, &_direction.x);
 }
 
-void Light::ambient() {
-    // set the global ambient color a bit darker so that we can see spot lights
+void Light::globalAmbient() {
+    // set the global ambient color a bit darker
+    // so that we can see spot lights
     GLfloat ambientLight[] = {0.6f, 0.6f, 0.6f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+}
+
+GLboolean Light::isColorMaterialOn() {
+    GLboolean isColorMaterial;
+    glGetBooleanv(GL_COLOR_MATERIAL, &isColorMaterial);
+    return isColorMaterial;
 }

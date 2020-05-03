@@ -16,6 +16,15 @@
 
 #endif
 
+static const GLfloat MATERIAL_WHITE[] = {1.0, 1.0, 1.0, 1.0 };
+static const GLfloat MATERIAL_BLACK[] = {0.0f, 0.0f, 0.0f, 1.0f};
+static const GLfloat MATERIAL_RED[] = {1.0f, 0.0f, 0.0f, 1.0f};
+static const GLfloat MATERIAL_YELLOW[] = {0.1f, 1.0f, 0.0f, 1.0f};
+
+static const GLfloat SHININESS_OFF = 0.0f;
+static const GLfloat SHININESS_LOW = 20.0f;
+static const GLfloat SHININESS_HIGH = 100.0f;
+
 class Light {
 public:
     Light();
@@ -23,7 +32,8 @@ public:
     void toggle();
     void draw();
 
-    static void ambient();
+    static void globalAmbient();
+    static GLboolean isColorMaterialOn();
 
 private:
     void drawLightSource() const;
