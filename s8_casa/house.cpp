@@ -50,8 +50,10 @@ Color COLOR_WALL_EXTERNAL_2 = {188, 170, 164 };
 #define COLOR_FLOOR             {160, 160, 160}
 #define COLOR_FLAG              {153,206,255}
 
-House::House(draw_utils& utils) :
+House::House(draw_utils& utils, Light& light1, Light& light2) :
     _utils{utils},
+    _light1{light1},
+    _light2{light2},
     _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
@@ -82,10 +84,20 @@ House::~House() {
 }
 
 void House::draw() {
+    if(!_light1.isRelative())
+        _light1.draw();
+    if(!_light2.isRelative())
+        _light2.draw();
+
+    glPushMatrix();
     glTranslatef(_translationX, _translationY, _translationZ);
     glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
 
-    glPushMatrix();
+    if(_light1.isRelative())
+        _light1.draw();
+    if(_light2.isRelative())
+        _light2.draw();
+
     drawFloor();
     drawLateralWalls();
     drawPrismWalls();

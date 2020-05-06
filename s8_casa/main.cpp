@@ -23,6 +23,10 @@
 
 #define COLOR_BKG 1.0, 1.0, 1.0, 0.0
 
+
+#define MNU_LIGHT_POS_2REL 15
+#define MNU_LIGHT_POS_1REL 14
+#define MNU_LIGHT_POS_2ABS 13
 #define MNU_TOGGLE_LIGHT2 12
 #define MNU_TOGGLE_LIGHT1 11
 #define MNU_RESET 10
@@ -59,7 +63,7 @@ struct AppGlobals {
 
     char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
     draw_utils utils;
-    House house{utils};
+    House house{utils, light1, light2};
 };
 
 static AppGlobals* _app;
@@ -69,8 +73,6 @@ void displayCallback() {
 
     // view transformation must be called before model transformation
     _app->camera.lookAt();
-    _app->light1.draw();
-    _app->light2.draw();
 
     // model transformations
     _app->utils.draw_wind(_app->windAngle);
@@ -135,6 +137,18 @@ void reshape(int w, int h) {
 
 void menuCallback(int value) {
     switch (value) {
+        case MNU_LIGHT_POS_2REL:
+            _app->light2.setRelative(true);
+            _app->light1.setRelative(true);
+            break;
+        case MNU_LIGHT_POS_1REL:
+            _app->light2.setRelative(false);
+            _app->light1.setRelative(true);
+            break;
+        case MNU_LIGHT_POS_2ABS:
+            _app->light2.setRelative(false);
+            _app->light1.setRelative(false);
+            break;
         case MNU_TOGGLE_LIGHT2:
             _app->light2.toggle();
             break;
@@ -377,6 +391,9 @@ void createMenu() {
     int menuLight = glutCreateMenu(menuCallback);
     glutAddMenuEntry("On/Off Light 1", MNU_TOGGLE_LIGHT1);
     glutAddMenuEntry("On/Off Light 2", MNU_TOGGLE_LIGHT2);
+    glutAddMenuEntry("All in relative position", MNU_LIGHT_POS_2REL);
+    glutAddMenuEntry("Light 1 in relative position", MNU_LIGHT_POS_1REL);
+    glutAddMenuEntry("All in absolute position", MNU_LIGHT_POS_2ABS);
 
     int menuProjection = glutCreateMenu(menuCallback);
     glutAddMenuEntry("Perspective", MNU_PERSPECTIVE);

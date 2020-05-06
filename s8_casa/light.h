@@ -19,7 +19,6 @@
 static const GLfloat MATERIAL_WHITE[] = {1.0, 1.0, 1.0, 1.0 };
 static const GLfloat MATERIAL_BLACK[] = {0.0f, 0.0f, 0.0f, 1.0f};
 static const GLfloat MATERIAL_RED[] = {1.0f, 0.0f, 0.0f, 1.0f};
-static const GLfloat MATERIAL_YELLOW[] = {0.1f, 1.0f, 0.0f, 1.0f};
 
 static const GLfloat SHININESS_OFF = 0.0f;
 static const GLfloat SHININESS_LOW = 20.0f;
@@ -31,6 +30,8 @@ public:
     explicit Light(const Vertex& pos, const Vertex& dir);
     void toggle();
     void draw();
+    void setRelative(bool isRelative);
+    bool isRelative();
 
     static void globalAmbient();
     static GLboolean isColorMaterialOn();
@@ -44,6 +45,7 @@ private:
     int _lightNum;
     Vertex _position;
     Vertex _direction;
+    bool _isRelative;
 
     void drawSpot();
 };

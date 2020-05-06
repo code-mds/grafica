@@ -26,6 +26,7 @@ Light::Light() :
 // A directional is not subject to attenuation since it is at an infinite distance. It is used to simulate the sun for example.
 Light::Light(const Vertex& pos, const Vertex& dir) :
     _isOn{true},
+    _isRelative{false},
     _lightNum{LastCreated},
     _position{pos},
     _direction{dir}
@@ -89,4 +90,12 @@ GLboolean Light::isColorMaterialOn() {
     GLboolean isColorMaterial;
     glGetBooleanv(GL_COLOR_MATERIAL, &isColorMaterial);
     return isColorMaterial;
+}
+
+void Light::setRelative(bool isRelative) {
+    _isRelative  = isRelative;
+}
+
+bool Light::isRelative() {
+    return _isRelative;
 }

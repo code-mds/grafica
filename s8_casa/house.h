@@ -6,10 +6,11 @@
 #define GRAFICA_HOUSE_H
 
 #include "draw_utils.h"
+#include "light.h"
 
 class House {
 public:
-    explicit House(draw_utils& utils);
+    explicit House(draw_utils& utils, Light& light1, Light& light2);
     ~House();
     void draw();
     void toggleDoor();
@@ -63,6 +64,7 @@ private:
     GLUquadric *_quadric;
     draw_utils& _utils;
     Volume _volume;
+    Light &_light1, &_light2;
 
     void setExternalMaterial() const;
 };
