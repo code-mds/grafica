@@ -24,6 +24,7 @@
 #define COLOR_BKG 1.0, 1.0, 1.0, 0.0
 
 
+#define MNU_TOGGLE_CLIPPLANE 16
 #define MNU_LIGHT_POS_2REL 15
 #define MNU_LIGHT_POS_1REL 14
 #define MNU_LIGHT_POS_2ABS 13
@@ -58,9 +59,16 @@ struct AppGlobals {
     Light light2{Vertex{.2, .1, .5, 1.0}, Vertex{-.1, .1, -1}};
 
     Camera camera;
+
+    //Clip Plane equation: Ax + By + Cz + D = 0
+    GLdouble clip_plane_0[4]={
+            -1.0,-0.3,0.0,0.5
+    };
+
     Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 50.0};
     Perspective perspective{  45.0, 1.0, 100.0};
 
+    bool enableClipPlane = true;
     char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
     draw_utils utils;
     House house{utils, light1, light2};
@@ -78,7 +86,7 @@ void displayCallback() {
     _app->utils.draw_wind(_app->windAngle);
     _app->utils.draw_axes();
     _app->house.draw();
-
+    glClipPlane (GL_CLIP_PLANE0, _app->clip_plane_0);
     glutSwapBuffers();
 }
 
@@ -137,6 +145,9 @@ void reshape(int w, int h) {
 
 void menuCallback(int value) {
     switch (value) {
+        case MNU_TOGGLE_CLIPPLANE:
+            toggleClipPlane();
+            break;
         case MNU_LIGHT_POS_2REL:
             _app->light2.setRelative(true);
             _app->light1.setRelative(true);
@@ -189,6 +200,16 @@ void menuCallback(int value) {
             _app->utils.log("unhandled MENU");
             break;
     }
+}
+
+void toggleClipPlane() {
+    _app->enableClipPlane = !_app->enableClipPlane;
+    if(_app->enableClipPlane) {
+        glEnable(GL_CLIP_PLANE0);
+    } else {
+        glDisable(GL_CLIP_PLANE0);
+    }
+    glutPostRedisplay();
 }
 
 /**
@@ -365,6 +386,7 @@ void appInit() {
     _app->mainWindowID = glutCreateWindow("house");
 
     glClearColor(COLOR_BKG);
+    glEnable(GL_CLIP_PLANE0);
 
     initLight();
     createMenu();
@@ -391,13 +413,14 @@ void createMenu() {
     int menuLight = glutCreateMenu(menuCallback);
     glutAddMenuEntry("On/Off Light 1", MNU_TOGGLE_LIGHT1);
     glutAddMenuEntry("On/Off Light 2", MNU_TOGGLE_LIGHT2);
-    glutAddMenuEntry("All in relative position", MNU_LIGHT_POS_2REL);
+    glutAddMenuEntry("Light 1/2 in relative position", MNU_LIGHT_POS_2REL);
     glutAddMenuEntry("Light 1 in relative position", MNU_LIGHT_POS_1REL);
-    glutAddMenuEntry("All in absolute position", MNU_LIGHT_POS_2ABS);
+    glutAddMenuEntry("Light 1/2 in absolute position", MNU_LIGHT_POS_2ABS);
 
     int menuProjection = glutCreateMenu(menuCallback);
     glutAddMenuEntry("Perspective", MNU_PERSPECTIVE);
     glutAddMenuEntry("Ortho", MNU_ORTHO);
+    glutAddMenuEntry("Toggle Clip Plane", MNU_TOGGLE_CLIPPLANE);
     glutCreateMenu(menuCallback);
 
     int menuStructure = glutCreateMenu(menuCallback);

@@ -20,5 +20,6 @@ void reshape(int w, int h);
 void forceReshape(char type);
 void reset();
 void initLight();
+void toggleClipPlane();
 
 #endif //S7_CASA_MAIN_H
