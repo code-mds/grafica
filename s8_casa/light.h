@@ -12,9 +12,9 @@
 // headers richiesti da Windows e linux
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include "vertex.h"
-
 #endif
+
+#include "vertex.h"
 
 static const GLfloat MATERIAL_WHITE[] = {1.0, 1.0, 1.0, 1.0 };
 static const GLfloat MATERIAL_BLACK[] = {0.0f, 0.0f, 0.0f, 1.0f};

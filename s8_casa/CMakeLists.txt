@@ -1,8 +1,10 @@
+project(s8_casa)
+
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
+
 if(APPLE)
     message(INFO ": PLATFORM APPLE")
-
     include_directories("/usr/local/include")
     find_package(OpenGL REQUIRED)
     include_directories(${OpenGL_INCLUDE_DIRS})
@@ -38,10 +40,10 @@ else()
     set(OPENGL_LIBRARY -lopengl32)
     set(GLUT_LIBRARY -lfreeGLUT -lglu32)
     set(GLEW_LIBRARIES -lglew32)
-endif()
 
+endif()
 set(REQUIRED_LIBS ${GLUT_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARY})
 
-project(s8_casa)
+
 add_executable(${PROJECT_NAME} light.cpp vertex.cpp camera.cpp draw_utils.cpp house.cpp main.cpp )
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBS})
