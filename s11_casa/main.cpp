@@ -415,12 +415,7 @@ void initLight() {
 
 void saveFile()
 {
-    GLint viewport[4]; //x,y,w,h
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    int w = viewport[2];
-    int h = viewport[3];
-
-    RgbImage theTexMap(h,w);
+    RgbImage theTexMap;
     theTexMap.LoadFromOpenglBuffer();
     theTexMap.WriteBmpFile(CAPTURE_FILENAME);
 }
