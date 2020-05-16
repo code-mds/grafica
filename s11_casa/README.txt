@@ -5,26 +5,34 @@ Ambiente:
 - CLion 2019.3.4
 - MinGW 64 (x86_64-8.1.0-posix-seh-rt_v6-rev0)
 ----------------------------------------------
-Serie: 7
-----------------------------------------------
 ATTENZIONE: Nel file CMakeLists.txt è definito il percorso di freeglut e glew
 	    Nel mio caso C:/SUPSI/freeglut e C:/SUPSI/glew-2.1.0
 	    Modificare il percorso per puntare al path corretto
 
 Pacchetto:
-- s7_casa\draw_utils.h
-- s7_casa\draw_utils.cpp
-- s7_casa\house.h
-- s7_casa\house.cpp
-- s7_casa\camera.h
-- s7_casa\camera.cpp
-- s7_casa\vertex.h
-- s7_casa\vertex.cpp
-- s7_casa\main.h
-- s7_casa\main.cpp
-- bin\s7_casa.exe
+- src\draw_utils.h
+- src\draw_utils.cpp
+- src\house.h
+- src\house.cpp
+- src\camera.h
+- src\camera.cpp
+- src\vertex.h
+- src\vertex.cpp
+- src\main.h
+- src\main.cpp
+- bin\s11_casa.exe
 
 Funzioni:
+
+*** NEW ***
+- Export as bmp (Right Click menu) salva framebuffer in "capture.bmp"
+
+*** OLD ***
+- Toggle Clipping Plane (Right Click menu)
+- Ligh1 Relative Pos (Right Click menu)
+- Ligh1/2 Relative Pos (Right Click menu)
+- Ligh1/2 Absolute Pos (Right Click menu)
+
 - Show/Hide Axes (x,X keys / Right Click menu)
 - Show/Hide Wireframe (w,W keys / Right Click menu)
 - Change Color (c,C / Right Click menu)
