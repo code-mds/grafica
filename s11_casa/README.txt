@@ -10,16 +10,21 @@ ATTENZIONE: Nel file CMakeLists.txt è definito il percorso di freeglut e glew
 	    Modificare il percorso per puntare al path corretto
 
 Pacchetto:
+- src\camera.h
+- src\camera.cpp
 - src\draw_utils.h
 - src\draw_utils.cpp
 - src\house.h
 - src\house.cpp
-- src\camera.h
-- src\camera.cpp
-- src\vertex.h
-- src\vertex.cpp
+- src\light.h
+- src\light.cpp
 - src\main.h
 - src\main.cpp
+- src\RgbImage.h
+- src\RgbImage.cpp
+- src\vertex.h
+- src\vertex.cpp
+
 - bin\s11_casa.exe
 
 Funzioni:
