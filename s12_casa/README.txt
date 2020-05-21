@@ -22,17 +22,28 @@ Pacchetto:
 - src\main.cpp
 - src\RgbImage.h
 - src\RgbImage.cpp
+- src\Texture.h
+- src\Texture.cpp
 - src\vertex.h
 - src\vertex.cpp
 
-- bin\s11_casa.exe
+- images\roof_texture.bmp
+- images\wall_texture.bmp
+- images\wood_texture.bmp
+
+- bin\s12_casa.exe
 
 Funzioni:
 
 *** NEW ***
-- Export as bmp (Right Click menu) salva framebuffer in "capture.bmp"
+- 3 Textures: Wall, Door, Roof
+- Il programma cercal le seguenti immagini nella sottocartella images:
+	- images\roof_texture.bmp
+	- images\wall_texture.bmp
+	- images\wood_texture.bmp
 
 *** OLD ***
+- Export as bmp (Right Click menu) salva framebuffer in "capture.bmp"
 - Toggle Clipping Plane (Right Click menu)
 - Ligh1 Relative Pos (Right Click menu)
 - Ligh1/2 Relative Pos (Right Click menu)
