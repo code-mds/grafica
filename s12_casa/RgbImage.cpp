@@ -21,10 +21,16 @@
 
 #include "RgbImage.h"
 
-#ifndef RGBIMAGE_DONT_USE_OPENGL
-#include <windows.h>
-#include "GL/gl.h"
+#ifdef __APPLE__
+#include <GL/glew.h>
+#include <GLUT/glut.h>
+#else
+// headers richiesti da Windows e linux
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 #endif
+
+
 #ifndef BI_RGB
 #define BI_RGB 0
 #endif
