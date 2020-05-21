@@ -87,9 +87,9 @@ void draw_utils::draw_parallelepiped(Rect &front, Rect &back) {
  * @param rect
  */
 void draw_utils::draw_rectangle3D(Rect &rect ) {
-    TextCoord textCoord1{isTextureEnabled(), 0,0, 1,0, 1,1};
+    TextCoord textCoord1{Texture::isTextureEnabled(), 0,0, 1,0, 1,1};
     draw_triangle3D(rect.v1, rect.v2, rect.v3, rect.color, textCoord1);
-    TextCoord textCoord2{isTextureEnabled(), 0,0, 1,1, 0,1};
+    TextCoord textCoord2{Texture::isTextureEnabled(), 0,0, 1,1, 0,1};
     draw_triangle3D(rect.v1, rect.v3, rect.v4, rect.color, textCoord2);
 }
 
@@ -98,14 +98,8 @@ void draw_utils::draw_rectangle3D(Rect &rect ) {
  * @param triangle
  */
 void draw_utils::draw_triangle3D(Triangle &triangle) {
-    TextCoord textCoord{isTextureEnabled(), 0,0, 2,0, 1,1};
+    TextCoord textCoord{Texture::isTextureEnabled(), 0,0, 2,0, 1,1};
     draw_triangle3D(triangle.v1, triangle.v2, triangle.v3, triangle.color, textCoord);
-}
-
-bool draw_utils::isTextureEnabled() {
-    GLboolean isTextureEnabled;
-    glGetBooleanv(GL_TEXTURE_2D, &isTextureEnabled);
-    return isTextureEnabled;
 }
 
 /**
@@ -271,12 +265,5 @@ void draw_utils::draw_wind(GLfloat windAngle) {
     glEnd();
     glDisable(GL_LINE_STIPPLE);
     glPopMatrix();
-}
-
-void draw_utils::enableTexture(bool enable) {
-    if(enable)
-        glEnable(GL_TEXTURE_2D);
-    else
-        glDisable(GL_TEXTURE_2D);
 }
 

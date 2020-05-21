@@ -18,6 +18,7 @@
 #include "house.h"
 #include "main.h"
 #include "RgbImage.h"
+#include "Texture.h"
 
 #define ANG2RAD (3.14159265358979323846 / 180.0 * 0.5)
 
@@ -58,7 +59,7 @@ struct AppGlobals {
     // The light source can be a POSITIONAL (w > 0) or DIRECTIONAL (w = 0) light source depending on the w value.
     Light light1{Vertex{-.4, 1.2, -.6, 1.0}, Vertex{.1, .1, 1}};
     Light light2{Vertex{.2, .1, .5, 1.0}, Vertex{-.1, .1, -1}};
-
+    Texture texture;
     Camera camera;
 
     //Clip Plane equation: Ax + By + Cz + D = 0
@@ -70,7 +71,7 @@ struct AppGlobals {
     char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
 
     draw_utils utils;
-    House house{utils, light1, light2};
+    House house{utils, light1, light2, texture};
 };
 
 static AppGlobals* _app;
@@ -408,32 +409,9 @@ void appInit() {
     glutTimerFunc(WIND_MSEC, windCallback, 0);
 }
 
-#define Width 256
-#define Height 256
-int ww, wh;
-static GLubyte Image[Height][Width][4];
-static GLuint texName;
 
 void initTexture() {
-    RgbImage rgbImage("wall_texture.bmp");
-
-    glGenTextures (1, &texName) ;
-    glBindTexture(GL_TEXTURE_2D, texName);
-
-    // Pixel alignment: each row is word aligned (aligned to a 4 byte boundary)
-    // Therefore, no need to call glPixelStore( GL_UNPACK_ALIGNMENT, ... );
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    //gluBuild2DMipmaps(GL_TEXTURE_2D, 3,theTexMap.GetNumCols(), theTexMap.GetNumRows(),
-    //				 GL_RGB, GL_UNSIGNED_BYTE, theTexMap.ImageData() );
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-            rgbImage.GetNumCols(), rgbImage.GetNumRows(),
-            0, GL_RGB, GL_UNSIGNED_BYTE, rgbImage.ImageData());
+    _app->texture.init();
 }
 
 void initLight() {

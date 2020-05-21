@@ -3,8 +3,6 @@
 //
 
 #include "house.h"
-#include "draw_utils.h"
-#include "light.h"
 
 static const GLfloat SW = 10.0f; //SCENE WIDTH
 
@@ -50,10 +48,11 @@ Color COLOR_WALL_EXTERNAL_2 = {188, 170, 164 };
 #define COLOR_FLOOR             {160, 160, 160}
 #define COLOR_FLAG              {153,206,255}
 
-House::House(draw_utils& utils, Light& light1, Light& light2) :
+House::House(draw_utils& utils, Light& light1, Light& light2, Texture& texture) :
     _utils{utils},
     _light1{light1},
     _light2{light2},
+    _texture{texture},
     _colorRoofInternal{COLOR_ROOF_INTERNAL_1},
     _colorRoofExternal{COLOR_ROOF_EXTERNAL_1},
     _colorWallExternal{COLOR_WALL_EXTERNAL_1}
@@ -110,6 +109,9 @@ void House::draw() {
 }
 
 void House::drawChimney() {
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WALL);
+
     setExternalMaterial();
     Rect rectangles[] = {
             // LEFT SIDE
@@ -179,6 +181,8 @@ void House::drawChimney() {
     for (int i = 0; i < nrOfWalls; i=i+2) {
         _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
+
+    _texture.enableTexture(false);
 }
 
 void House::drawFloor() {
@@ -205,6 +209,9 @@ void House::drawFloor() {
 }
 
 void House::drawRoof() {
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::ROOF);
+
     glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_RED);
     glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_HIGH);
 
@@ -241,6 +248,7 @@ void House::drawRoof() {
 
     _utils.draw_parallelepiped(rectangles[0], rectangles[1]);
     _utils.draw_parallelepiped(rectangles[2], rectangles[3]);
+    _texture.enableTexture(false);
 }
 
 void House::setExternalMaterial() const {
@@ -250,7 +258,8 @@ void House::setExternalMaterial() const {
 
 void House::drawPrismWalls() {
     setExternalMaterial();
-    _utils.enableTexture(true);
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WALL);
     Triangle triangles[] = {
             {
                     { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
@@ -280,12 +289,13 @@ void House::drawPrismWalls() {
 
     _utils.draw_prism(triangles[0], triangles[1]);
     _utils.draw_prism(triangles[2], triangles[3]);
-    _utils.enableTexture(false);
+    _texture.enableTexture(false);
 }
 
 void House::drawLateralWalls() {
     setExternalMaterial();
-    _utils.enableTexture(true);
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WALL);
 
     Rect rectangles[] = {
             // front walls
@@ -367,11 +377,14 @@ void House::drawLateralWalls() {
     for (int i = 0; i < nrOfWalls; i=i+2) {
         _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
-    _utils.enableTexture(false);
+    _texture.enableTexture(false);
 }
 
 void House::drawDoor() {
     glPushMatrix();
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WOOD);
+
     glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
     glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
 
@@ -399,6 +412,7 @@ void House::drawDoor() {
         _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
     }
     glPopMatrix();
+    _texture.enableTexture(false);
 }
 
 void House::toggleDoor() {

@@ -17,13 +17,7 @@
 #include <string>
 #include <cmath>
 #include "vertex.h"
-
-struct TextCoord {
-    GLboolean enabled;
-    GLfloat s1,t1;
-    GLfloat s2,t2;
-    GLfloat s3,t3;
-};
+#include "Texture.h"
 
 struct Perspective {
     GLdouble fovy;
@@ -61,8 +55,6 @@ struct Volume {
 
 class draw_utils {
 public:
-    void enableTexture(bool enable);
-    bool isTextureEnabled();
     void draw_axes();
     void toggleAxesVisibility();
 

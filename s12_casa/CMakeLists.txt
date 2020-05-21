@@ -1,4 +1,8 @@
 project(s12_casa)
+set(SOURCE_FILES Texture.cpp RgbImage.cpp light.cpp vertex.cpp camera.cpp draw_utils.cpp house.cpp main.cpp)
+configure_file(images/wall_texture.bmp images/wall_texture.bmp COPYONLY)
+configure_file(images/wood_texture.bmp images/wood_texture.bmp COPYONLY)
+configure_file(images/roof_texture.bmp images/roof_texture.bmp COPYONLY)
 
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
@@ -43,7 +47,6 @@ else()
 
 endif()
 set(REQUIRED_LIBS ${GLUT_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARY})
+add_executable(${PROJECT_NAME}  ${SOURCE_FILES})
 
-add_executable(${PROJECT_NAME} RgbImage.cpp light.cpp vertex.cpp camera.cpp draw_utils.cpp house.cpp main.cpp )
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBS})
-FILE(COPY wall_texture.bmp DESTINATION "${CMAKE_BINARY_DIR}")

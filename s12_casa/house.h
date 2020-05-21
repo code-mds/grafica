@@ -10,7 +10,7 @@
 
 class House {
 public:
-    explicit House(draw_utils& utils, Light& light1, Light& light2);
+    explicit House(draw_utils& utils, Light& light1, Light& light2, Texture& texture);
     ~House();
     void draw();
     void toggleDoor();
@@ -65,6 +65,7 @@ private:
     draw_utils& _utils;
     Volume _volume;
     Light &_light1, &_light2;
+    Texture& _texture;
 
     void setExternalMaterial() const;
 };
