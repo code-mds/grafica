@@ -1,0 +1,1 @@
+g++ -framework OpenGL -framework GLUT  -o TextureBMP TextureBMP.cpp RgbImage.cpp 
