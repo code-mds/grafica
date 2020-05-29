@@ -39,6 +39,7 @@ if(APPLE)
 else()
     message(INFO ": PLATFORM WINDOWS")
 
+    #3.0.0-1
     set(CMAKE_PREFIX_PATH "C:/SUPSI/opengl/freeglut")
 
     include_directories("C:/SUPSI/opengl/freeglut/include")
@@ -47,15 +48,16 @@ else()
     include_directories("C:/SUPSI/opengl/glew-2.1.0/include")
     link_directories("C:/SUPSI/opengl/glew-2.1.0/lib/release/x64")
 
-    include_directories("C:/SUPSI/opengl/glfw-3.3.2.bin.WIN64/include")
-    link_directories("C:/SUPSI/opengl/glfw-3.3.2.bin.WIN64/lib-mingw-w64")
+    #include_directories("C:/SUPSI/opengl/glfw-3.3.2.bin.WIN64/include")
+    #link_directories("C:/SUPSI/opengl/glfw-3.3.2.bin.WIN64/lib-mingw-w64")
 
     include_directories("C:/SUPSI/opengl/glm-0.9.9.8/glm")
 
     set(OPENGL_LIBRARY -lopengl32)
     set(GLUT_LIBRARY -lfreeGLUT -lglu32)
     set(GLEW_LIBRARIES -lglew32)
-    set(GLFW3_LIBRARIES -lglfw3)
+    #set(GLFW3_LIBRARIES -lglfw3)
+
 endif()
 
 # Set necessary libs.
