@@ -6,16 +6,16 @@
 
 // Headers richiesti da OSX
 #ifdef __APPLE__
-//#include <OpenGL/gl3.h>
-#include <GL/glew.h>
-#include <GLUT/glut.h>
-#include <iostream>
-
+    //#include <OpenGL/gl3.h>
+    #include <GL/glew.h>
+    #include <GLUT/glut.h>
 // headers richiesti da Windows e linux
 #else
-#include <GL/glew.h>
-#include <GL/glut.h>
+    #include <GL/glew.h>
+    #include <GL/glut.h>
 #endif
+
+#include <iostream>
 
 
 // ----------------------------DEFINIZIONE SHADER ------------------------------- //
