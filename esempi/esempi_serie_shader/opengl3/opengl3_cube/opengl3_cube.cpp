@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-
 // Headers richiesti da OSX
 #ifdef __APPLE__
 //#include <OpenGL/gl3.h>
@@ -29,6 +28,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <vector>
+
 
 // -------------------------------- VARIABILI GLOBALI ------------------------------- //
 
@@ -37,28 +38,50 @@ GLuint VBO;
 GLuint EBO;
 Texture _texture;
 
+struct Vertex {
+    // position
+    glm::vec3 Position;
+    // color
+    glm::vec3 Color;
+    // texCoords
+    glm::vec2 TexCoords;
+};
+
+std::vector<GLuint> indices;
+std::vector<Vertex> vertices;
+
 GLint projectionPos, modelviewPos; // Riferimenti alle variabili uniform
 glm::mat4 projection, modelview; // Riferimenti alle matrici modelview e proiezione
 int mouseoldx, mouseoldy ; // Usate dai callback del mouse
 
 glm::vec3 initEyeloc = glm::vec3(0.0, -2.0, 6.0); // Posizione iniziale del punto di vista
+glm::vec3 direction = glm::vec3(0.0, 0.0, 0.0);;
 glm::vec3 eyeloc = initEyeloc;
-
 
 // -------------------------------- INIZIALIZZAZIONI ------------------------------- //
 void init () {
+    glEnable(GL_DEPTH_TEST);
     _texture.init();
     // Coordinate dei vertici del triangolo
-    float vertices[] = {
-            // positions          // colors           // texture coords
-             0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-             0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+    // positions          // colors           // texture coords
+    vertices = {
+        {{-0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {0.0f, 0.0f} },       // bottom left front
+        {{ 0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right front
+        {{ 0.5f,  0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right front
+        {{-0.5f,  0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left front
+
+        {{-0.5f, -0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom left back
+        {{ 0.5f, -0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {0.0f, 0.0f}},       // bottom right back
+        {{ 0.5f,  0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top right back
+        {{-0.5f,  0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top left back
     };
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+    indices = {
+        0, 1, 2, // front first triangle (bl, br, tr)
+        0, 2, 3,  // front second triangle (bl, tr, tl)
+        1, 5, 6,
+        1, 6, 2,
+        4, 5, 6, // back first triangle (bl, br, tr)
+        4, 6, 7,  // back second triangle (bl, tr, tl)
     };
 
     glGenVertexArrays(1, &VAO); // Vertex Array Object
@@ -69,22 +92,24 @@ void init () {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);  // Si copiano i vertici nel Vertex Buffer Object
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
 
     // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+    glBindVertexArray(0);
 
     // Carica gli shaders dai rispettivi files, inizializza, linka e compila
     GLuint vertexShader = initshaders(GL_VERTEX_SHADER, "shaders/shader.vert") ;
@@ -96,7 +121,7 @@ void init () {
     projection = glm::mat4(1.0f);
 
     // Definisce il punto di vista (posizione, dove guarda, upvector)
-    modelview = glm::lookAt(initEyeloc, glm::vec3(0,0,0), glm::vec3(0, 1, 1));
+    modelview = glm::lookAt(initEyeloc, direction, glm::vec3(0, 1, 1));
 
     // Leggi le posizioni delle variabili uniform
     projectionPos = glGetUniformLocation(shaderProgram, "projection_matrix");
@@ -111,12 +136,12 @@ void display() {
 
     // Cancella il color buffer
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Rotazione intorno ad uno dei vertici. Notare che l'angolo va passato in radianti. Rotazione di 1 grado
-//    modelview  = glm::translate(modelview, glm::vec3(0.5f, -0.5f, 0.0f));
-//    modelview = glm::rotate(modelview, 1 / 180.0f * glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-//    modelview  = glm::translate(modelview, glm::vec3(-0.5f, 0.5f, 0.0f));
+    modelview  = glm::translate(modelview, glm::vec3(0.5f, -0.5f, 0.0f));
+    modelview = glm::rotate(modelview, 1 / 180.0f * glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelview  = glm::translate(modelview, glm::vec3(-0.5f, 0.5f, 0.0f));
 
     // Passa la matrice di modelview allo shader
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
@@ -125,9 +150,9 @@ void display() {
     glBindVertexArray(VAO);
 
     _texture.enableTexture(true);
-    _texture.bind(TextureEnum::WOOD);
+    _texture.bind(TextureEnum::WALL);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     _texture.enableTexture(false);
 
     glFlush();
@@ -181,16 +206,17 @@ void mouse(int button, int state, int x, int y)
 }
 
 void mousedrag(int x, int y) {
-    int yloc = y - mouseoldy  ;    // si usa la coordinata y per definire lo zoom in/out
+    int xloc = x - mouseoldx;
+    int yloc = y - mouseoldy;    // si usa la coordinata y per definire lo zoom in/out
 
     // Sposta il punto di vista di un fattore proporzionale allo spostamento del mouse
-    eyeloc += glm::vec3(0.0, -0.005*yloc, +0.005*yloc);
+    eyeloc += glm::vec3(-0.005*xloc, -0.005*yloc, +0.005*yloc);
 
     if (yloc<0) yloc = 0;
     mouseoldy = y ;
 
     /* imposta nella modelview il nuovo punto di vista */
-    modelview = glm::lookAt(eyeloc, glm::vec3(0, 0, 0), glm::vec3(0, 1, 1));
+    modelview = glm::lookAt(eyeloc, direction, glm::vec3(0, 1, 1));
 
     // Invia la matrice aggiornata allo shader e ridisegna
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
@@ -213,7 +239,6 @@ void keyboard (unsigned char key, int x, int y)
             break ;
     }
 }
-
 
 // -------------------------------- MAIN ------------------------------- //
 int main(int argc, char** argv)
