@@ -165,8 +165,6 @@ void TimerFunc(int value)
     glutTimerFunc(10, TimerFunc, 1);
 }
 
-
-
 // -------------------------------- RESHAPE ------------------------------- //
 void reshape(int w, int h)
 {
