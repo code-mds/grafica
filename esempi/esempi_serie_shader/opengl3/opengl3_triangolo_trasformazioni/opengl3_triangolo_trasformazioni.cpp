@@ -31,8 +31,8 @@
 
 // -------------------------------- VARIABILI GLOBALI ------------------------------- //
 
-GLuint vao;
-GLuint vbo;
+GLuint VAO;
+GLuint VBO;
 GLint projectionPos, modelviewPos; // Riferimenti alle variabili uniform
 glm::mat4 projection, modelview; // Riferimenti alle matrici modelview e proiezione
 int mouseoldx, mouseoldy ; // Usate dai callback del mouse
@@ -53,12 +53,12 @@ void init () {
     };
 
     // Si crea un Vertex Array Object
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     // Si crea un Vertex Buffer Object
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // Si copiano i vertici nel Vertex Buffer Object
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -192,8 +192,8 @@ void keyboard (unsigned char key, int x, int y)
         case 27:  // Tasto Escape per uscire
 
             // Cancella tutti i buffers allocati
-            glDeleteVertexArrays(1, &vao);
-            glDeleteBuffers(1, &vbo);
+            glDeleteVertexArrays(1, &VAO);
+            glDeleteBuffers(1, &VBO);
 
             exit(0) ;
         default:

@@ -72,3 +72,4 @@ set(REQUIRED_LIBS
 add_subdirectory(opengl3/opengl3_triangolo)
 add_subdirectory(opengl3/opengl3_triangolo_lookat)
 add_subdirectory(opengl3/opengl3_triangolo_trasformazioni)
+add_subdirectory(opengl3/opengl3_cube)
