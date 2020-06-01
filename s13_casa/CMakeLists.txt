@@ -1,5 +1,5 @@
 project(s13_casa)
-set(SOURCE_FILES Texture.cpp RgbImage.cpp box.cpp shaders_loader.cpp vertex.cpp camera.cpp house.cpp main.cpp)
+set(SOURCE_FILES Texture.cpp RgbImage.cpp solid.cpp shaders_loader.cpp vertex.cpp camera.cpp house.cpp main.cpp)
 
 configure_file(images/wall_texture.bmp images/wall_texture.bmp COPYONLY)
 configure_file(images/wood_texture.bmp images/wood_texture.bmp COPYONLY)

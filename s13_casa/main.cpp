@@ -21,7 +21,7 @@
 // Funzioni per caricare, inizializzare e compilare gli shader
 #include "shaders_loader.h"
 #include "Texture.h"
-#include "box.h"
+#include "solid.h"
 #include "house.h"
 #include "main.h"
 #include "RgbImage.h"

@@ -7,7 +7,7 @@
 
 #include <vector>
 #include "Texture.h"
-#include "box.h"
+#include "solid.h"
 
 class House {
 public:
@@ -44,9 +44,6 @@ private:
     void drawDoor();
     void drawFlag();
     void drawCylinder() const;
-    void setupVolume();
-    void updateColor();
-    void setupDoor();
 
 private:
     bool _doorOpen = false;
@@ -67,13 +64,23 @@ private:
 
     Box _floor;
     Box _door;
+
     Box _wallRight;
     Box _wallBack;
     Box _wallLeft;
     Box _wallFrontLeft;
     Box _wallFrontRight;
+
+    Box _chimRight;
+    Box _chimLeft;
+    Box _chimBack;
+    Box _chimFront;
+
     Box _roofRight;
     Box _roofLeft;
+
+    Prism _triangleFront;
+    Prism _triangleBack;
 
     void setExternalMaterial() const;
 };

@@ -235,6 +235,126 @@ House::House(glm::mat4& modelview, GLint& modelviewPos, Texture& texture) :
                     { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
             {{ 0,  ROOF_HEIGHT, ROOF_THICK },
                     { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+    }},
+
+    //front triangle
+    _triangleFront{std::vector<Vertex>{
+        // front face
+            {{ -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{ HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ 0,  ROOF_HEIGHT, 0 },
+                    {1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
+            // back face
+            {{ HALF_BASE_WIDTH, WALL_HEIGHT, -WALL_THICK },
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            { { -HALF_BASE_WIDTH,  WALL_HEIGHT,  -WALL_THICK},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {  { 0,  ROOF_HEIGHT, -WALL_THICK },
+                    { 1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
+    }},
+    //back triangle
+    _triangleBack{std::vector<Vertex>{
+            // front face
+            {{ HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT) },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {  { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT)},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ 0,  ROOF_HEIGHT, -BASE_HEIGHT },
+                    {1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
+            // back face
+            {{ -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK)},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{ HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            { { 0,  ROOF_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
+                    { 1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
+    }},
+
+    //chimney
+    _chimLeft{std::vector<Vertex>{
+            // front face
+            {{CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{CHIM_LEFT, CHIM_BOTTOM, CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            { {CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            { {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+            // back face
+            {{CHIM_LEFT+CHIM_THICK, CHIM_BOTTOM,  CHIM_START_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{CHIM_LEFT+CHIM_THICK, CHIM_BOTTOM, CHIM_END_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_LEFT+CHIM_THICK, CHIM_TOP,  CHIM_END_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_LEFT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+    }},
+
+    _chimRight{std::vector<Vertex>{
+            // front face
+            {{CHIM_RIGHT, CHIM_BOTTOM,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{CHIM_RIGHT, CHIM_BOTTOM, CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_RIGHT, CHIM_TOP,  CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+            // back face
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM,  CHIM_START_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_END_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_END_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+    }},
+
+    _chimFront{std::vector<Vertex>{
+            // front face
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{CHIM_LEFT, CHIM_BOTTOM,  CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+            // back face
+            {{CHIM_LEFT, CHIM_BOTTOM,  CHIM_START_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_START_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+    }},
+
+    _chimBack{std::vector<Vertex>{
+            // front face
+            {{CHIM_RIGHT, CHIM_BOTTOM, CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+            // back face
+            {{CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{CHIM_RIGHT, CHIM_BOTTOM, CHIM_END_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            { {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH+CHIM_THICK},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
     }}
 {
     _quadric = gluNewQuadric();
@@ -254,11 +374,10 @@ void House::draw() {
 
     drawFloor();
     drawLateralWalls();
-//    drawPrismWalls();
     drawRoof();
-//    drawCylinder();
-//    drawFlag();
-//    drawChimney();
+    drawCylinder();
+    drawFlag();
+    drawChimney();
     drawDoor();
 
     // restore original matrix
@@ -266,83 +385,16 @@ void House::draw() {
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 }
 
-//void House::drawChimney() {
-//    _texture.enableTexture(true);
-//    _texture.bind(TextureEnum::WALL);
-//
-//    setExternalMaterial();
-//    Rect rectangles[] = {
-//            // LEFT SIDE
-//            {
-//                    {CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH},
-//                    {CHIM_LEFT, CHIM_BOTTOM, CHIM_START_DEPTH},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH},
-//                    COLOR_FLOOR
-//            },
-//            {
-//                    {CHIM_LEFT+CHIM_THICK, CHIM_BOTTOM,  CHIM_START_DEPTH},
-//                    {CHIM_LEFT+CHIM_THICK, CHIM_BOTTOM, CHIM_END_DEPTH},
-//                    {CHIM_LEFT+CHIM_THICK, CHIM_TOP,  CHIM_END_DEPTH},
-//                    {CHIM_LEFT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
-//                    COLOR_WALL_INTERNAL
-//            },
-//            // RIGHT SIDE
-//            {
-//                    {CHIM_RIGHT, CHIM_BOTTOM,  CHIM_END_DEPTH},
-//                    {CHIM_RIGHT, CHIM_BOTTOM, CHIM_START_DEPTH},
-//                    {CHIM_RIGHT, CHIM_TOP,  CHIM_START_DEPTH},
-//                    {CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH},
-//                    COLOR_FLOOR
-//            },
-//            {
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM,  CHIM_START_DEPTH},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_END_DEPTH},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_END_DEPTH},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
-//                    COLOR_FLOOR
-//            },
-//            // FRONT
-//            {
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_START_DEPTH},
-//                    {CHIM_LEFT, CHIM_BOTTOM,  CHIM_START_DEPTH},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH},
-//                    COLOR_FLOOR
-//            },
-//            {
-//                    {CHIM_LEFT, CHIM_BOTTOM,  CHIM_START_DEPTH+CHIM_THICK},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_BOTTOM, CHIM_START_DEPTH+CHIM_THICK},
-//                    {CHIM_RIGHT+CHIM_THICK, CHIM_TOP,  CHIM_START_DEPTH+CHIM_THICK},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_START_DEPTH+CHIM_THICK},
-//                    COLOR_FLOOR
-//            },
-//            // BACK
-//            {
-//                    {CHIM_RIGHT, CHIM_BOTTOM, CHIM_END_DEPTH},
-//                    {CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH},
-//                    {CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH},
-//                    COLOR_FLOOR
-//            },
-//            {
-//                    {CHIM_LEFT, CHIM_BOTTOM,  CHIM_END_DEPTH+CHIM_THICK},
-//                    {CHIM_RIGHT, CHIM_BOTTOM, CHIM_END_DEPTH+CHIM_THICK},
-//                    {CHIM_RIGHT, CHIM_TOP,  CHIM_END_DEPTH+CHIM_THICK},
-//                    {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH+CHIM_THICK},
-//                    COLOR_WALL_INTERNAL
-//            }
-//
-//    };
-//
-//    int nrOfWalls = sizeof(rectangles) / sizeof(rectangles[0]);
-//    for (int i = 0; i < nrOfWalls; i=i+2) {
-//        _utils.draw_parallelepiped(rectangles[i], rectangles[i + 1]);
-//    }
-//
-//    _texture.enableTexture(false);
-//}
-//
+void House::drawChimney() {
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WALL);
+    _chimRight.draw();
+    _chimLeft.draw();
+    _chimBack.draw();
+    _chimFront.draw();
+    _texture.enableTexture(false);
+}
+
 void House::drawFloor() {
     // draw door
     _texture.enableTexture(true);
@@ -363,45 +415,9 @@ void House::drawRoof() {
 //    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_WHITE);
 //    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_LOW);
 //}
-//
-//void House::drawPrismWalls() {
-//    setExternalMaterial();
-//    _texture.enableTexture(true);
-//    _texture.bind(TextureEnum::WALL);
-//    Triangle triangles[] = {
-//            {
-//                    { -HALF_BASE_WIDTH,  WALL_HEIGHT, 0 },
-//                    { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
-//                    { 0,  ROOF_HEIGHT, 0 },
-//                    _colorWallExternal
-//            },
-//            {
-//                    { HALF_BASE_WIDTH, WALL_HEIGHT, -WALL_THICK },
-//                    { -HALF_BASE_WIDTH,  WALL_HEIGHT,  -WALL_THICK},
-//                    { 0,  ROOF_HEIGHT, -WALL_THICK },
-//                    COLOR_WALL_INTERNAL
-//            },
-//            {
-//                    { HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT) },
-//                    { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT)},
-//                    { 0,  ROOF_HEIGHT, -BASE_HEIGHT },
-//                    _colorWallExternal
-//            },
-//            {
-//                    { -HALF_BASE_WIDTH,  WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK)},
-//                    { HALF_BASE_WIDTH, WALL_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
-//                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT - WALL_THICK) },
-//                    COLOR_WALL_INTERNAL
-//            },
-//    };
-//
-//    _utils.draw_prism(triangles[0], triangles[1]);
-//    _utils.draw_prism(triangles[2], triangles[3]);
-//    _texture.enableTexture(false);
-//}
-//
-void House::drawLateralWalls() {
 
+
+void House::drawLateralWalls() {
     _texture.enableTexture(true);
     _texture.bind(TextureEnum::WALL);
 
@@ -411,6 +427,8 @@ void House::drawLateralWalls() {
     _wallRight.draw();
     _wallFrontLeft.draw();
     _wallFrontRight.draw();
+    _triangleFront.draw();
+    _triangleBack.draw();
 
     _texture.enableTexture(false);
 }
@@ -432,7 +450,9 @@ void House::drawDoor() {
     _door.draw();
     _texture.enableTexture(false);
 
+    // restore original matrix
     modelview = ori;
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 }
 
 void House::toggleDoor() {
@@ -498,7 +518,7 @@ bool House::rotationEnabled() {
     return _rotationEnabled;
 }
 
-//void House::drawFlag() {
+void House::drawFlag() {
 //    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
 //    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
 //
@@ -522,25 +542,31 @@ bool House::rotationEnabled() {
 //    glRotatef(_flagAngle-_rotationX, 0, 1, 0);
 //    _utils.draw_prism(triangles[0], triangles[1]);
 //    glPopMatrix();
-//}
-//
-//// flag cylinder
-//void House::drawCylinder() const {
-//    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, MATERIAL_BLACK);
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
-//    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
-//
-//    gluQuadricDrawStyle(_quadric, GLU_LINE);
-//    gluQuadricNormals(_quadric, GLU_SMOOTH);
-//
-//    glPushMatrix();
-//    glLineWidth(1.0f);
-//    glColor3ub(15, 32, 112);
-//    glTranslatef(0, ROOF_HEIGHT, 0);
-//    glRotatef(-90, 1, 0, 0);
-//    gluCylinder(_quadric, CYLINDER_RADIUS, CYLINDER_RADIUS, CYLINDER_HEIGHT, 32, 32);
-//    glPopMatrix();
-//}
+}
+
+// flag cylinder
+void House::drawCylinder() const {
+    gluQuadricDrawStyle(_quadric, GLU_LINE);
+    gluQuadricNormals(_quadric, GLU_SMOOTH);
+
+    glPushMatrix();
+    glLineWidth(1.0f);
+
+    glm::mat4 ori{modelview};
+
+    // Rotazione intorno ad uno dei vertici. Notare che l'angolo va passato in radianti. Rotazione di 1 grado
+    modelview  = glm::translate(modelview, glm::vec3(0, ROOF_HEIGHT, 0));
+    modelview = glm::rotate(modelview, -PI_HALF, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // Passa la matrice di modelview allo shader
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+
+    gluCylinder(_quadric, CYLINDER_RADIUS, CYLINDER_RADIUS, CYLINDER_HEIGHT, 32, 32);
+
+    // restore original matrix
+    modelview = ori;
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+}
 
 void House::updateWind(GLfloat windAngle) {
     _windAngle = windAngle;
@@ -562,11 +588,20 @@ void House::reset() {
 void House::init() {
     _door.init();
     _floor.init();
+
     _wallBack.init();
     _wallLeft.init();
     _wallRight.init();
     _wallFrontLeft.init();
     _wallFrontRight.init();
+    _triangleFront.init();
+    _triangleBack.init();
+
     _roofLeft.init();
     _roofRight.init();
+
+    _chimRight.init();
+    _chimLeft.init();
+    _chimBack.init();
+    _chimFront.init();
 }
