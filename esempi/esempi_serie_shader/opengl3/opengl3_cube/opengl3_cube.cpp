@@ -29,14 +29,41 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include <stack>
 
 
 // -------------------------------- VARIABILI GLOBALI ------------------------------- //
+
+#define MNU_SAVE_BMP 17
+#define MNU_TOGGLE_CLIPPLANE 16
+#define MNU_LIGHT_POS_2REL 15
+#define MNU_LIGHT_POS_1REL 14
+#define MNU_LIGHT_POS_2ABS 13
+#define MNU_TOGGLE_LIGHT2 12
+#define MNU_TOGGLE_LIGHT1 11
+#define MNU_RESET 10
+#define MNU_ORTHO 9
+#define MNU_PERSPECTIVE 8
+#define MNU_TOGGLE_WIND 7
+#define MNU_CHANGE_COLOR 6
+#define MNU_OPENCLOSE_DOOR 5
+#define MNU_STOP_HOUSE_ROTATION 4
+#define MNU_START_HOUSE_ROTATION 3
+#define MNU_TOGGLE_WIREFRAME 2
+#define MNU_TOGGLE_AXIS 1
+#define PROJ_ORTHOGRAPHIC 'a'
+#define PROJ_PERSPECTIVE 'p'
+const int ANIM_MSEC = 10;
 
 GLuint VAO;
 GLuint VBO;
 GLuint EBO;
 Texture _texture;
+GLfloat _doorAngle = 0.0;
+GLboolean _doorOpen = false;
+GLfloat PI_HALF = glm::pi<float>() / 2;
+GLfloat DOOR_STEP = 1 / 180.0f * glm::pi<float>();
+
 
 struct Vertex {
     // position
@@ -46,6 +73,8 @@ struct Vertex {
     // texCoords
     glm::vec2 TexCoords;
 };
+
+void initMenu();
 
 std::vector<GLuint> indices;
 std::vector<Vertex> vertices;
@@ -57,31 +86,48 @@ int mouseoldx, mouseoldy ; // Usate dai callback del mouse
 glm::vec3 initEyeloc = glm::vec3(0.0, -2.0, 6.0); // Posizione iniziale del punto di vista
 glm::vec3 direction = glm::vec3(0.0, 0.0, 0.0);;
 glm::vec3 eyeloc = initEyeloc;
+static const GLfloat SW = 5.0f; //SCENE WIDTH
+
+const float DOOR_THINK = 2.5f / SW;
+const float HALF_DOOR_WIDTH = 2.0f / SW;
+const float HALF_BASE_WIDTH = 5.0f / SW;
+const float BASE_HEIGHT = 8.0f / SW;
+const float WALL_THICK = 0.5f / SW;
+const float WALL_HEIGHT = 6.0f / SW;
+
+void menuCallback(int value) {
+    switch (value) {
+        case MNU_OPENCLOSE_DOOR:
+            _doorOpen = !_doorOpen;
+            break;
+    }
+}
 
 // -------------------------------- INIZIALIZZAZIONI ------------------------------- //
-void init () {
+void init() {
+    initMenu();
     glEnable(GL_DEPTH_TEST);
     _texture.init();
     // Coordinate dei vertici del triangolo
     // positions          // colors           // texture coords
     vertices = {
-        {{-0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {0.0f, 0.0f} },       // bottom left front
-        {{ 0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right front
-        {{ 0.5f,  0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right front
-        {{-0.5f,  0.5f, 0.0f},   {1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left front
+            {{ -HALF_DOOR_WIDTH, 0, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {0.0f, 0.0f} },       // bottom left front
+            {{ HALF_DOOR_WIDTH, 0, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right front
+            {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right front
+            {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left front
 
-        {{-0.5f, -0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom left back
-        {{ 0.5f, -0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {0.0f, 0.0f}},       // bottom right back
-        {{ 0.5f,  0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top right back
-        {{-0.5f,  0.5f, -0.5f},  { 1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top left back
+            {{ HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {0.0f, 0.0f}},       // bottom left back
+            {{ -HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right back
+            {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right back
+            {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left back
     };
     indices = {
-        0, 1, 2, // front first triangle (bl, br, tr)
-        0, 2, 3,  // front second triangle (bl, tr, tl)
-        1, 5, 6,
-        1, 6, 2,
-        4, 5, 6, // back first triangle (bl, br, tr)
-        4, 6, 7,  // back second triangle (bl, tr, tl)
+        0, 1, 2, 0, 2, 3, // front
+        1, 4, 7, 1, 7, 2, // right
+        4, 5, 6, 4, 6, 7, // back
+        5, 0, 3, 5, 3, 6, // left
+        0, 1, 4, 0, 4, 5, // bottom
+        3, 2, 7, 3, 7, 6, // top
     };
 
     glGenVertexArrays(1, &VAO); // Vertex Array Object
@@ -99,7 +145,12 @@ void init () {
 
     // position attribute
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glVertexAttribPointer(0,    // indice dell’attributo
+            3,                  // n. di componenti (1..4)
+            GL_FLOAT,           // tipo di dato
+            GL_TRUE,            // se da normalizzare
+            sizeof(Vertex),     // offset (in byte) fra dati consecutivi
+            (void*)0);
 
     // color attribute
     glEnableVertexAttribArray(1);
@@ -131,6 +182,25 @@ void init () {
     glUniformMatrix4fv(projectionPos, 1, GL_FALSE, &projection[0][0]);
 }
 
+void initMenu() {
+    int menuAnimation = glutCreateMenu(menuCallback);
+    glutAddMenuEntry("Open/Close Door", MNU_OPENCLOSE_DOOR);
+    glutCreateMenu(menuCallback);
+
+    glutAddSubMenu("Animation", menuAnimation);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+
+void rotateDoor() {
+    if(_doorOpen && _doorAngle < PI_HALF) {
+        _doorAngle += DOOR_STEP;
+    } else if(!_doorOpen && _doorAngle > 0) {
+        _doorAngle -= DOOR_STEP;
+    }
+}
+
+
 // -------------------------------- DISPLAY ------------------------------- //
 void display() {
 
@@ -138,10 +208,12 @@ void display() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glm::mat4 ori = modelview;
+
     // Rotazione intorno ad uno dei vertici. Notare che l'angolo va passato in radianti. Rotazione di 1 grado
-    modelview  = glm::translate(modelview, glm::vec3(0.5f, -0.5f, 0.0f));
-    modelview = glm::rotate(modelview, 1 / 180.0f * glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
-    modelview  = glm::translate(modelview, glm::vec3(-0.5f, 0.5f, 0.0f));
+    modelview  = glm::translate(modelview, glm::vec3(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK));
+    modelview = glm::rotate(modelview, _doorAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+    modelview  = glm::translate(modelview, glm::vec3(HALF_DOOR_WIDTH, 0.f, WALL_THICK));
 
     // Passa la matrice di modelview allo shader
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
@@ -149,11 +221,15 @@ void display() {
     // render container
     glBindVertexArray(VAO);
 
+    // draw door
     _texture.enableTexture(true);
     _texture.bind(TextureEnum::WALL);
-
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     _texture.enableTexture(false);
+
+    modelview = ori;
+    // Passa la matrice di modelview allo shader
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 
     glFlush();
 }
@@ -161,8 +237,10 @@ void display() {
 // -------------------------------- TIMER ------------------------------- //
 void TimerFunc(int value)
 {
+    rotateDoor();
+
     glutPostRedisplay();
-    glutTimerFunc(10, TimerFunc, 1);
+    glutTimerFunc(ANIM_MSEC, TimerFunc, 1);
 }
 
 // -------------------------------- RESHAPE ------------------------------- //
@@ -259,7 +337,7 @@ int main(int argc, char** argv)
         std::cout << "Error: " << glewGetString(err) << std::endl;
     }
 
-    init ();
+    init();
 
     // Vari callback.
     glutDisplayFunc(display);
