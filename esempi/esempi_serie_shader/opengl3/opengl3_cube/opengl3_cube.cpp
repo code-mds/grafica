@@ -4,35 +4,40 @@
 #include <assert.h>
 #include <stdlib.h>
 
-// Headers richiesti da OSX
+#include <GL/glew.h>
 #ifdef __APPLE__
-//#include <OpenGL/gl3.h>
-#include <GL/glew.h>
-#include <GLUT/glut.h>
-#include <iostream>
-
-
-// headers richiesti da Windows e linux
+    // Headers richiesti da OSX
+    #include <GLUT/glut.h>
 #else
-#include <GL/glew.h>
-#include <GL/glut.h>
+    // headers richiesti da Windows e linux
+    #include <GL/glut.h>
 #endif
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <iostream>
 
 // Funzioni per caricare, inizializzare e compilare gli shader
 #include "../shaders_loader.h"
 #include "Texture.h"
+#include "box.h"
 
 // Librerie matematiche
 // Si usano i radianti (gli angoli in decimale sono deprecati)
 #define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
-#include <vector>
 #include <stack>
 
 
 // -------------------------------- VARIABILI GLOBALI ------------------------------- //
+static const GLfloat SW = 5.0f; //SCENE WIDTH
+
+const float DOOR_THINK = 0.5f / SW;
+const float HALF_DOOR_WIDTH = 2.0f / SW;
+const float HALF_BASE_WIDTH = 5.0f / SW;
+const float BASE_HEIGHT = 8.0f / SW;
+const float WALL_THICK = 0.5f / SW;
+const float WALL_HEIGHT = 6.0f / SW;
 
 #define MNU_SAVE_BMP 17
 #define MNU_TOGGLE_CLIPPLANE 16
@@ -55,9 +60,6 @@
 #define PROJ_PERSPECTIVE 'p'
 const int ANIM_MSEC = 10;
 
-GLuint VAO;
-GLuint VBO;
-GLuint EBO;
 Texture _texture;
 GLfloat _doorAngle = 0.0;
 GLboolean _doorOpen = false;
@@ -65,35 +67,78 @@ GLfloat PI_HALF = glm::pi<float>() / 2;
 GLfloat DOOR_STEP = 1 / 180.0f * glm::pi<float>();
 
 
-struct Vertex {
-    // position
-    glm::vec3 Position;
-    // color
-    glm::vec3 Color;
-    // texCoords
-    glm::vec2 TexCoords;
-};
 
 void initMenu();
 
-std::vector<GLuint> indices;
-std::vector<Vertex> vertices;
+Box _door{std::vector<Vertex>{
+        // front face
+        {{ -HALF_DOOR_WIDTH, 0, -WALL_THICK },
+            {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+        {{ HALF_DOOR_WIDTH, 0, -WALL_THICK },
+            {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+        {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },
+            {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+        {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },
+            {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+        // back face
+        {{ HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) },
+            { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+        {{ -HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) },
+            { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+        {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) },
+             { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+        {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) },
+             { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+}};
+
+
+Box _wall{std::vector<Vertex>{
+        {
+                { HALF_DOOR_WIDTH, 0, 0 },
+                {1.0f, 1.0f, 1.0f},
+                {0.0f, 0.0f} },       // bottom left
+        {
+                { HALF_BASE_WIDTH, 0, 0 },
+                {1.0f, 1.0f, 1.0f},
+                {1.0f, 0.0f}},       // bottom right
+        {
+                { HALF_BASE_WIDTH, WALL_HEIGHT, 0 },
+                {1.0f, 1.0f, 1.0f},
+                {1.0f, 1.0f}},       // top right
+        {
+                { HALF_DOOR_WIDTH, WALL_HEIGHT, 0 },
+                {1.0f, 1.0f, 1.0f},
+                {0.0f, 1.0f}},       // top left
+        // back face
+        {
+                { (HALF_BASE_WIDTH - WALL_THICK),  0, -WALL_THICK },
+                { 1.0f, 1.0f, 1.0f},
+                {0.0f, 0.0f}},       // bottom left
+        {
+                { HALF_DOOR_WIDTH, 0, -WALL_THICK },
+                { 1.0f, 1.0f, 1.0f},
+                {1.0f, 0.0f}},       // bottom right
+        {
+                { HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },
+                { 1.0f, 1.0f, 1.0f},
+                {1.0f, 1.0f}},       // top right
+        {
+                { (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -WALL_THICK },
+                { 1.0f, 1.0f, 1.0f},
+                {0.0f, 1.0f}},       // top left
+
+}};
+
+
 
 GLint projectionPos, modelviewPos; // Riferimenti alle variabili uniform
 glm::mat4 projection, modelview; // Riferimenti alle matrici modelview e proiezione
 int mouseoldx, mouseoldy ; // Usate dai callback del mouse
 
-glm::vec3 initEyeloc = glm::vec3(0.0, -2.0, 6.0); // Posizione iniziale del punto di vista
+glm::vec3 initEyeloc = glm::vec3(0.0, 2.0, 6.0); // Posizione iniziale del punto di vista
 glm::vec3 direction = glm::vec3(0.0, 0.0, 0.0);;
 glm::vec3 eyeloc = initEyeloc;
-static const GLfloat SW = 5.0f; //SCENE WIDTH
 
-const float DOOR_THINK = 2.5f / SW;
-const float HALF_DOOR_WIDTH = 2.0f / SW;
-const float HALF_BASE_WIDTH = 5.0f / SW;
-const float BASE_HEIGHT = 8.0f / SW;
-const float WALL_THICK = 0.5f / SW;
-const float WALL_HEIGHT = 6.0f / SW;
 
 void menuCallback(int value) {
     switch (value) {
@@ -108,59 +153,9 @@ void init() {
     initMenu();
     glEnable(GL_DEPTH_TEST);
     _texture.init();
-    // Coordinate dei vertici del triangolo
-    // positions          // colors           // texture coords
-    vertices = {
-            {{ -HALF_DOOR_WIDTH, 0, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {0.0f, 0.0f} },       // bottom left front
-            {{ HALF_DOOR_WIDTH, 0, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right front
-            {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right front
-            {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -WALL_THICK },{1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left front
 
-            {{ HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {0.0f, 0.0f}},       // bottom left back
-            {{ -HALF_DOOR_WIDTH, 0, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {1.0f, 0.0f}},       // bottom right back
-            {{ -HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},       // top right back
-            {{ HALF_DOOR_WIDTH, WALL_HEIGHT, -(WALL_THICK+DOOR_THINK) }, { 1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}},       // top left back
-    };
-    indices = {
-        0, 1, 2, 0, 2, 3, // front
-        1, 4, 7, 1, 7, 2, // right
-        4, 5, 6, 4, 6, 7, // back
-        5, 0, 3, 5, 3, 6, // left
-        0, 1, 4, 0, 4, 5, // bottom
-        3, 2, 7, 3, 7, 6, // top
-    };
-
-    glGenVertexArrays(1, &VAO); // Vertex Array Object
-    glGenBuffers(1, &VBO);      // Vertex Buffer Object
-    glGenBuffers(1, &EBO);      // Element Buffer Object
-
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
-
-    // position attribute
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0,    // indice dell’attributo
-            3,                  // n. di componenti (1..4)
-            GL_FLOAT,           // tipo di dato
-            GL_TRUE,            // se da normalizzare
-            sizeof(Vertex),     // offset (in byte) fra dati consecutivi
-            (void*)0);
-
-    // color attribute
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
-
-    // texture coord attribute
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-    glBindVertexArray(0);
+    _door.init();
+    _wall.init();
 
     // Carica gli shaders dai rispettivi files, inizializza, linka e compila
     GLuint vertexShader = initshaders(GL_VERTEX_SHADER, "shaders/shader.vert") ;
@@ -208,7 +203,7 @@ void display() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 ori = modelview;
+    glm::mat4 ori{modelview};
 
     // Rotazione intorno ad uno dei vertici. Notare che l'angolo va passato in radianti. Rotazione di 1 grado
     modelview  = glm::translate(modelview, glm::vec3(-HALF_DOOR_WIDTH, 0.f, -WALL_THICK));
@@ -218,18 +213,21 @@ void display() {
     // Passa la matrice di modelview allo shader
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 
-    // render container
-    glBindVertexArray(VAO);
-
     // draw door
     _texture.enableTexture(true);
-    _texture.bind(TextureEnum::WALL);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    _texture.bind(TextureEnum::WOOD);
+    _door.draw();
     _texture.enableTexture(false);
 
     modelview = ori;
     // Passa la matrice di modelview allo shader
     glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::WALL);
+    _wall.draw();
+    _texture.enableTexture(false);
+
 
     glFlush();
 }
@@ -304,12 +302,6 @@ void keyboard (unsigned char key, int x, int y)
 {
     switch (key) {
         case 27:  // Tasto Escape per uscire
-
-            // Cancella tutti i buffers allocati
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-            glDeleteBuffers(1, &EBO);
-
             exit(0) ;
         default:
             break ;
