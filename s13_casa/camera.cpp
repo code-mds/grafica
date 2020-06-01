@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <glm/ext/matrix_transform.hpp>
 #include "camera.h"
 
 static const float CAMERA_STEP = .25;
@@ -40,15 +41,11 @@ void Camera::reset() {
 }
 
 void Camera::lookAt() {
-    // set MODEL/VIEW matrix mode
-    glMatrixMode(GL_MODELVIEW);
+    modelview = glm::lookAt(eye, center, up);
 
-    // load identity matrix
-    glLoadIdentity();
-
-    gluLookAt(eye.x, eye.y, eye.z,
-              center.x, center.y, center.z,
-              up.x, up.y, up.z);
+    // Invia la matrice aggiornata allo shader e ridisegna
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+    glutPostRedisplay() ;
 }
 
 std::string Camera::toString() {
@@ -58,4 +55,11 @@ std::string Camera::toString() {
     ostr << ", y=" << eye.y;
     ostr << ", z=" << eye.z;
     return ostr.str();
+}
+
+Camera::Camera(glm::mat4& modelview, GLint& modelviewPos) :
+    modelview{modelview},
+    modelviewPos{modelviewPos}
+{
+    reset();
 }

@@ -1,24 +1,31 @@
-//glut_test.cpp
-//glut_test.cpp
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
+#include <GL/glew.h>
 #ifdef __APPLE__
-    // Headers richiesti da OSX
-    #include <GL/glew.h>
+// Headers richiesti da OSX
     #include <GLUT/glut.h>
 #else
-    // headers richiesti da Windows e linux
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+// headers richiesti da Windows e linux
+#include <GL/glut.h>
 #endif
 
-#include <cstdlib>
-#include "camera.h"
-#include "draw_utils.h"
+// Librerie matematiche
+// Si usano i radianti (gli angoli in decimale sono deprecati)
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <stdlib.h>
+#include <iostream>
+
+// Funzioni per caricare, inizializzare e compilare gli shader
+#include "shaders_loader.h"
+#include "Texture.h"
+#include "box.h"
 #include "house.h"
 #include "main.h"
 #include "RgbImage.h"
-#include "Texture.h"
+#include "camera.h"
 
 #define ANG2RAD (3.14159265358979323846 / 180.0 * 0.5)
 
@@ -52,41 +59,41 @@ const int WIND_MSEC = 5000;
 const char ESCAPE = 27;
 
 struct AppGlobals {
+    GLint projectionPos, modelviewPos; // Riferimenti alle variabili uniform
+    glm::mat4 projection, modelview; // Riferimenti alle matrici modelview e proiezione
+    Camera camera{modelview, modelviewPos};
+
     // global variables
     GLfloat windAngle = 0.0;
     int mainWindowID = 0;
+    GLfloat fovy = 30;
 
-    // The light source can be a POSITIONAL (w > 0) or DIRECTIONAL (w = 0) light source depending on the w value.
-    Light light1{Vertex{-.4, 1.2, -.6, 1.0}, Vertex{.1, .1, 1}};
-    Light light2{Vertex{.2, .1, .5, 1.0}, Vertex{-.1, .1, -1}};
     Texture texture;
-    Camera camera;
 
     //Clip Plane equation: Ax + By + Cz + D = 0
     GLdouble clip_plane_0[4]={ -1.0, -0.3, 0.0, 0.5 };
     bool enableClipPlane = false;
 
-    Ortho ortho{-6.0, 6.0, -6.0, 6.0, -6.0, 50.0};
-    Perspective perspective{  45.0, 1.0, 100.0};
-    char projection_type = PROJ_PERSPECTIVE; //PROJ_ORTHOGRAPHIC
-
-    draw_utils utils;
-    House house{utils, light1, light2, texture};
+    House house{modelview, modelviewPos, texture};
 };
 
+
 static AppGlobals* _app;
+
+void log(std::basic_string<char> msg) {
+    std::cout << msg << std::endl;
+}
 
 void displayCallback() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     // view transformation must be called before model transformation
     _app->camera.lookAt();
 
-    // model transformations
-    _app->utils.draw_wind(_app->windAngle);
-    _app->utils.draw_axes();
+    // draw house
     _app->house.draw();
+
+
     glClipPlane (GL_CLIP_PLANE0, _app->clip_plane_0);
     glutSwapBuffers();
 }
@@ -108,41 +115,13 @@ void animationCallback(int value) {
 }
 
 void reshapeCallback(int w, int h) {
-    glViewport(0, 0, w, h);
-    reshape(w, h);
+    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+    GLfloat aspect = (GLfloat)w/(h==0 ? 1.0 : h);
+    // Imposta la matrice di proiezione di tipo prospettica
+    // notare che l'angolo va passato in radianti
+    _app->projection = glm::perspective(_app->fovy / 180.0f * glm::pi<float>(), aspect, 1.0f, 10.0f);
+    glUniformMatrix4fv(_app->projectionPos, 1, GL_FALSE, &_app->projection[0][0]);
 }
-
-void reshape(int w, int h) {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    GLdouble aspect = (GLdouble)w/(h==0 ? 1 : h);
-
-    if(_app->projection_type == PROJ_ORTHOGRAPHIC) {
-        GLdouble l{_app->ortho.left};
-        GLdouble r{_app->ortho.right};
-        GLdouble b{_app->ortho.bottom};
-        GLdouble t{_app->ortho.top};
-        // orthographic projection
-        if (w <= h) {
-            b /= aspect;
-            t /= aspect;
-        } else {
-            l *= aspect;
-            r *= aspect;
-        }
-        glOrtho(l, r, b, t, _app->ortho.zNear, _app->ortho.zFar);
-    } else {
-        // perspective projection using glFrustum
-        GLdouble fH = tan(_app->perspective.fovy * ANG2RAD) * _app->perspective.zNear;
-        GLdouble fW = fH * aspect;
-        glFrustum(-fW, fW, -fH, fH, _app->perspective.zNear, _app->perspective.zFar);
-
-        // perspective projection using gluPerspective
-        //gluPerspective(_app->perspective.fovy, aspect, _app->perspective.zNear, _app->perspective.zFar);
-    }
-}
-
 
 void menuCallback(int value) {
     switch (value) {
@@ -152,41 +131,8 @@ void menuCallback(int value) {
         case MNU_TOGGLE_CLIPPLANE:
             toggleClipPlane();
             break;
-        case MNU_LIGHT_POS_2REL:
-            _app->light2.setRelative(true);
-            _app->light1.setRelative(true);
-            break;
-        case MNU_LIGHT_POS_1REL:
-            _app->light2.setRelative(false);
-            _app->light1.setRelative(true);
-            break;
-        case MNU_LIGHT_POS_2ABS:
-            _app->light2.setRelative(false);
-            _app->light1.setRelative(false);
-            break;
-        case MNU_TOGGLE_LIGHT2:
-            _app->light2.toggle();
-            break;
-        case MNU_TOGGLE_LIGHT1:
-            _app->light1.toggle();
-            break;
         case MNU_RESET:
             reset();
-            break;
-        case MNU_ORTHO:
-            setOrthographicProjection();
-            break;
-        case MNU_PERSPECTIVE:
-            setProspectiveProjection();
-            break;
-        case MNU_TOGGLE_AXIS:
-            _app->utils.toggleAxesVisibility();
-            break;
-        case MNU_TOGGLE_WIREFRAME:
-            _app->utils.toggleWireframeVisibility();
-            break;
-        case MNU_TOGGLE_WIND:
-            _app->utils.toggleWindVisibility();
             break;
         case MNU_START_HOUSE_ROTATION:
             _app->house.updateRotation(true);
@@ -197,11 +143,8 @@ void menuCallback(int value) {
         case MNU_OPENCLOSE_DOOR:
             _app->house.toggleDoor();
             break;
-        case MNU_CHANGE_COLOR:
-            _app->house.changeColor();
-            break;
         default:
-            _app->utils.log("unhandled MENU");
+            log("unhandled MENU");
             break;
     }
 }
@@ -222,24 +165,7 @@ void toggleClipPlane() {
 void reset() {
     _app->camera.reset();
     _app->house.reset();
-    _app->utils.log("reset");
-}
-
-void setProspectiveProjection() {
-    _app->utils.log("Projection: Prospective");
-    forceReshape(PROJ_PERSPECTIVE);
-}
-
-void setOrthographicProjection() {
-    _app->utils.log("Projection: Orthographic");
-    forceReshape(PROJ_ORTHOGRAPHIC);
-}
-
-void forceReshape(char type) {
-    _app->projection_type = type;
-    GLint viewport[4]; //x,y,w,h
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    reshape(viewport[2], viewport[3]);
+    log("reset");
 }
 
 void specialKeyCallback(int key, int x, int y) {
@@ -248,51 +174,38 @@ void specialKeyCallback(int key, int x, int y) {
             reset();
             break;
         case GLUT_KEY_F9:
-            _app->perspective.fovy -= 1;
-            _app->utils.log("fovy=" + std::to_string(_app->perspective.fovy));
-            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            _app->fovy -= 1;
+            log("fovy=" + std::to_string(_app->fovy));
+            //TODO reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
         case GLUT_KEY_F10:
-            _app->perspective.fovy += 1;
-            _app->utils.log("fovy=" + std::to_string(_app->perspective.fovy));
-            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            _app->fovy += 1;
+            log("fovy=" + std::to_string(_app->fovy));
+            //TODO reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
 
         case GLUT_KEY_PAGE_DOWN:
             _app->camera.moveBackward();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveForward();
-
             updateCamera();
             break;
         case GLUT_KEY_PAGE_UP:
             _app->camera.moveForward();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveBackward();
             updateCamera();
             break;
         case GLUT_KEY_UP:
             _app->camera.moveTop();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveBottom();
             updateCamera();
             break;
         case GLUT_KEY_DOWN:
             _app->camera.moveBottom();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveTop();
             updateCamera();
             break;
         case GLUT_KEY_RIGHT:
             _app->camera.moveRight();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveLeft();
             updateCamera();
             break;
         case GLUT_KEY_LEFT:
             _app->camera.moveLeft();
-            if(!_app->house.inBoundaries())
-                _app->camera.moveRight();
             updateCamera();
             break;
 
@@ -321,43 +234,18 @@ void specialKeyCallback(int key, int x, int y) {
             _app->house.moveFar();
             break;
         default:
-            _app->utils.log("unhandled key");
+            log("unhandled key");
             break;
     }
 }
 
 void updateCamera() {
-    _app->utils.log(_app->camera.toString());
+    log(_app->camera.toString());
     glutPostRedisplay();
 }
 
 void keyCallback(unsigned char key, int x, int y) {
     switch (key) {
-        case 'C':
-        case 'c':
-            _app->house.changeColor();
-            break;
-
-        case 'X':
-        case 'x':
-            _app->utils.toggleAxesVisibility();
-            break;
-
-        case 'W':
-        case 'w':
-            _app->utils.toggleWireframeVisibility();
-            break;
-
-        case 'A':
-        case 'a':
-            setOrthographicProjection();
-            break;
-
-        case 'P':
-        case 'p':
-            setProspectiveProjection();
-            break;
-
         case 'R':
         case 'r':
             _app->house.updateRotation(true);
@@ -378,17 +266,29 @@ void keyCallback(unsigned char key, int x, int y) {
             exit(0);
 
         default:
-            _app->utils.log("unhandled key");
+            log("unhandled key");
             break;
     }
 }
 
-void appInit() {
+void initApp() {
 
+#ifdef __APPLE__
+    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_SINGLE | GLUT_RGB);
+#else
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    _app->mainWindowID = glutCreateWindow("house");
+#endif
 
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    _app->mainWindowID = glutCreateWindow("house shader");
+
+    // Inizializza Glew
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        std::cout << "Error: " << glewGetString(err) << std::endl;
+    }
+
+    glEnable(GL_DEPTH_TEST);
     glClearColor(COLOR_BKG);
     if(_app->enableClipPlane) {
         glEnable(GL_CLIP_PLANE0);
@@ -396,31 +296,41 @@ void appInit() {
         glDisable(GL_CLIP_PLANE0);
     }
 
-    initLight();
-    initTexture();
+    _app->texture.init();
+    _app->house.init();
+    initShader();
     createMenu();
 
+    // callbacks
     glutReshapeFunc(reshapeCallback);
     glutDisplayFunc(displayCallback);
     glutSpecialFunc(specialKeyCallback);
     glutKeyboardFunc(keyCallback);
 
+    // timers
     glutTimerFunc(ANIM_MSEC, animationCallback, 0);
     glutTimerFunc(WIND_MSEC, windCallback, 0);
 }
 
+void initShader() {
+    // Carica gli shaders dai rispettivi files, inizializza, linka e compila
+    GLuint vertexShader = initshaders(GL_VERTEX_SHADER, "shaders/shader.vert") ;
+    GLuint fragmentShader = initshaders(GL_FRAGMENT_SHADER, "shaders/shader.frag") ;
+    GLuint shaderProgram = initprogram(vertexShader, fragmentShader) ;
+    glBindFragDataLocation(shaderProgram, 0, "outColor");
 
-void initTexture() {
-    _app->texture.init();
-}
+    // Inizializza la matrice di proiezione con la matrice di identità
+    _app->projection = glm::mat4(1.0f);
 
-void initLight() {
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_LIGHTING);
-//    glEnable(GL_COLOR_MATERIAL);
-    Light::globalAmbient();
+    // Definisce il punto di vista (posizione, dove guarda, upvector)
+    _app->modelview = glm::lookAt(_app->camera.eye, _app->camera.center, _app->camera.up);
+
+    // Leggi le posizioni delle variabili uniform
+    _app->projectionPos = glGetUniformLocation(shaderProgram, "projection_matrix");
+    _app->modelviewPos = glGetUniformLocation(shaderProgram, "modelview_matrix");
+
+    // Passa le matrici di proiezione e modelview allo shader
+    glUniformMatrix4fv(_app->projectionPos, 1, GL_FALSE, &_app->projection[0][0]);
 }
 
 void saveFile()
@@ -434,24 +344,7 @@ void createMenu() {
     int menuFile = glutCreateMenu(menuCallback);
     glutAddMenuEntry("Export as bmp", MNU_SAVE_BMP);
 
-    int menuLight = glutCreateMenu(menuCallback);
-    glutAddMenuEntry("On/Off Light 1", MNU_TOGGLE_LIGHT1);
-    glutAddMenuEntry("On/Off Light 2", MNU_TOGGLE_LIGHT2);
-    glutAddMenuEntry("Light 1/2 in relative position", MNU_LIGHT_POS_2REL);
-    glutAddMenuEntry("Light 1 in relative position", MNU_LIGHT_POS_1REL);
-    glutAddMenuEntry("Light 1/2 in absolute position", MNU_LIGHT_POS_2ABS);
-
-    int menuProjection = glutCreateMenu(menuCallback);
-    glutAddMenuEntry("Perspective", MNU_PERSPECTIVE);
-    glutAddMenuEntry("Ortho", MNU_ORTHO);
-    glutAddMenuEntry("Toggle Clip Plane", MNU_TOGGLE_CLIPPLANE);
-    glutCreateMenu(menuCallback);
-
     int menuStructure = glutCreateMenu(menuCallback);
-    glutAddMenuEntry("Show/Hide Wind", MNU_TOGGLE_WIND);
-    glutAddMenuEntry("Show/Hide Axes", MNU_TOGGLE_AXIS);
-    glutAddMenuEntry("Show/Hide Wireframe", MNU_TOGGLE_WIREFRAME);
-    glutAddMenuEntry("Change color", MNU_CHANGE_COLOR);
     glutAddMenuEntry("Reset", MNU_RESET);
     glutCreateMenu(menuCallback);
 
@@ -462,12 +355,8 @@ void createMenu() {
     glutCreateMenu(menuCallback);
 
     glutAddSubMenu("File", menuFile);
-    glutAddSubMenu("Light", menuLight);
     glutAddSubMenu("Structure", menuStructure);
     glutAddSubMenu("Animation", menuAnimation);
-    glutAddSubMenu("Projection", menuProjection);
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
-
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -476,7 +365,6 @@ int main(int argc, char* argv[]) {
     _app = &app;
 
     glutInit(&argc, argv);
-    appInit();
-
+    initApp();
     glutMainLoop();
 }

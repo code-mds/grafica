@@ -5,13 +5,16 @@
 #ifndef GRAFICA_HOUSE_H
 #define GRAFICA_HOUSE_H
 
-#include "draw_utils.h"
-#include "light.h"
+#include <vector>
+#include "Texture.h"
+#include "box.h"
 
 class House {
 public:
-    explicit House(draw_utils& utils, Light& light1, Light& light2, Texture& texture);
+    explicit House(glm::mat4& modelview, GLint& modelviewPos, Texture& texture);
     ~House();
+
+    void init();
     void draw();
     void toggleDoor();
     void rotateDoor();
@@ -43,13 +46,9 @@ private:
     void drawCylinder() const;
     void setupVolume();
     void updateColor();
+    void setupDoor();
 
 private:
-    bool _colorStandard = true;
-    Color _colorRoofInternal;
-    Color _colorRoofExternal;
-    Color _colorWallExternal;
-
     bool _doorOpen = false;
     bool _rotationEnabled = false;
 
@@ -62,10 +61,17 @@ private:
     GLfloat _flagAngle = 0.0;
 
     GLUquadric *_quadric;
-    draw_utils& _utils;
-    Volume _volume;
-    Light &_light1, &_light2;
     Texture& _texture;
+    glm::mat4& modelview;
+    GLint& modelviewPos;
+
+    Box _floor;
+    Box _door;
+    Box _wallRight;
+    Box _wallBack;
+    Box _wallLeft;
+    Box _wallFrontLeft;
+    Box _wallFrontRight;
 
     void setExternalMaterial() const;
 };

@@ -2,15 +2,27 @@
 // Created by massi on 25.04.2020.
 //
 
-#ifndef S7_CASA_CAMERA_H
-#define S7_CASA_CAMERA_H
+#ifndef CASA_CAMERA_H
+#define CASA_CAMERA_H
+
+#include <GL/glew.h>
+#ifdef __APPLE__
+// Headers richiesti da OSX
+    #include <GLUT/glut.h>
+#else
+// headers richiesti da Windows e linux
+#include <GL/glut.h>
+#endif
 #include <string>
-#include "vertex.h"
 
 struct Camera {
-    Vertex eye{0, 0, 5.0};
-    Vertex center{0, 0, 0};
-    Vertex up{0 , 1, 0};
+    Camera(glm::mat4& modelview, GLint& modelviewPos);
+    glm::mat4& modelview;
+    GLint& modelviewPos;
+
+    glm::vec3 eye;
+    glm::vec3 center;
+    glm::vec3 up;
 
     void reset();
 
@@ -29,4 +41,4 @@ struct Camera {
 };
 
 
-#endif //S7_CASA_CAMERA_H
+#endif //CASA_CAMERA_H

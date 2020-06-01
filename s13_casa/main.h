@@ -15,16 +15,14 @@ void specialKeyCallback(int key, int x, int y);
 void keyCallback(unsigned char key, int x, int y);
 
 // initialization
-void appInit();
-void initLight();
-void initTexture();
+void initApp();
+void initShader();
 
 void setOrthographicProjection();
 void setProspectiveProjection();
 void createMenu();
 void updateCamera();
 void reshape(int w, int h);
-void forceReshape(char type);
 void reset();
 void toggleClipPlane();
 void saveFile();

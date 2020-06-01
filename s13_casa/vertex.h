@@ -15,30 +15,41 @@
     #include <GL/freeglut.h>
 #endif
 
+#include <glm/glm.hpp>
 
 struct Vertex {
-    GLfloat x=0, y=0, z=0, w=1;
-
-    void set(float x, float y, float z);
-    void copyFrom(const Vertex& o);
-    Vertex operator-() const;
-    Vertex sum(const Vertex& o) const;
-    Vertex subtract(const Vertex& o) const;
-
-    Vertex crossProduct(const Vertex& o) const;
-    Vertex scalarProduct(float scalar) const;
-    GLfloat dotProduct(const Vertex& u) const;
-    Vertex matrixProduct(const float *m) const;
-    bool inViewingVolume(const float* projectionMatrix, const float *modelviewMatrix) const;
-
-    GLfloat length() const;
-
-    static void matrixTranspose(const float *m, float *t);
-    static Vertex normal(const Vertex &v1, const Vertex &v2, const Vertex &v3);
-
-private:
-    void normalize();
+    // position
+    glm::vec3 Position;
+    // color
+    glm::vec3 Color;
+    // texCoords
+    glm::vec2 TexCoords;
 };
+
+
+//struct Vertex {
+//    GLfloat x=0, y=0, z=0, w=1;
+//
+//    void set(float x, float y, float z);
+//    void copyFrom(const Vertex& o);
+//    Vertex operator-() const;
+//    Vertex sum(const Vertex& o) const;
+//    Vertex subtract(const Vertex& o) const;
+//
+//    Vertex crossProduct(const Vertex& o) const;
+//    Vertex scalarProduct(float scalar) const;
+//    GLfloat dotProduct(const Vertex& u) const;
+//    Vertex matrixProduct(const float *m) const;
+//    bool inViewingVolume(const float* projectionMatrix, const float *modelviewMatrix) const;
+//
+//    GLfloat length() const;
+//
+//    static void matrixTranspose(const float *m, float *t);
+//    static Vertex normal(const Vertex &v1, const Vertex &v2, const Vertex &v3);
+//
+//private:
+//    void normalize();
+//};
 
 
 #endif //S7_CASA_VERTEX_H

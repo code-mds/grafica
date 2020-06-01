@@ -5,12 +5,13 @@
 #include "Texture.h"
 #include "RgbImage.h"
 
-#define TEXTURES_NUM 3
+#define TEXTURES_NUM 4
 
 const char * textureFiles[TEXTURES_NUM] = {
     "images/wall_texture.bmp",
     "images/wood_texture.bmp",
-    "images/roof_texture.bmp"
+    "images/roof_texture.bmp",
+    "images/marble_texture.bmp"
 };
 
 void Texture::init()  {
