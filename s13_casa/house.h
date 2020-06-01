@@ -72,6 +72,8 @@ private:
     Box _wallLeft;
     Box _wallFrontLeft;
     Box _wallFrontRight;
+    Box _roofRight;
+    Box _roofLeft;
 
     void setExternalMaterial() const;
 };

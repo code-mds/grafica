@@ -191,9 +191,51 @@ House::House(glm::mat4& modelview, GLint& modelviewPos, Texture& texture) :
                     { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
             {{ (HALF_BASE_WIDTH - WALL_THICK),  WALL_HEIGHT, -WALL_THICK },
                     { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+    }},
 
+//front right wall
+    _roofRight{std::vector<Vertex>{
+            // front face
+            {{ HALF_BASE_WIDTH + ROOF_THICK, WALL_HEIGHT, ROOF_THICK },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            { { HALF_BASE_WIDTH + ROOF_THICK,  WALL_HEIGHT, -(BASE_HEIGHT + ROOF_THICK)},
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ 0, ROOF_HEIGHT + ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK) },
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{ 0, ROOF_HEIGHT + ROOF_THICK, ROOF_THICK },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+            // back face
+            {{ HALF_BASE_WIDTH+ ROOF_THICK,  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{ HALF_BASE_WIDTH+ ROOF_THICK, WALL_HEIGHT- ROOF_THICK,   ROOF_THICK },
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ 0,  ROOF_HEIGHT, ROOF_THICK },
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{ 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+    }},
+
+//front right wall
+    _roofLeft{std::vector<Vertex>{
+            // front face
+            {{ -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT,    -(BASE_HEIGHT + ROOF_THICK)},
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            { { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT,      ROOF_THICK },
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ 0,  (ROOF_HEIGHT + ROOF_THICK), ROOF_THICK },
+                    {1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            { { 0,  (ROOF_HEIGHT + ROOF_THICK), -(BASE_HEIGHT + ROOF_THICK) },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
+            // back face
+            {{ -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT- ROOF_THICK, ROOF_THICK },
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{ -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            { { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
+            {{ 0,  ROOF_HEIGHT, ROOF_THICK },
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top left
     }}
-
 {
     _quadric = gluNewQuadric();
 }
@@ -213,7 +255,7 @@ void House::draw() {
     drawFloor();
     drawLateralWalls();
 //    drawPrismWalls();
-//    drawRoof();
+    drawRoof();
 //    drawCylinder();
 //    drawFlag();
 //    drawChimney();
@@ -309,49 +351,14 @@ void House::drawFloor() {
     _texture.enableTexture(false);
 }
 
-//void House::drawRoof() {
-//    _texture.enableTexture(true);
-//    _texture.bind(TextureEnum::ROOF);
-//
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_RED);
-//    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_HIGH);
-//
-//    Rect rectangles[] = {
-//            // right roof wall
-//            {
-//                    { HALF_BASE_WIDTH + ROOF_THICK, WALL_HEIGHT, ROOF_THICK },
-//                    { HALF_BASE_WIDTH + ROOF_THICK,  WALL_HEIGHT, -(BASE_HEIGHT + ROOF_THICK)},
-//                    { 0, ROOF_HEIGHT + ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK) },
-//                    { 0, ROOF_HEIGHT + ROOF_THICK, ROOF_THICK },
-//                    _colorRoofExternal
-//            },{
-//                    { HALF_BASE_WIDTH+ ROOF_THICK,  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
-//                    { HALF_BASE_WIDTH+ ROOF_THICK, WALL_HEIGHT- ROOF_THICK,   ROOF_THICK },
-//                    { 0,  ROOF_HEIGHT, ROOF_THICK },
-//                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
-//                    _colorRoofInternal
-//            },
-//            // left roof wall
-//            {
-//                    { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT,    -(BASE_HEIGHT + ROOF_THICK)},
-//                    { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT,      ROOF_THICK },
-//                    { 0,  (ROOF_HEIGHT + ROOF_THICK), ROOF_THICK },
-//                    { 0,  (ROOF_HEIGHT + ROOF_THICK), -(BASE_HEIGHT + ROOF_THICK) },
-//                    _colorRoofExternal
-//            },{
-//                    { -(HALF_BASE_WIDTH + ROOF_THICK), WALL_HEIGHT- ROOF_THICK, ROOF_THICK },
-//                    { -(HALF_BASE_WIDTH + ROOF_THICK),  WALL_HEIGHT- ROOF_THICK, -(BASE_HEIGHT + ROOF_THICK)},
-//                    { 0,  ROOF_HEIGHT, -(BASE_HEIGHT + ROOF_THICK) },
-//                    { 0,  ROOF_HEIGHT, ROOF_THICK },
-//                    _colorRoofInternal
-//            }
-//    };
-//
-//    _utils.draw_parallelepiped(rectangles[0], rectangles[1]);
-//    _utils.draw_parallelepiped(rectangles[2], rectangles[3]);
-//    _texture.enableTexture(false);
-//}
-//
+void House::drawRoof() {
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::ROOF);
+    _roofLeft.draw();
+    _roofRight.draw();
+    _texture.enableTexture(false);
+}
+
 //void House::setExternalMaterial() const {
 //    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_WHITE);
 //    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_LOW);
@@ -560,4 +567,6 @@ void House::init() {
     _wallRight.init();
     _wallFrontLeft.init();
     _wallFrontRight.init();
+    _roofLeft.init();
+    _roofRight.init();
 }
