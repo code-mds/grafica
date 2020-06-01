@@ -30,13 +30,10 @@ public:
     void updateRotation(bool enabled);
 
     bool rotationEnabled();
-    void changeColor();
     void updateWind(GLfloat windAngle);
     void updateAnimation();
-    bool inBoundaries();
 
 private:
-    void drawPrismWalls();
     void drawLateralWalls();
     void drawRoof();
     void drawFloor();
@@ -81,8 +78,7 @@ private:
 
     Prism _triangleFront;
     Prism _triangleBack;
-
-    void setExternalMaterial() const;
+    Prism _flag;
 };
 
 

@@ -22,7 +22,7 @@ struct TextCoord {
     GLfloat s4,t4;
 };
 
-enum TextureEnum { WALL=0, WOOD, ROOF, MARBLE };
+enum TextureEnum { WALL=0, WOOD, ROOF, MARBLE, FLAG };
 
 class Texture {
 

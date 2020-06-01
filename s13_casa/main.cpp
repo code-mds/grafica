@@ -99,7 +99,7 @@ void displayCallback() {
 }
 
 void windCallback(int value) {
-    _app->windAngle = rand() % 360 + 1;
+    _app->windAngle = (rand() % 360 + 1) * ANG2RAD;
     _app->house.updateWind(_app->windAngle);
     glutTimerFunc(WIND_MSEC, windCallback, 0);
 }

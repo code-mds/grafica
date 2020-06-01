@@ -35,7 +35,7 @@ const float FLAG_HEIGHT = 1.0f / SW;
 const float FLAG_WIDTH = .03f / SW;
 
 const float TRANSLATION_STEP = .05;
-const float ROTATION_STEP = 1.0;
+const float ROTATION_STEP = 1 / 180.0f * glm::pi<float>();
 
 House::House(glm::mat4& modelview, GLint& modelviewPos, Texture& texture) :
     _texture{texture},
@@ -355,6 +355,24 @@ House::House(glm::mat4& modelview, GLint& modelviewPos, Texture& texture) :
                     { 1.0f, 1.0f, 1.0f},{1.0f, 1.0f}},       // top right
             { {CHIM_LEFT, CHIM_TOP,  CHIM_END_DEPTH+CHIM_THICK},
                     { 1.0f, 1.0f, 1.0f},{0.0f, 1.0f}},       // top right
+    }},
+
+//back triangle
+    _flag{std::vector<Vertex>{
+            // front face
+            {{ -FLAG_WIDTH,  0, 0 },
+                    {1.0f, 1.0f, 1.0f},{0.0f, 0.0f} },       // bottom left
+            {{ -FLAG_WIDTH, FLAG_HEIGHT, 0 },
+                    {1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ -FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
+                    {1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
+            // back face
+            {{ FLAG_WIDTH, FLAG_HEIGHT, 0 },
+                    { 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}},       // bottom left
+            {{ FLAG_WIDTH, 0, 0 },
+                    { 1.0f, 1.0f, 1.0f},{1.0f, 0.0f}},       // bottom right
+            {{ FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
+                    { 1.0f, 1.0f, 1.0f},{0.5f, 1.0f}},       // top right
     }}
 {
     _quadric = gluNewQuadric();
@@ -411,12 +429,6 @@ void House::drawRoof() {
     _texture.enableTexture(false);
 }
 
-//void House::setExternalMaterial() const {
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_WHITE);
-//    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_LOW);
-//}
-
-
 void House::drawLateralWalls() {
     _texture.enableTexture(true);
     _texture.bind(TextureEnum::WALL);
@@ -464,9 +476,9 @@ void House::updateAnimation() {
         _rotationX += ROTATION_STEP;
 
     if(_windAngle > _flagAngle) {
-        _flagAngle++;
+        _flagAngle += ROTATION_STEP;
     } else if(_windAngle < _flagAngle) {
-        _flagAngle--;
+        _flagAngle -= ROTATION_STEP;
     }
 
     glutPostRedisplay();
@@ -519,29 +531,25 @@ bool House::rotationEnabled() {
 }
 
 void House::drawFlag() {
-//    glMaterialfv(GL_FRONT, GL_SPECULAR, MATERIAL_BLACK);
-//    glMaterialf(GL_FRONT, GL_SHININESS, SHININESS_OFF);
-//
-//    Triangle triangles[] = {
-//            {
-//                    { -FLAG_WIDTH,  0, 0 },
-//                    { -FLAG_WIDTH, FLAG_HEIGHT, 0 },
-//                    { -FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
-//                    COLOR_FLAG
-//            },
-//            {
-//                    { FLAG_WIDTH, FLAG_HEIGHT, 0 },
-//                    { FLAG_WIDTH, 0, 0 },
-//                    { FLAG_WIDTH,  FLAG_HEIGHT/2, -FLAG_HEIGHT },
-//                    COLOR_FLAG
-//            }
-//    };
-//
-//    glPushMatrix();
-//    glTranslatef(0, ROOF_HEIGHT+CYLINDER_HEIGHT-FLAG_HEIGHT, 0);
-//    glRotatef(_flagAngle-_rotationX, 0, 1, 0);
-//    _utils.draw_prism(triangles[0], triangles[1]);
-//    glPopMatrix();
+
+    glm::mat4 ori{modelview};
+
+    // Rotazione intorno ad uno dei vertici. Notare che l'angolo va passato in radianti. Rotazione di 1 grado
+    modelview  = glm::translate(modelview, glm::vec3(0, ROOF_HEIGHT+CYLINDER_HEIGHT-FLAG_HEIGHT, 0));
+    modelview = glm::rotate(modelview, _flagAngle-_rotationX, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // Passa la matrice di modelview allo shader
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+
+    // draw door
+    _texture.enableTexture(true);
+    _texture.bind(TextureEnum::FLAG);
+    _flag.draw();
+    _texture.enableTexture(false);
+
+    // restore original matrix
+    modelview = ori;
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 }
 
 // flag cylinder
@@ -604,4 +612,6 @@ void House::init() {
     _chimLeft.init();
     _chimBack.init();
     _chimFront.init();
+
+    _flag.init();
 }

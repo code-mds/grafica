@@ -18,10 +18,10 @@
 
 class Solid {
 public:
+    explicit Solid(std::vector<Vertex> vertices, std::vector<GLuint> indices);
     ~Solid();
     void draw();
     void init();
-    explicit Solid(std::vector<Vertex> vertices, std::vector<GLuint> indices);
 
 protected:
     std::vector<GLuint> _indices;
