@@ -1,9 +1,5 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-
 #include <GL/glew.h>
 #ifdef __APPLE__
     // Headers richiesti da OSX
@@ -12,22 +8,20 @@
     // headers richiesti da Windows e linux
     #include <GL/glut.h>
 #endif
+
+// Librerie matematiche
+// Si usano i radianti (gli angoli in decimale sono deprecati)
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <stdlib.h>
 #include <iostream>
 
 // Funzioni per caricare, inizializzare e compilare gli shader
 #include "../shaders_loader.h"
 #include "Texture.h"
 #include "box.h"
-
-// Librerie matematiche
-// Si usano i radianti (gli angoli in decimale sono deprecati)
-#define GLM_FORCE_RADIANS
-
-#include <stack>
-
 
 // -------------------------------- VARIABILI GLOBALI ------------------------------- //
 static const GLfloat SW = 5.0f; //SCENE WIDTH
@@ -66,9 +60,8 @@ GLboolean _doorOpen = false;
 GLfloat PI_HALF = glm::pi<float>() / 2;
 GLfloat DOOR_STEP = 1 / 180.0f * glm::pi<float>();
 
-
-
 void initMenu();
+void reset();
 
 Box _door{std::vector<Vertex>{
         // front face
@@ -133,7 +126,6 @@ Box _wall{std::vector<Vertex>{
 
 GLint projectionPos, modelviewPos; // Riferimenti alle variabili uniform
 glm::mat4 projection, modelview; // Riferimenti alle matrici modelview e proiezione
-int mouseoldx, mouseoldy ; // Usate dai callback del mouse
 
 glm::vec3 initEyeloc = glm::vec3(0.0, 2.0, 6.0); // Posizione iniziale del punto di vista
 glm::vec3 direction = glm::vec3(0.0, 0.0, 0.0);;
@@ -153,7 +145,6 @@ void init() {
     initMenu();
     glEnable(GL_DEPTH_TEST);
     _texture.init();
-
     _door.init();
     _wall.init();
 
@@ -167,7 +158,7 @@ void init() {
     projection = glm::mat4(1.0f);
 
     // Definisce il punto di vista (posizione, dove guarda, upvector)
-    modelview = glm::lookAt(initEyeloc, direction, glm::vec3(0, 1, 1));
+    modelview = glm::lookAt(initEyeloc, direction, glm::vec3(0, 1, 0));
 
     // Leggi le posizioni delle variabili uniform
     projectionPos = glGetUniformLocation(shaderProgram, "projection_matrix");
@@ -252,51 +243,6 @@ void reshape(int w, int h)
     glUniformMatrix4fv(projectionPos, 1, GL_FALSE, &projection[0][0]);
 }
 
-
-// -------------------------------- EVENTI DEL MOUSE ------------------------------- //
-
-
-void mouse(int button, int state, int x, int y)
-{
-
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_UP) {
-            // Do Nothing ;
-        }
-        else if (state == GLUT_DOWN) {
-            mouseoldx = x ; mouseoldy = y ; // so we can move wrt x , y
-        }
-    }
-    else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-
-        // Resetta gluLookAt al valore iniziale
-        eyeloc = initEyeloc;
-        modelview = glm::lookAt(eyeloc, glm::vec3(0, 0, 0), glm::vec3(0, 1, 1));
-
-        // Invia la matrice aggiornata allo shader e ridisegna
-        glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
-        glutPostRedisplay() ;
-    }
-}
-
-void mousedrag(int x, int y) {
-    int xloc = x - mouseoldx;
-    int yloc = y - mouseoldy;    // si usa la coordinata y per definire lo zoom in/out
-
-    // Sposta il punto di vista di un fattore proporzionale allo spostamento del mouse
-    eyeloc += glm::vec3(-0.005*xloc, -0.005*yloc, +0.005*yloc);
-
-    if (yloc<0) yloc = 0;
-    mouseoldy = y ;
-
-    /* imposta nella modelview il nuovo punto di vista */
-    modelview = glm::lookAt(eyeloc, direction, glm::vec3(0, 1, 1));
-
-    // Invia la matrice aggiornata allo shader e ridisegna
-    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
-    glutPostRedisplay() ;
-}
-
 // -------------------------------- EVENTI DEL MOUSE E TASTIERA ------------------------------- //
 void keyboard (unsigned char key, int x, int y)
 {
@@ -307,6 +253,37 @@ void keyboard (unsigned char key, int x, int y)
             break ;
     }
 }
+
+void updateCamera() {
+    modelview = glm::lookAt(eyeloc, glm::vec3(0, 0, 0), glm::vec3(0, 1, 1));
+
+    // Invia la matrice aggiornata allo shader e ridisegna
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
+    glutPostRedisplay() ;
+}
+
+void specialKeyCallback(int key, int x, int y) {
+    switch (key) {
+        case GLUT_KEY_F12:
+            reset();
+            break;
+        case GLUT_KEY_LEFT:
+            eyeloc += glm::vec3(-0.5, 0, 0);
+            updateCamera();
+            break;
+        case GLUT_KEY_RIGHT:
+            eyeloc += glm::vec3(0.5, 0, 0);
+            updateCamera();
+            break;
+    }
+}
+
+void reset() {
+    // Resetta gluLookAt al valore iniziale
+    eyeloc = initEyeloc;
+    updateCamera();
+}
+
 
 // -------------------------------- MAIN ------------------------------- //
 int main(int argc, char** argv)
@@ -335,9 +312,7 @@ int main(int argc, char** argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape) ;
     glutKeyboardFunc(keyboard);
-    glutMouseFunc(mouse) ;
-    glutMotionFunc(mousedrag) ;
-
+    glutSpecialFunc(specialKeyCallback);
     glutTimerFunc(1000, TimerFunc, 1);
 
     glutMainLoop();
