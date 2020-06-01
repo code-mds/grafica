@@ -34,27 +34,14 @@
 
 #define MNU_SAVE_BMP 17
 #define MNU_TOGGLE_CLIPPLANE 16
-#define MNU_LIGHT_POS_2REL 15
-#define MNU_LIGHT_POS_1REL 14
-#define MNU_LIGHT_POS_2ABS 13
-#define MNU_TOGGLE_LIGHT2 12
-#define MNU_TOGGLE_LIGHT1 11
 #define MNU_RESET 10
-#define MNU_ORTHO 9
-#define MNU_PERSPECTIVE 8
-#define MNU_TOGGLE_WIND 7
-#define MNU_CHANGE_COLOR 6
 #define MNU_OPENCLOSE_DOOR 5
 #define MNU_STOP_HOUSE_ROTATION 4
 #define MNU_START_HOUSE_ROTATION 3
-#define MNU_TOGGLE_WIREFRAME 2
-#define MNU_TOGGLE_AXIS 1
-#define PROJ_ORTHOGRAPHIC 'a'
-#define PROJ_PERSPECTIVE 'p'
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-const int ANIM_MSEC = 50;
+const int ANIM_MSEC = 10;
 const int WIND_MSEC = 5000;
 const char ESCAPE = 27;
 
@@ -66,7 +53,7 @@ struct AppGlobals {
     // global variables
     GLfloat windAngle = 0.0;
     int mainWindowID = 0;
-    GLfloat fovy = 30;
+    GLfloat fovy = 45;
 
     Texture texture;
 
@@ -93,7 +80,6 @@ void displayCallback() {
     // draw house
     _app->house.draw();
 
-
     glClipPlane (GL_CLIP_PLANE0, _app->clip_plane_0);
     glutSwapBuffers();
 }
@@ -116,10 +102,14 @@ void animationCallback(int value) {
 
 void reshapeCallback(int w, int h) {
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+    reshape(w, h);
+}
+
+void reshape(int w, int h) {
     GLfloat aspect = (GLfloat)w/(h==0 ? 1.0 : h);
     // Imposta la matrice di proiezione di tipo prospettica
     // notare che l'angolo va passato in radianti
-    _app->projection = glm::perspective(_app->fovy / 180.0f * glm::pi<float>(), aspect, 1.0f, 10.0f);
+    _app->projection = glm::perspective(_app->fovy / 180.0f * glm::pi<float>(), aspect, 1.0f, 100.0f);
     glUniformMatrix4fv(_app->projectionPos, 1, GL_FALSE, &_app->projection[0][0]);
 }
 
@@ -176,12 +166,12 @@ void specialKeyCallback(int key, int x, int y) {
         case GLUT_KEY_F9:
             _app->fovy -= 1;
             log("fovy=" + std::to_string(_app->fovy));
-            //TODO reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
         case GLUT_KEY_F10:
             _app->fovy += 1;
             log("fovy=" + std::to_string(_app->fovy));
-            //TODO reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+            reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
             break;
 
         case GLUT_KEY_PAGE_DOWN:

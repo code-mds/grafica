@@ -387,8 +387,9 @@ void House::draw() {
     // save origina matrix
     glm::mat4 ori{modelview};
 
-    glTranslatef(_translationX, _translationY, _translationZ);
-    glRotatef(_rotationX, 0.0f, 1.0f, 0.0f);
+    modelview  = glm::translate(modelview, glm::vec3(-_translationX, _translationY, _translationZ));
+    modelview = glm::rotate(modelview, _rotationX, glm::vec3(0.0f, 1.0f, 0.0f));
+    glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 
     drawFloor();
     drawLateralWalls();
