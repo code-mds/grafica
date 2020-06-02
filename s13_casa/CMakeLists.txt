@@ -31,6 +31,15 @@ if(APPLE)
     if(NOT GLUT_FOUND)
         message(ERROR " GLUT not found!")
     endif(NOT GLUT_FOUND)
+
+    # GLEW
+    #########################################################
+    find_package(GLEW REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIR})
+    # GLFW.
+    #########################################################
+    find_package(GLFW3 REQUIRED)
+    include_directories(${GLFW3_INCLUDE_DIR})
 #endif(APPLE)
 #if(UNIX)
 #    message(INFO ": PLATFORM LINUX")
