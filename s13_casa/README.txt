@@ -5,8 +5,11 @@ Ambiente:
 - CLion 2019.3.4
 - MinGW 64 (x86_64-8.1.0-posix-seh-rt_v6-rev0)
 ----------------------------------------------
-ATTENZIONE: Nel file CMakeLists.txt è definito il percorso di freeglut e glew
-	    Nel mio caso C:/SUPSI/freeglut e C:/SUPSI/glew-2.1.0
+ATTENZIONE: Nel file CMakeLists.txt è definito il percorso di freeglut, glew e GLM
+	    Nel mio caso:
+		C:/SUPSI/opengl/freeglut
+		C:/SUPSI/opengl/glew-2.1.0
+		C:/SUPSI/opengl/glm-0.9.9.8
 	    Modificare il percorso per puntare al path corretto
 
 Pacchetto:
@@ -40,6 +43,9 @@ Pacchetto:
 Funzioni:
 
 *** NEW ***
+- Shader, indici EBO, glDrawElements
+
+*** OLD ***
 - 3 Textures: Wall, Door, Roof, Flag
 - Il programma cerca le seguenti immagini nella sottocartella images:
 	- images\roof_texture.bmp
@@ -47,10 +53,6 @@ Funzioni:
 	- images\wood_texture.bmp
 	- images\flag_texture.bmp
 
-*** NEW ***
-- Shader, indici EBO, glDrawElements
-
-*** OLD ***
 - Export as bmp (Right Click menu) salva framebuffer in "capture.bmp"
 - Reset (F12 / Right Click menu)
 

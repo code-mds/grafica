@@ -16,6 +16,9 @@ set(CMAKE_CXX_STANDARD 14)
 if(APPLE)
     message(INFO ": PLATFORM APPLE")
     include_directories("/usr/local/include")
+
+    # FIND OPENGL
+    #########################################################
     find_package(OpenGL REQUIRED)
     include_directories(${OpenGL_INCLUDE_DIRS})
     link_directories(${OpenGL_LIBRARY_DIRS})
@@ -24,6 +27,9 @@ if(APPLE)
         message(ERROR " OPENGL not found!")
     endif(NOT OPENGL_FOUND)
 
+    # FIND GLUT
+    # NOTA: in realtà si tratta della libreria FreeGLUT
+    #########################################################
     find_package(GLUT REQUIRED)
     include_directories(${GLUT_INCLUDE_DIRS})
     link_directories(${GLUT_LIBRARY_DIRS})
@@ -32,14 +38,31 @@ if(APPLE)
         message(ERROR " GLUT not found!")
     endif(NOT GLUT_FOUND)
 
+
+
     # GLEW
     #########################################################
-    find_package(GLEW REQUIRED)
+    find_package(GLEW)
     include_directories(${GLEW_INCLUDE_DIR})
+    link_libraries(${GLEW_LIBRARIES})
+    include_directories("/usr/local/include")
+    link_libraries("/usr/local/lib/libGLEW.a")
+
+
+
     # GLFW.
     #########################################################
     find_package(GLFW3 REQUIRED)
     include_directories(${GLFW3_INCLUDE_DIR})
+
+    # Set necessary libs.
+    set(REQUIRED_LIBS
+            ${GLUT_LIBRARY}
+            ${GLFW3_LIBRARIES}
+            ${GLEW_LIBRARIES}
+            ${OPENGL_LIBRARY}
+            )
+
 #endif(APPLE)
 #if(UNIX)
 #    message(INFO ": PLATFORM LINUX")
